@@ -1,0 +1,15 @@
+# python
+__pycache__/
+
+# editors
+.vscode
+
+# env
+.env
+env
+
+# wheels
+*.whl
+
+# data
+data
