@@ -7,7 +7,7 @@ from rioxarray._io import open_rasterio
 class GeotiffRaster:
     DATA_COLUMN_NAME = "reflectance"
 
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         self._raster = self._init_geotiff_raster(file_path)
 
     def __repr__(self):
@@ -53,6 +53,11 @@ class GeotiffRaster:
     @property
     def shape(self):
         return self._raster.shape
+
+
+class GeotiffRasterMulti:
+    def __init__(self, rasters: list[GeotiffRaster]):
+        self._rasters = rasters
 
 
 if __name__ == "__main__":

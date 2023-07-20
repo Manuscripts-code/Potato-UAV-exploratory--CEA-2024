@@ -8,7 +8,7 @@ class ShapefilePoints:
     X = "x"
     Y = "y"
 
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         self._shapefile = self._init_shapefile_points(file_path)
 
     def _init_shapefile_points(self, file_path):
@@ -25,7 +25,7 @@ class ShapefilePoints:
 
     @lru_cache(maxsize=None)
     def to_pandas(self):
-        return pd.DataFrame(shapefile._shapefile)
+        return pd.DataFrame(self._shapefile)
 
 
 if __name__ == "__main__":
@@ -33,4 +33,4 @@ if __name__ == "__main__":
 
     file = configs.SHAPEFILES_DIR / "oznake.shp"
     shapefile = ShapefilePoints(file)
-    print(shapefile._shapefile)
+    print(shapefile)
