@@ -33,7 +33,7 @@ class GeotiffRaster:
         return array
 
     @lru_cache(maxsize=None)
-    def to_dataframe(self):
+    def to_pandas(self):
         df = self._raster.to_dataframe().reset_index()
         df = df[df[self.DATA_COLUMN_NAME] != self.nodata]
         return df.reset_index(drop=True)
@@ -53,3 +53,15 @@ class GeotiffRaster:
     @property
     def shape(self):
         return self._raster.shape
+
+
+if __name__ == "__main__":
+    from configs import configs
+
+    file = (
+        configs.MUTISPECTRAL_DIR
+        / "2022_06_15__eko_ecobreed/Ecobreed_krompir_EKO_15_06_2022_transparent_reflectance_blue_modified.tif"
+    )
+
+    raster = GeotiffRaster(file)
+    print(raster)
