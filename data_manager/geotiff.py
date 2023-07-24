@@ -5,6 +5,8 @@ from rioxarray._io import open_rasterio
 
 
 class GeotiffRaster:
+    X = "x"
+    Y = "y"
     DATA_COLUMN_NAME = "reflectance"
 
     def __init__(self, file_path: str):

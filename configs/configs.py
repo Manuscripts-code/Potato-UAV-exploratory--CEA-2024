@@ -6,3 +6,7 @@ DATA_DIR = Path(BASE_DIR, "data")
 
 MUTISPECTRAL_DIR = Path(DATA_DIR, "multispectral_images")
 SHAPEFILES_DIR = Path(DATA_DIR, "shapefiles")
+
+SAVE_DIR = Path(BASE_DIR, "saved")
+SAVE_MERGED_DIR = Path(SAVE_DIR, "merged")
+
