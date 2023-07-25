@@ -2,6 +2,7 @@ from functools import lru_cache
 
 import numpy as np
 import pandas as pd
+from rich.progress import track
 from scipy.spatial import distance
 
 from configs import configs
@@ -26,7 +27,7 @@ class Merger:
         # TEMP!
         shapefile_df = self._shapefile.to_pandas()
         self.merged_df = shapefile_df.iloc[0:50].copy().reset_index(drop=True)
-        raster = self._rasters[0]
+        raster = self._rasters[1]
         #
 
         reflectance_list = self._extract_reflectances(
@@ -51,7 +52,9 @@ class Merger:
         reflectance_list = []
         coordinates_list = []
 
-        for _, row in shapefile_df.iterrows():
+        for _, row in track(
+            shapefile_df.iterrows(), description=f"Extracting reflectances for: {raster.name}"
+        ):
             row_coord = row[[self.shapefile_X, self.shapefile_Y]].to_numpy().astype(float)
             row_coord = np.expand_dims(row_coord, axis=0)
             n_closest_indices = self._get_closest_distance_indices(
@@ -73,7 +76,7 @@ class Merger:
         dist = distance.cdist(arr1, arr2, metric)
         indices = np.argpartition(dist, kth=n_closest, axis=0)[0:n_closest]
         # closest_values = np.sort(dist[indices], axis=0)
-        return indices.flatten()
+        return np.sort(indices.flatten())
 
     def _save_coords(self, coordinates_list, save_name=""):
         coordinates = np.concatenate(coordinates_list, axis=0)

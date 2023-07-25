@@ -10,11 +10,12 @@ class GeotiffRaster:
     Y = "y"
     DATA_COLUMN_NAME = "reflectance"
 
-    def __init__(self, raster: DataArray):
+    def __init__(self, raster: DataArray, *, name=""):
         self._raster = raster
+        self._name = name
 
     def __str__(self):
-        return f"<GeotiffRaster(shape={self._raster.shape})>"
+        return f"<GeotiffRaster(shape={self.shape}, name={self.name})>"
 
     def __len__(self):
         return len(self._raster)
@@ -27,9 +28,9 @@ class GeotiffRaster:
         return raster
 
     @classmethod
-    def from_path(cls, file_path):
+    def from_path(cls, file_path, name=""):
         raster = cls._init_geotiff_raster(file_path)
-        return cls(raster)
+        return cls(raster, name=name)
 
     @lru_cache(maxsize=None)
     def to_numpy(self, set_nodata_to_zero=True):
@@ -58,7 +59,7 @@ class GeotiffRaster:
 
     @property
     def name(self):
-        return self.path.stem
+        return self._name
 
     @property
     def shape(self):
@@ -81,9 +82,22 @@ class GeotiffRasterMulti:
     def add_raster(self, raster: GeotiffRaster):
         self._rasters.append(raster)
 
+    @staticmethod
+    def _from_paths_dict(file_paths: dict[str, str]):
+        return [GeotiffRaster.from_path(path, name) for name, path in file_paths.items()]
+
+    @staticmethod
+    def _from_paths_list(file_paths: list[str]):
+        return [GeotiffRaster.from_path(path) for path in file_paths]
+
     @classmethod
-    def from_paths(cls, file_paths: list[str]):
-        rasters = [GeotiffRaster.from_path(path) for path in file_paths]
+    def from_paths(cls, file_paths: list[str] | dict[str, str]):
+        if isinstance(file_paths, dict):
+            rasters = cls._from_paths_dict(file_paths)
+        elif isinstance(file_paths, list):
+            rasters = cls._from_paths_list(file_paths)
+        else:
+            raise ValueError(f"Invalid type: {type(file_paths)}")
         return cls(rasters)
 
 
@@ -94,7 +108,13 @@ if __name__ == "__main__":
     blue = base_path["blue"]
     green = base_path["green"]
 
-    raster = GeotiffRasterMulti.from_paths([blue, green])
+    # raster = GeotiffRasterMulti.from_paths([blue, green])
+
+    paths = {
+        "blue": blue,
+        "green": green,
+    }
+    raster = GeotiffRasterMulti.from_paths(paths)
     print(raster)
     for channel in raster:
         print(channel)
