@@ -1,7 +1,8 @@
 from functools import lru_cache
+from pathlib import Path
 
 import numpy as np
-from rioxarray._io import open_rasterio
+from rioxarray._io import DataArray, open_rasterio
 
 
 class GeotiffRaster:
@@ -9,23 +10,26 @@ class GeotiffRaster:
     Y = "y"
     DATA_COLUMN_NAME = "reflectance"
 
-    def __init__(self, file_path: str):
-        self._raster = self._init_geotiff_raster(file_path)
-
-    def __repr__(self):
-        return repr(self._raster)
+    def __init__(self, raster: DataArray):
+        self._raster = raster
 
     def __str__(self):
-        return str(self._raster)
+        return f"<GeotiffRaster(shape={self._raster.shape})>"
 
     def __len__(self):
         return len(self._raster)
 
-    def _init_geotiff_raster(self, file_path):
+    @staticmethod
+    def _init_geotiff_raster(file_path):
         raster = open_rasterio(file_path)
         raster = raster.squeeze().drop("spatial_ref").drop("band")
-        raster.name = self.DATA_COLUMN_NAME
+        raster.name = GeotiffRaster.DATA_COLUMN_NAME
         return raster
+
+    @classmethod
+    def from_path(cls, file_path):
+        raster = cls._init_geotiff_raster(file_path)
+        return cls(raster)
 
     @lru_cache(maxsize=None)
     def to_numpy(self, set_nodata_to_zero=True):
@@ -49,8 +53,12 @@ class GeotiffRaster:
         return self._raster
 
     @property
-    def file_path(self):
-        return self._raster.encoding["source"]
+    def path(self):
+        return Path(self._raster.encoding["source"])
+
+    @property
+    def name(self):
+        return self.path.stem
 
     @property
     def shape(self):
@@ -58,17 +66,35 @@ class GeotiffRaster:
 
 
 class GeotiffRasterMulti:
-    def __init__(self, rasters: list[GeotiffRaster]):
-        self._rasters = rasters
+    def __init__(self, rasters: list[GeotiffRaster] = None):
+        self._rasters = [] if rasters is None else rasters
+
+    def __str__(self):
+        return f"<GeotiffRasterMulti object with {len(self._rasters)} rasters>"
+
+    def __len__(self):
+        return len(self._rasters)
+
+    def __getitem__(self, index):
+        return self._rasters[index]
+
+    def add_raster(self, raster: GeotiffRaster):
+        self._rasters.append(raster)
+
+    @classmethod
+    def from_paths(cls, file_paths: list[str]):
+        rasters = [GeotiffRaster.from_path(path) for path in file_paths]
+        return cls(rasters)
 
 
 if __name__ == "__main__":
-    from configs import configs
+    from configs import specific_paths
 
-    file = (
-        configs.MUTISPECTRAL_DIR
-        / "2022_06_15__eko_ecobreed/Ecobreed_krompir_EKO_15_06_2022_transparent_reflectance_blue_modified.tif"
-    )
+    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"]["2022_06_15"]
+    blue = base_path["blue"]
+    green = base_path["green"]
 
-    raster = GeotiffRaster(file)
+    raster = GeotiffRasterMulti.from_paths([blue, green])
     print(raster)
+    for channel in raster:
+        print(channel)

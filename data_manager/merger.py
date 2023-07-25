@@ -1,19 +1,18 @@
 from functools import lru_cache
-from typing import NamedTuple
 
 import numpy as np
 import pandas as pd
 from scipy.spatial import distance
 
 from configs import configs
-from data_manager.geotiff import GeotiffRaster
+from data_manager.geotiff import GeotiffRaster, GeotiffRasterMulti
 from data_manager.shapefile import ShapefilePoints
 from utils.utils import ensure_dir
 
 
 class Merger:
-    def __init__(self, raster: GeotiffRaster, shapefile: ShapefilePoints):
-        self._raster = raster
+    def __init__(self, rasters: GeotiffRasterMulti, shapefile: ShapefilePoints):
+        self._rasters = rasters
         self._shapefile = shapefile
 
         self.shapefile_X = self._shapefile.X
@@ -27,15 +26,16 @@ class Merger:
         # TEMP!
         shapefile_df = self._shapefile.to_pandas()
         self.merged_df = shapefile_df.iloc[0:50].copy().reset_index(drop=True)
+        raster = self._rasters[0]
         #
 
         reflectance_list = self._extract_reflectances(
-            self._raster,
+            raster,
             self.merged_df,
             n_closest=10,
             save_coords=True,
         )
-        self.merged_df[self._raster.DATA_COLUMN_NAME] = reflectance_list
+        self.merged_df[raster.DATA_COLUMN_NAME] = reflectance_list
 
     def _extract_reflectances(
         self,
@@ -65,7 +65,7 @@ class Merger:
                 coordinates_list.append(coordinates[n_closest_indices])
 
         if save_coords:
-            self._save_coords(coordinates_list)
+            self._save_coords(coordinates_list, save_name=raster.name)
 
         return reflectance_list
 
@@ -75,21 +75,22 @@ class Merger:
         # closest_values = np.sort(dist[indices], axis=0)
         return indices.flatten()
 
-    def _save_coords(self, coordinates_list):
+    def _save_coords(self, coordinates_list, save_name=""):
         coordinates = np.concatenate(coordinates_list, axis=0)
         coordinates_df = pd.DataFrame(coordinates, columns=[self.shapefile_X, self.shapefile_Y])
-        coordinates_df.to_csv(self.save_dir / "coordinates_closest.csv", index=False)
+        coordinates_df.to_csv(self.save_dir / f"{save_name}_coordinates_closest.csv", index=False)
 
 
 if __name__ == "__main__":
-    file = configs.SHAPEFILES_DIR / "oznake.shp"
-    shapefile = ShapefilePoints(file)
+    from configs import specific_paths
 
-    file = (
-        configs.MUTISPECTRAL_DIR
-        / "2022_06_15__eko_ecobreed/Ecobreed_krompir_EKO_15_06_2022_transparent_reflectance_blue_modified.tif"
-    )
-    raster = GeotiffRaster(file)
+    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"]["2022_06_15"]
+    blue = base_path["blue"]
+    green = base_path["green"]
+    raster = GeotiffRasterMulti.from_paths([blue, green])
+
+    path_shape = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
+    shapefile = ShapefilePoints.from_path(path_shape)
 
     merger = Merger(raster, shapefile)
     merger.merged_data()

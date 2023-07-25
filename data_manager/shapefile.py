@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
@@ -8,29 +9,54 @@ class ShapefilePoints:
     X = "x"
     Y = "y"
 
-    def __init__(self, file_path: str):
-        self._shapefile = self._init_shapefile_points(file_path)
+    def __init__(self, shapefile: gpd.GeoDataFrame, *, name="", path=""):
+        self._shapefile = shapefile
+        self._name = name
+        self._path = Path(path)
 
-    def _init_shapefile_points(self, file_path):
-        shapefile = gpd.read_file(file_path)
-        shapefile = self._make_new_coordinates_columns(shapefile)
-        return shapefile
+    def __str__(self):
+        return f"<ShapefilePoints(shape={self._shapefile.shape})>"
 
-    def _make_new_coordinates_columns(self, shapefile):
+    @staticmethod
+    def _make_new_coordinates_columns(shapefile):
         x = lambda row: row.geometry.x
         y = lambda row: row.geometry.y
-        shapefile[self.X] = shapefile.apply(x, axis=1)
-        shapefile[self.Y] = shapefile.apply(y, axis=1)
+        shapefile[ShapefilePoints.X] = shapefile.apply(x, axis=1)
+        shapefile[ShapefilePoints.Y] = shapefile.apply(y, axis=1)
         return shapefile
+
+    @staticmethod
+    def _init_shapefile_points(file_path):
+        shapefile = gpd.read_file(file_path)
+        shapefile = ShapefilePoints._make_new_coordinates_columns(shapefile)
+        return shapefile
+
+    @classmethod
+    def from_path(cls, file_path):
+        shapefile = cls._init_shapefile_points(file_path)
+        kwargs = {"name": Path(file_path).stem, "path": str(file_path)}
+        return cls(shapefile, **kwargs)
 
     @lru_cache(maxsize=None)
     def to_pandas(self):
         return pd.DataFrame(self._shapefile)
 
+    @property
+    def file(self):
+        return self._shapefile
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def name(self):
+        return self._name
+
 
 if __name__ == "__main__":
-    from configs import configs
+    from configs import specific_paths
 
-    file = configs.SHAPEFILES_DIR / "oznake.shp"
-    shapefile = ShapefilePoints(file)
+    file = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
+    shapefile = ShapefilePoints.from_path(file)
     print(shapefile)
