@@ -21,22 +21,23 @@ class Merger:
 
         self.merged_df = None
         self.save_dir = ensure_dir(configs.SAVE_MERGED_DIR)
+        self.save_coords = configs.SAVE_COORDS
+        self.num_closest_points = configs.NUM_CLOSEST_POINTS
 
     @lru_cache(maxsize=None)
     def merged_data(self):
         # TEMP!
         shapefile_df = self._shapefile.to_pandas()
-        self.merged_df = shapefile_df.iloc[0:50].copy().reset_index(drop=True)
-        raster = self._rasters[1]
+        self.merged_df = shapefile_df.iloc[0:20].copy().reset_index(drop=True)
         #
-
-        reflectance_list = self._extract_reflectances(
-            raster,
-            self.merged_df,
-            n_closest=10,
-            save_coords=True,
-        )
-        self.merged_df[raster.DATA_COLUMN_NAME] = reflectance_list
+        for raster in self._rasters:
+            reflectance_list = self._extract_reflectances(
+                raster,
+                self.merged_df,
+                n_closest=self.num_closest_points,
+                save_coords=self.save_coords,
+            )
+            self.merged_df[raster.name] = reflectance_list
 
     def _extract_reflectances(
         self,
@@ -88,9 +89,11 @@ if __name__ == "__main__":
     from configs import specific_paths
 
     base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"]["2022_06_15"]
-    blue = base_path["blue"]
-    green = base_path["green"]
-    raster = GeotiffRasterMulti.from_paths([blue, green])
+    paths = {
+        "blue": base_path["blue"],
+        "green": base_path["green"],
+    }
+    raster = GeotiffRasterMulti.from_paths(paths)
 
     path_shape = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
     shapefile = ShapefilePoints.from_path(path_shape)
