@@ -5,7 +5,7 @@ import geopandas as gpd
 import pandas as pd
 
 
-class ShapefilePoints:
+class PointsShapefile:
     X = "x"
     Y = "y"
 
@@ -21,14 +21,14 @@ class ShapefilePoints:
     def _make_new_coordinates_columns(shapefile):
         x = lambda row: row.geometry.x
         y = lambda row: row.geometry.y
-        shapefile[ShapefilePoints.X] = shapefile.apply(x, axis=1)
-        shapefile[ShapefilePoints.Y] = shapefile.apply(y, axis=1)
+        shapefile[PointsShapefile.X] = shapefile.apply(x, axis=1)
+        shapefile[PointsShapefile.Y] = shapefile.apply(y, axis=1)
         return shapefile
 
     @staticmethod
     def _init_shapefile_points(file_path):
         shapefile = gpd.read_file(file_path)
-        shapefile = ShapefilePoints._make_new_coordinates_columns(shapefile)
+        shapefile = PointsShapefile._make_new_coordinates_columns(shapefile)
         return shapefile
 
     @classmethod
@@ -58,5 +58,5 @@ if __name__ == "__main__":
     from configs import specific_paths
 
     file = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
-    shapefile = ShapefilePoints.from_path(file)
+    shapefile = PointsShapefile.from_path(file)
     print(shapefile)

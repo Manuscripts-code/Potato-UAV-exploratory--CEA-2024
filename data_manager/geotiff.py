@@ -66,7 +66,7 @@ class GeotiffRaster:
         return self._raster.shape
 
 
-class GeotiffRasterMulti:
+class MultiGeotiffRaster:
     def __init__(self, rasters: list[GeotiffRaster] = None):
         self._rasters = [] if rasters is None else rasters
 
@@ -78,9 +78,6 @@ class GeotiffRasterMulti:
 
     def __getitem__(self, index):
         return self._rasters[index]
-
-    def add_raster(self, raster: GeotiffRaster):
-        self._rasters.append(raster)
 
     @staticmethod
     def _from_paths_dict(file_paths: dict[str, str]):
@@ -100,6 +97,9 @@ class GeotiffRasterMulti:
             raise ValueError(f"Invalid type: {type(file_paths)}")
         return cls(rasters)
 
+    def add_raster(self, raster: GeotiffRaster):
+        self._rasters.append(raster)
+
 
 if __name__ == "__main__":
     from configs import specific_paths
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         "blue": blue,
         "green": green,
     }
-    raster = GeotiffRasterMulti.from_paths(paths)
+    raster = MultiGeotiffRaster.from_paths(paths)
     print(raster)
     for channel in raster:
         print(channel)

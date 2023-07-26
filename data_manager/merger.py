@@ -6,13 +6,13 @@ from rich.progress import track
 from scipy.spatial import distance
 
 from configs import configs
-from data_manager.geotiff import GeotiffRaster, GeotiffRasterMulti
-from data_manager.shapefile import ShapefilePoints
+from data_manager.geotiff import GeotiffRaster, MultiGeotiffRaster
+from data_manager.shapefile import PointsShapefile
 from utils.utils import ensure_dir
 
 
-class Merger:
-    def __init__(self, rasters: GeotiffRasterMulti, shapefile: ShapefilePoints):
+class RasterPointsMerger:
+    def __init__(self, rasters: MultiGeotiffRaster, shapefile: PointsShapefile):
         self._rasters = rasters
         self._shapefile = shapefile
 
@@ -93,10 +93,10 @@ if __name__ == "__main__":
         "blue": base_path["blue"],
         "green": base_path["green"],
     }
-    raster = GeotiffRasterMulti.from_paths(paths)
+    raster = MultiGeotiffRaster.from_paths(paths)
 
     path_shape = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
-    shapefile = ShapefilePoints.from_path(path_shape)
+    shapefile = PointsShapefile.from_path(path_shape)
 
-    merger = Merger(raster, shapefile)
+    merger = RasterPointsMerger(raster, shapefile)
     merger.merged_data()
