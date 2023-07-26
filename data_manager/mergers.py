@@ -6,8 +6,8 @@ from rich.progress import track
 from scipy.spatial import distance
 
 from configs import configs
-from data_manager.geotiff import GeotiffRaster, MultiGeotiffRaster
-from data_manager.shapefile import PointsShapefile
+from data_manager.geotiffs import GeotiffRaster, MultiGeotiffRaster
+from data_manager.shapefiles import PointsShapefile
 from utils.utils import ensure_dir
 
 
@@ -129,7 +129,7 @@ class MultiRasterPointsMerger:
         self._mergers.extend(mergers)
         return self
 
-    def _run_separate_merges(self):
+    def run_merges(self):
         self._data_column_names = []
         self._merged_dfs = []
         for merger in self._mergers:
@@ -145,10 +145,6 @@ class MultiRasterPointsMerger:
         columns = {old_name: new_name for old_name, new_name in zip(rasters_channels, new_names)}
         merged_df.rename(columns=columns, inplace=True, errors="raise")
         return merged_df, new_names
-
-    def run_merge(self):
-        self._run_separate_merges()
-        pass
 
     @property
     def mergers(self):
@@ -200,4 +196,4 @@ if __name__ == "__main__":
     ###############
 
     mergers = MultiRasterPointsMerger().add_mergers([merger1, merger2])
-    mergers.run_merge()
+    mergers.run_merges()

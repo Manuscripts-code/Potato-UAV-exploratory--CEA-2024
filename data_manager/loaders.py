@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from rioxarray._io import open_rasterio
 
 from configs import configs
-from data_manager.geotiff import GeotiffRaster
+from data_manager.geotiffs import GeotiffRaster
 
 if __name__ == "__main__":
     file = (
