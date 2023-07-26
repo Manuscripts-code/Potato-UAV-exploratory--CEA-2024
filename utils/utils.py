@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import spectral as sp
+import toml
 
 
 def ensure_dir(dirname):
@@ -25,6 +26,12 @@ def write_json(content, fname):
     fname = Path(fname)
     with fname.open("wt") as handle:
         json.dump(content, handle, indent=4, sort_keys=False)
+
+
+def read_toml(fname):
+    fname = Path(fname)
+    with fname.open("rt") as handle:
+        return toml.load(handle)
 
 
 def write_txt(content, fname):
