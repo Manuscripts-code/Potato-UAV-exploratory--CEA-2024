@@ -113,7 +113,6 @@ class MultiRasterPointsMerger:
     def __init__(self, merger: list[RasterPointsMerger] = None):
         self._mergers = [] if merger is None else merger
         self._merged_dfs = None
-        self._multi_merged_df = None
         self._data_column_names = None
 
     def __str__(self):
@@ -153,10 +152,6 @@ class MultiRasterPointsMerger:
     @property
     def merged_dfs(self):
         return self._merged_dfs
-
-    @property
-    def multi_merged_df(self):
-        return self._multi_merged_df
 
     @property
     def data_column_names(self):

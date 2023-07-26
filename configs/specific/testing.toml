@@ -2,6 +2,6 @@
 
 ["multispectral"]
 imagings_dates = ["2022_06_15", "2022_07_11"]
-treatments = ["eko"]
+treatments = ["eko", "konv"]
 channels = ["blue", "green"]
 location_type = "measured"

@@ -18,22 +18,36 @@ class MultispectralLoader:
         self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
         self.cfg = configs.CONFIGS_TOML[self.ROOT]
 
-        self.mergers = None
-        self.multi_merger = None
+        self._mergers = None
+        self._multi_merger = None
+
+    def __str__(self):
+        return f"<MultispectralLoader object with {len(self._mergers)} mergers>"
 
     def load(self):
+        self.load_mergers()
+        self.run_merges()
+        self.final_merge()
+        return self
+
+    def load_mergers(self):
         dates, treatments, channels, location_type = self._get_configs()
-        self.mergers = []
+        self._mergers = []
         for date, treatment in product(dates, treatments):
             merger = self._create_merger(date, treatment, channels, location_type)
-            self.mergers.append(merger)
+            self._mergers.append(merger)
         return self
 
     def run_merges(self):
-        if self.mergers is None:
+        if self._mergers is None:
             raise ValueError("Mergers are not loaded.")
-        self.multi_merger = MultiRasterPointsMerger().add_mergers(self.mergers)
-        self.multi_merger.run_merges()
+        self._multi_merger = MultiRasterPointsMerger(self._mergers)
+        self._multi_merger.run_merges()
+        return self
+
+    def final_merge(self):
+        # TODO: implement
+        pass
         return self
 
     def _get_configs(self):
@@ -51,13 +65,19 @@ class MultispectralLoader:
         paths = {channel: base_path[channel] for channel in channels}
         raster = MultiGeotiffRaster.from_paths(paths)
         raster.set_name(date)
-
         path_shape = self.shapefiles_paths[treatment][location_type]
         shapefile = PointsShapefile.from_path(path_shape)
-
         return RasterPointsMerger(raster, shapefile)
+
+    @property
+    def mergers(self):
+        return self._multi_merger.mergers
+
+    @property
+    def merged_dfs(self):
+        return self._multi_merger.merged_dfs
 
 
 if __name__ == "__main__":
-    loader = MultispectralLoader().load().run_merges()
+    loader = MultispectralLoader().load()
     pass
