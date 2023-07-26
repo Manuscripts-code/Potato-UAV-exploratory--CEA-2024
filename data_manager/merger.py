@@ -85,29 +85,36 @@ class RasterPointsMerger:
         coordinates_df = pd.DataFrame(coordinates, columns=[self.shapefile_X, self.shapefile_Y])
         coordinates_df.to_csv(self.save_dir / f"{save_name}_coordinates_closest.csv", index=False)
 
-    def to_pandas(self):
+    def merged_df(self):
         return self._merged_df
-
-    @property
-    def rasters_paths(self):
-        return self._rasters.paths
-
-    @property
-    def shapefile_path(self):
-        return self._shapefile.path
 
     @property
     def rasters_name(self):
         return self._rasters.name
 
     @property
+    def rasters_paths(self):
+        return self._rasters.paths
+
+    @property
+    def rasters_channels(self):
+        return self._rasters.channels
+
+    @property
     def shapefile_name(self):
         return self._shapefile.name
+
+    @property
+    def shapefile_path(self):
+        return self._shapefile.path
 
 
 class MultiRasterPointsMerger:
     def __init__(self, merger: list[RasterPointsMerger] = None):
         self._mergers = [] if merger is None else merger
+        self._merged_dfs = None
+        self._multi_merged_df = None
+        self._data_column_names = None
 
     def __str__(self):
         return f"<MultiRasterPointsMerger object with {len(self._mergers)} mergers>"
@@ -122,9 +129,42 @@ class MultiRasterPointsMerger:
         self._mergers.extend(mergers)
         return self
 
+    def _run_separate_merges(self):
+        self._data_column_names = []
+        self._merged_dfs = []
+        for merger in self._mergers:
+            merged_df = merger.run_merge()
+            merged_df, new_names = self._change_column_names(
+                merged_df, merger.rasters_name, merger.rasters_channels
+            )
+            self._data_column_names.extend(new_names)
+            self._merged_dfs.append(merged_df)
+
+    def _change_column_names(self, merged_df, rasters_name, rasters_channels):
+        new_names = [f"{rasters_name}__{channel}" for channel in rasters_channels]
+        columns = {old_name: new_name for old_name, new_name in zip(rasters_channels, new_names)}
+        merged_df.rename(columns=columns, inplace=True, errors="raise")
+        return merged_df, new_names
+
+    def run_merge(self):
+        self._run_separate_merges()
+        pass
+
     @property
     def mergers(self):
         return self._mergers
+
+    @property
+    def merged_dfs(self):
+        return self._merged_dfs
+
+    @property
+    def multi_merged_df(self):
+        return self._multi_merged_df
+
+    @property
+    def data_column_names(self):
+        return self._data_column_names
 
 
 if __name__ == "__main__":
@@ -160,4 +200,4 @@ if __name__ == "__main__":
     ###############
 
     mergers = MultiRasterPointsMerger().add_mergers([merger1, merger2])
-    pass
+    mergers.run_merge()

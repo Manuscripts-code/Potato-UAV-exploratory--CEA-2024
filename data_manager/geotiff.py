@@ -10,9 +10,9 @@ class GeotiffRaster:
     Y = "y"
     DATA_COLUMN_NAME = "reflectance"
 
-    def __init__(self, raster: DataArray, *, name=""):
+    def __init__(self, raster: DataArray, *, name=None):
         self._raster = raster
-        self._name = name
+        self._name = name if name is not None else self.DATA_COLUMN_NAME
 
     def __str__(self):
         return f"<GeotiffRaster(shape={self.shape}, name={self.name})>"
@@ -108,6 +108,10 @@ class MultiGeotiffRaster:
     @property
     def paths(self):
         return [raster.path for raster in self._rasters]
+
+    @property
+    def channels(self):
+        return [raster.name for raster in self._rasters]
 
 
 if __name__ == "__main__":
