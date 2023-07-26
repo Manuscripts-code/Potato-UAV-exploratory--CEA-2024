@@ -19,25 +19,26 @@ class RasterPointsMerger:
         self.shapefile_X = self._shapefile.X
         self.shapefile_Y = self._shapefile.Y
 
-        self.merged_df = None
+        self._merged_df = None
         self.save_dir = ensure_dir(configs.SAVE_MERGED_DIR)
         self.save_coords = configs.SAVE_COORDS
         self.num_closest_points = configs.NUM_CLOSEST_POINTS
 
     @lru_cache(maxsize=None)
-    def merged_data(self):
+    def run_merge(self):
         # TEMP!
         shapefile_df = self._shapefile.to_pandas()
-        self.merged_df = shapefile_df.iloc[0:20].copy().reset_index(drop=True)
+        self._merged_df = shapefile_df.iloc[0:4].copy().reset_index(drop=True)
         #
         for raster in self._rasters:
             reflectance_list = self._extract_reflectances(
                 raster,
-                self.merged_df,
+                self._merged_df,
                 n_closest=self.num_closest_points,
                 save_coords=self.save_coords,
             )
-            self.merged_df[raster.name] = reflectance_list
+            self._merged_df[raster.name] = reflectance_list
+        return self._merged_df
 
     def _extract_reflectances(
         self,
@@ -84,19 +85,79 @@ class RasterPointsMerger:
         coordinates_df = pd.DataFrame(coordinates, columns=[self.shapefile_X, self.shapefile_Y])
         coordinates_df.to_csv(self.save_dir / f"{save_name}_coordinates_closest.csv", index=False)
 
+    def to_pandas(self):
+        return self._merged_df
+
+    @property
+    def rasters_paths(self):
+        return self._rasters.paths
+
+    @property
+    def shapefile_path(self):
+        return self._shapefile.path
+
+    @property
+    def rasters_name(self):
+        return self._rasters.name
+
+    @property
+    def shapefile_name(self):
+        return self._shapefile.name
+
+
+class MultiRasterPointsMerger:
+    def __init__(self, merger: list[RasterPointsMerger] = None):
+        self._mergers = [] if merger is None else merger
+
+    def __str__(self):
+        return f"<MultiRasterPointsMerger object with {len(self._mergers)} mergers>"
+
+    def __len__(self):
+        return len(self._mergers)
+
+    def __getitem__(self, index):
+        return self._mergers[index]
+
+    def add_mergers(self, mergers: list[RasterPointsMerger]):
+        self._mergers.extend(mergers)
+        return self
+
+    @property
+    def mergers(self):
+        return self._mergers
+
 
 if __name__ == "__main__":
     from configs import specific_paths
 
-    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"]["2022_06_15"]
+    date = "2022_06_15"
+    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"][date]
     paths = {
         "blue": base_path["blue"],
         "green": base_path["green"],
     }
     raster = MultiGeotiffRaster.from_paths(paths)
+    raster.set_name(date)
 
     path_shape = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
     shapefile = PointsShapefile.from_path(path_shape)
 
-    merger = RasterPointsMerger(raster, shapefile)
-    merger.merged_data()
+    merger1 = RasterPointsMerger(raster, shapefile)
+
+    ###############
+
+    date = "2022_07_11"
+    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"][date]
+    paths = {
+        "blue": base_path["blue"],
+        "green": base_path["green"],
+    }
+    raster = MultiGeotiffRaster.from_paths(paths)
+    raster.set_name(date)
+
+    merger2 = RasterPointsMerger(raster, shapefile)
+
+    ###############
+
+    mergers = MultiRasterPointsMerger().add_mergers([merger1, merger2])
+    pass

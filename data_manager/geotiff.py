@@ -69,9 +69,10 @@ class GeotiffRaster:
 class MultiGeotiffRaster:
     def __init__(self, rasters: list[GeotiffRaster] = None):
         self._rasters = [] if rasters is None else rasters
+        self._name = ""
 
     def __str__(self):
-        return f"<GeotiffRasterMulti object with {len(self._rasters)} rasters>"
+        return f"<MultiGeotiffRaster object with {len(self._rasters)} rasters>"
 
     def __len__(self):
         return len(self._rasters)
@@ -97,8 +98,16 @@ class MultiGeotiffRaster:
             raise ValueError(f"Invalid type: {type(file_paths)}")
         return cls(rasters)
 
-    def add_raster(self, raster: GeotiffRaster):
-        self._rasters.append(raster)
+    def set_name(self, name):
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def paths(self):
+        return [raster.path for raster in self._rasters]
 
 
 if __name__ == "__main__":

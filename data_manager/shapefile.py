@@ -15,7 +15,7 @@ class PointsShapefile:
         self._path = Path(path)
 
     def __str__(self):
-        return f"<ShapefilePoints(shape={self._shapefile.shape})>"
+        return f"<PointsShapefile(shape={self._shapefile.shape})>"
 
     @staticmethod
     def _make_new_coordinates_columns(shapefile):
