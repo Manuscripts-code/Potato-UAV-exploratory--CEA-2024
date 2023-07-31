@@ -21,7 +21,7 @@ PATHS_MULTISPECTRAL_IMAGES = {
             ),
             "red_edge": str(
                 configs.MUTISPECTRAL_DIR
-                / "2022_06_15__eko_ecobreed/Ecobreed_krompir_EKO_15_06_2022_transparent_reflectance_red_edge_modified.tif"
+                / "2022_06_15__eko_ecobreed/Ecobreed_krompir_EKO_15_06_2022_transparent_reflectance_red edge_modified.tif"
             ),
             "red": str(
                 configs.MUTISPECTRAL_DIR
@@ -43,7 +43,7 @@ PATHS_MULTISPECTRAL_IMAGES = {
             ),
             "red_edge": str(
                 configs.MUTISPECTRAL_DIR
-                / "2022_07_11__eko_ecobreed/Ecobreed_krompir_eko_11_07_2022_transparent_reflectance_red_edge_modified.tif"
+                / "2022_07_11__eko_ecobreed/Ecobreed_krompir_eko_11_07_2022_transparent_reflectance_red edge_modified.tif"
             ),
             "red": str(
                 configs.MUTISPECTRAL_DIR
@@ -65,7 +65,7 @@ PATHS_MULTISPECTRAL_IMAGES = {
             ),
             "red_edge": str(
                 configs.MUTISPECTRAL_DIR
-                / "2022_07_20__eko_ecobreed/Ecobreed_krompir_eko_20_07_2022_transparent_reflectance_red_edge_modified.tif"
+                / "2022_07_20__eko_ecobreed/Ecobreed_krompir_eko_20_07_2022_transparent_reflectance_red edge_modified.tif"
             ),
             "red": str(
                 configs.MUTISPECTRAL_DIR
@@ -89,7 +89,7 @@ PATHS_MULTISPECTRAL_IMAGES = {
             ),
             "red_edge": str(
                 configs.MUTISPECTRAL_DIR
-                / "2022_06_15__konv_ecobreed/Ecobreed_krompir_KONV_15_06_2022_transparent_reflectance_red_edge_modified.tif"
+                / "2022_06_15__konv_ecobreed/Ecobreed_krompir_KONV_15_06_2022_transparent_reflectance_red edge_modified.tif"
             ),
             "red": str(
                 configs.MUTISPECTRAL_DIR
@@ -111,7 +111,7 @@ PATHS_MULTISPECTRAL_IMAGES = {
             ),
             "red_edge": str(
                 configs.MUTISPECTRAL_DIR
-                / "2022_07_11__konv_ecobreed/Ecobreed_krompir_konv_11_07_2022_transparent_reflectance_red_edge_modified.tif"
+                / "2022_07_11__konv_ecobreed/Ecobreed_krompir_konv_11_07_2022_transparent_reflectance_red edge_modified.tif"
             ),
             "red": str(
                 configs.MUTISPECTRAL_DIR
@@ -133,7 +133,7 @@ PATHS_MULTISPECTRAL_IMAGES = {
             ),
             "red_edge": str(
                 configs.MUTISPECTRAL_DIR
-                / "2022_07_20__konv_ecobreed/Ecobreed_krompir_konv_20_07_2022_transparent_reflectance_red_edge_modified.tif"
+                / "2022_07_20__konv_ecobreed/Ecobreed_krompir_konv_20_07_2022_transparent_reflectance_red edge_modified.tif"
             ),
             "red": str(
                 configs.MUTISPECTRAL_DIR

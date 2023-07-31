@@ -1,7 +1,7 @@
 # this is testing file
 
 ["multispectral"]
-imagings_dates = ["2022_06_15", "2022_07_11"]
+imagings_dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
 treatments = ["eko", "konv"]
-channels = ["blue", "green"]
+channels = ["blue", "green", "nir", "red_edge", "red"]
 location_type = "measured"
