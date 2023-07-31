@@ -1,4 +1,7 @@
+from dataclasses import dataclass
 from itertools import product
+
+import pandas as pd
 
 from configs import configs, specific_paths
 from data_manager.geotiffs import MultiGeotiffRaster
@@ -6,20 +9,32 @@ from data_manager.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_manager.shapefiles import PointsShapefile
 
 
+@dataclass
+class StructuredData:
+    data: pd.DataFrame
+    meta: pd.DataFrame
+    target: pd.DataFrame = None
+
+
 class MultispectralLoader:
+    # settings coupled to /configs/specific/*.toml files and original labels in shapefiles
     ROOT = "multispectral"
     DATES = "imagings_dates"
     TREATMENTS = "treatments"
     CHANNELS = "channels"
     LOCATION_TYPE = "location_type"
+    COLUMNS_SLO = ["Blok", "Rastlina", "Sorta"]
+    COLUMNS_ENG = ["blocks", "plants", "varieties"]
 
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
         self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
         self.cfg = configs.CONFIGS_TOML[self.ROOT]
+        self.dates, self.treatments, self.channels, self.location_type = 4 * [None]
 
         self._mergers = None
         self._multi_merger = None
+        self._structured_data = None
 
     def __str__(self):
         return f"<MultispectralLoader object with {len(self._mergers)} mergers>"
@@ -31,24 +46,48 @@ class MultispectralLoader:
         return self
 
     def load_mergers(self):
-        dates, treatments, channels, location_type = self._get_configs()
+        self.dates, self.treatments, self.channels, self.location_type = self._get_configs()
         self._mergers = []
-        for date, treatment in product(dates, treatments):
-            merger = self._create_merger(date, treatment, channels, location_type)
+        for date, treatment in product(self.dates, self.treatments):
+            merger = self._create_merger(date, treatment, self.channels, self.location_type)
             self._mergers.append(merger)
-        return self
 
     def run_merges(self):
         if self._mergers is None:
             raise ValueError("Mergers are not loaded.")
         self._multi_merger = MultiRasterPointsMerger(self._mergers)
         self._multi_merger.run_merges()
-        return self
 
     def final_merge(self):
-        # TODO: implement
-        pass
-        return self
+        columns_meta = self.COLUMNS_SLO + [self.TREATMENTS, self.DATES]
+        columns_data = self.channels
+
+        df_meta_merged = pd.DataFrame(columns=columns_meta)
+        df_data_merged = pd.DataFrame(columns=columns_data)
+
+        for merged_df in self.merged_dfs:
+            df_data, treatment, date = self._extract_data(merged_df)
+            df_meta = self._extract_meta(merged_df, treatment, date, columns_meta)
+            df_data_merged = pd.concat([df_data_merged, df_data], axis=0)
+            df_meta_merged = pd.concat([df_meta_merged, df_meta], axis=0)
+
+        columns = {old_name: new_name for old_name, new_name in zip(self.COLUMNS_SLO, self.COLUMNS_ENG)}
+        df_meta_merged.rename(columns=columns, inplace=True, errors="raise")
+        df_data_merged.reset_index(drop=True, inplace=True)
+        df_meta_merged.reset_index(drop=True, inplace=True)
+        self._structured_data = StructuredData(data=df_data_merged, meta=df_meta_merged)
+
+    def _extract_data(self, merged_df):
+        df_data = merged_df.loc[:, merged_df.columns.isin(self.data_column_names)]
+        treatment, date = df_data.columns[0].split("__")[:2]
+        channels = [column.split("__")[2] for column in df_data.columns]
+        df_data.columns = channels
+        return df_data, treatment, date
+
+    def _extract_meta(self, merged_df, treatment, date, columns_meta):
+        merged_df[[self.TREATMENTS, self.DATES]] = [treatment, date]
+        df_meta = merged_df.loc[:, merged_df.columns.isin(columns_meta)]
+        return df_meta
 
     def _get_configs(self):
         try:
@@ -64,7 +103,7 @@ class MultispectralLoader:
         base_path = self.rasters_paths[treatment][date]
         paths = {channel: base_path[channel] for channel in channels}
         raster = MultiGeotiffRaster.from_paths(paths)
-        raster.set_name(date)
+        raster.set_name("".join([treatment, "__", date]))
         path_shape = self.shapefiles_paths[treatment][location_type]
         shapefile = PointsShapefile.from_path(path_shape)
         return RasterPointsMerger(raster, shapefile)
@@ -76,6 +115,14 @@ class MultispectralLoader:
     @property
     def merged_dfs(self):
         return self._multi_merger.merged_dfs
+
+    @property
+    def data_column_names(self):
+        return self._multi_merger.data_column_names
+
+    @property
+    def structured_data(self):
+        return self._structured_data
 
 
 if __name__ == "__main__":

@@ -19,10 +19,12 @@ class PointsShapefile:
 
     @staticmethod
     def _make_new_coordinates_columns(shapefile):
-        x = lambda row: row.geometry.x
-        y = lambda row: row.geometry.y
-        shapefile[PointsShapefile.X] = shapefile.apply(x, axis=1)
-        shapefile[PointsShapefile.Y] = shapefile.apply(y, axis=1)
+        if shapefile.geometry.iloc[0].geom_type == "Point":
+            shapefile[PointsShapefile.X] = shapefile.geometry.x
+            shapefile[PointsShapefile.Y] = shapefile.geometry.y
+        elif shapefile.geometry.iloc[0].geom_type == "MultiPoint":
+            shapefile[PointsShapefile.X] = shapefile.geometry.centroid.x
+            shapefile[PointsShapefile.Y] = shapefile.geometry.centroid.y
         return shapefile
 
     @staticmethod
