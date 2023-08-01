@@ -1,4 +1,3 @@
-from functools import lru_cache
 from pathlib import Path
 
 import geopandas as gpd
@@ -39,7 +38,6 @@ class PointsShapefile:
         kwargs = {"name": Path(file_path).stem, "path": str(file_path)}
         return cls(shapefile, **kwargs)
 
-    @lru_cache(maxsize=None)
     def to_pandas(self):
         return pd.DataFrame(self._shapefile)
 

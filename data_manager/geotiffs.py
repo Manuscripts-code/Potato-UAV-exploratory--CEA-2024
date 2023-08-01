@@ -1,4 +1,3 @@
-from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -32,14 +31,12 @@ class GeotiffRaster:
         raster = cls._init_geotiff_raster(file_path)
         return cls(raster, name=name)
 
-    @lru_cache(maxsize=None)
     def to_numpy(self, set_nodata_to_zero=True):
         array = self._raster.to_numpy()
         if set_nodata_to_zero:
             array[np.where(array == self.nodata)] = 0
         return array
 
-    @lru_cache(maxsize=None)
     def to_pandas(self):
         df = self._raster.to_dataframe().reset_index()
         df = df[df[self.DATA_COLUMN_NAME] != self.nodata]

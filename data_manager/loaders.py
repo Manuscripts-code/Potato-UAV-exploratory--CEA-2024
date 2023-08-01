@@ -3,10 +3,11 @@ from itertools import product
 
 import pandas as pd
 
-from configs import configs, specific_paths
+from configs.global_enums import MultispectralEnum
 from data_manager.geotiffs import MultiGeotiffRaster
 from data_manager.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_manager.shapefiles import PointsShapefile
+from utils.config_parser import MultispectralConfig
 
 
 @dataclass
@@ -17,20 +18,14 @@ class StructuredData:
 
 
 class MultispectralLoader:
-    # settings coupled to /configs/specific/*.toml files and original labels in shapefiles
-    ROOT = "multispectral"
-    DATES = "imagings_dates"
-    TREATMENTS = "treatments"
-    CHANNELS = "channels"
-    LOCATION_TYPE = "location_type"
-    COLUMNS_SLO = ["Blok", "Rastlina", "Sorta"]
-    COLUMNS_ENG = ["blocks", "plants", "varieties"]
-
-    def __init__(self):
-        self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
-        self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
-        self.cfg = configs.CONFIGS_TOML[self.ROOT]
-        self.dates, self.treatments, self.channels, self.location_type = 4 * [None]
+    def __init__(self, multispectral_config: MultispectralConfig):
+        self.rasters_paths, self.shapefiles_paths = multispectral_config.parse_specific_paths()
+        (
+            self.dates,
+            self.treatments,
+            self.channels,
+            self.location_type,
+        ) = multispectral_config.parse_toml_config()
 
         self._mergers = None
         self._multi_merger = None
@@ -46,7 +41,6 @@ class MultispectralLoader:
         return self
 
     def load_mergers(self):
-        self.dates, self.treatments, self.channels, self.location_type = self._get_configs()
         self._mergers = []
         for date, treatment in product(self.dates, self.treatments):
             merger = self._create_merger(date, treatment, self.channels, self.location_type)
@@ -59,7 +53,10 @@ class MultispectralLoader:
         self._multi_merger.run_merges()
 
     def final_merge(self):
-        columns_meta = self.COLUMNS_SLO + [self.TREATMENTS, self.DATES]
+        columns_meta = MultispectralEnum.COLUMNS_SLO.value + [
+            MultispectralEnum.TREATMENTS.value,
+            MultispectralEnum.DATES.value,
+        ]
         columns_data = self.channels
 
         df_meta_merged = pd.DataFrame(columns=columns_meta)
@@ -71,7 +68,12 @@ class MultispectralLoader:
             df_data_merged = pd.concat([df_data_merged, df_data], axis=0)
             df_meta_merged = pd.concat([df_meta_merged, df_meta], axis=0)
 
-        columns = {old_name: new_name for old_name, new_name in zip(self.COLUMNS_SLO, self.COLUMNS_ENG)}
+        columns = {
+            old_name: new_name
+            for old_name, new_name in zip(
+                MultispectralEnum.COLUMNS_SLO.value, MultispectralEnum.COLUMNS_ENG.value
+            )
+        }
         df_meta_merged.rename(columns=columns, inplace=True, errors="raise")
         df_data_merged.reset_index(drop=True, inplace=True)
         df_meta_merged.reset_index(drop=True, inplace=True)
@@ -85,19 +87,12 @@ class MultispectralLoader:
         return df_data, treatment, date
 
     def _extract_meta(self, merged_df, treatment, date, columns_meta):
-        merged_df[[self.TREATMENTS, self.DATES]] = [treatment, date]
+        merged_df[[MultispectralEnum.TREATMENTS.value, MultispectralEnum.DATES.value]] = [
+            treatment,
+            date,
+        ]
         df_meta = merged_df.loc[:, merged_df.columns.isin(columns_meta)]
         return df_meta
-
-    def _get_configs(self):
-        try:
-            dates = self.cfg[self.DATES]
-            treatments = self.cfg[self.TREATMENTS]
-            channels = self.cfg[self.CHANNELS]
-            location_type = self.cfg[self.LOCATION_TYPE]
-        except KeyError:
-            raise KeyError("Missing key in config file.")
-        return dates, treatments, channels, location_type
 
     def _create_merger(self, date, treatment, channels, location_type):
         base_path = self.rasters_paths[treatment][date]
@@ -126,5 +121,10 @@ class MultispectralLoader:
 
 
 if __name__ == "__main__":
-    loader = MultispectralLoader().load()
+    from utils.config_parser import ConfigParser
+
+    config_parser = ConfigParser()
+    multispectral_config = config_parser.get_multispectral_configs()
+
+    loader = MultispectralLoader(multispectral_config).load()
     pass

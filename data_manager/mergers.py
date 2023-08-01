@@ -1,5 +1,3 @@
-from functools import lru_cache
-
 import numpy as np
 import pandas as pd
 from rich.progress import track
@@ -24,7 +22,6 @@ class RasterPointsMerger:
         self.save_coords = configs.SAVE_COORDS
         self.num_closest_points = configs.NUM_CLOSEST_POINTS
 
-    @lru_cache(maxsize=None)
     def run_merge(self):
         # TEMP!
         shapefile_df = self._shapefile.to_pandas()
