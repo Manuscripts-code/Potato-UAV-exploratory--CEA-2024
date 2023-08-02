@@ -1,7 +1,7 @@
 from zenml import pipeline
 
 from configs import configs
-from pipelines.steps import data_loader, data_sampler
+from steps import data_loader, data_sampler
 from utils.config_parser import ConfigParser
 
 
