@@ -8,6 +8,7 @@ from data_manager.geotiffs import MultiGeotiffRaster
 from data_manager.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_manager.shapefiles import PointsShapefile
 from utils.config_parser import MultispectralConfig
+from utils.utils import ensure_dir
 
 
 @dataclass
@@ -18,7 +19,18 @@ class StructuredData:
 
 
 class MultispectralLoader:
-    def __init__(self, multispectral_config: MultispectralConfig):
+    def __init__(
+        self,
+        multispectral_config: MultispectralConfig,
+        *,
+        save_dir="saved",
+        save_coords=False,
+        num_closest_points=1,
+    ):
+        self.save_dir = ensure_dir(save_dir)
+        self.save_coords = save_coords
+        self.num_closest_points = num_closest_points
+
         self.rasters_paths, self.shapefiles_paths = multispectral_config.parse_specific_paths()
         (
             self.dates,
@@ -101,7 +113,13 @@ class MultispectralLoader:
         raster.set_name("".join([treatment, "__", date]))
         path_shape = self.shapefiles_paths[treatment][location_type]
         shapefile = PointsShapefile.from_path(path_shape)
-        return RasterPointsMerger(raster, shapefile)
+        return RasterPointsMerger(
+            raster,
+            shapefile,
+            save_dir=self.save_dir,
+            save_coords=self.save_coords,
+            num_closest_points=self.num_closest_points,
+        )
 
     @property
     def mergers(self):

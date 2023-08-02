@@ -3,14 +3,21 @@ import pandas as pd
 from rich.progress import track
 from scipy.spatial import distance
 
-from configs import configs
 from data_manager.geotiffs import GeotiffRaster, MultiGeotiffRaster
 from data_manager.shapefiles import PointsShapefile
 from utils.utils import ensure_dir
 
 
 class RasterPointsMerger:
-    def __init__(self, rasters: MultiGeotiffRaster, shapefile: PointsShapefile):
+    def __init__(
+        self,
+        rasters: MultiGeotiffRaster,
+        shapefile: PointsShapefile,
+        *,
+        save_dir="saved",
+        save_coords=False,
+        num_closest_points=1,
+    ):
         self._rasters = rasters
         self._shapefile = shapefile
 
@@ -18,9 +25,9 @@ class RasterPointsMerger:
         self.shapefile_Y = self._shapefile.Y
 
         self._merged_df = None
-        self.save_dir = ensure_dir(configs.SAVE_MERGED_DIR)
-        self.save_coords = configs.SAVE_COORDS
-        self.num_closest_points = configs.NUM_CLOSEST_POINTS
+        self.save_dir = ensure_dir(save_dir)
+        self.save_coords = save_coords
+        self.num_closest_points = num_closest_points
 
     def run_merge(self):
         # TEMP!

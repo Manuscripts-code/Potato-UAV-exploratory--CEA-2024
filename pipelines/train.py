@@ -1,15 +1,16 @@
 from zenml import pipeline
 
-from pipelines.steps import data_loader
+from configs import configs
+from pipelines.steps import data_loader, data_sampler
 from utils.config_parser import ConfigParser
 
 
-@pipeline(enable_cache=True)
+@pipeline(enable_cache=configs.CACHING)
 def train_and_register_model_pipeline() -> None:
     config_parser = ConfigParser()
     multispectral_config = config_parser.get_multispectral_configs()
     structured_data = data_loader(multispectral_config)
-    pass
+    structured_data = data_sampler(structured_data)
 
 
 if __name__ == "__main__":
