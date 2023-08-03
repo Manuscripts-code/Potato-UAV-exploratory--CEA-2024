@@ -4,7 +4,6 @@ from itertools import product
 import pandas as pd
 
 from configs import configs
-from configs.global_enums import MultispectralConfigEnum
 from configs.parser import GeneralConfig, MultispectralConfig
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
@@ -27,7 +26,6 @@ class MultispectralLoader:
         *,
         save_dir="saved",
         save_coords=False,
-        num_closest_points=1,
     ):
         self.save_dir = ensure_dir(save_dir)
         self.save_coords = save_coords
@@ -67,10 +65,7 @@ class MultispectralLoader:
         self._multi_merger.run_merges()
 
     def final_merge(self):
-        columns_meta = MultispectralConfigEnum.COLUMNS_SLO.value + [
-            MultispectralConfigEnum.TREATMENTS.value,
-            MultispectralConfigEnum.DATES.value,
-        ]
+        columns_meta = configs.COLUMNS_SLO + [configs.TREATMENTS, configs.DATES]
         columns_data = self.channels
 
         df_meta_merged = pd.DataFrame(columns=columns_meta)
@@ -83,10 +78,7 @@ class MultispectralLoader:
             df_meta_merged = pd.concat([df_meta_merged, df_meta], axis=0)
 
         columns = {
-            old_name: new_name
-            for old_name, new_name in zip(
-                MultispectralConfigEnum.COLUMNS_SLO.value, MultispectralConfigEnum.COLUMNS_ENG.value
-            )
+            old_name: new_name for old_name, new_name in zip(configs.COLUMNS_SLO, configs.COLUMNS_ENG)
         }
         df_meta_merged.rename(columns=columns, inplace=True, errors="raise")
         df_data_merged.reset_index(drop=True, inplace=True)
@@ -101,7 +93,7 @@ class MultispectralLoader:
         return df_data, treatment, date
 
     def _extract_meta(self, merged_df, treatment, date, columns_meta):
-        merged_df[[MultispectralConfigEnum.TREATMENTS.value, MultispectralConfigEnum.DATES.value]] = [
+        merged_df[[configs.TREATMENTS, configs.DATES]] = [
             treatment,
             date,
         ]

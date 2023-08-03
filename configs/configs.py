@@ -25,3 +25,9 @@ GENERAL_CFG_NAME = "general"
 MULTISPECTRAL_CFG_NAME = "multispectral"
 SAMPLER_CFG_NAME = "sampler"
 FORMATTER_CFG_NAME = "formatter"
+
+# MULTISPECTRAL LOADER CONFIG
+DATES = "dates"
+TREATMENTS = "treatments"
+COLUMNS_SLO = ["Blok", "Rastlina", "Sorta"]
+COLUMNS_ENG = ["blocks", "plants", "varieties"]

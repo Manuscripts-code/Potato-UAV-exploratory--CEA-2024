@@ -3,10 +3,9 @@ import logging
 from zenml import step
 
 from configs import configs
-from configs.global_enums import SamplerConfigEnum
+from configs.parser import SamplerConfig
 from data_manager import samplers
 from data_manager.loaders import StructuredData
-from configs.parser import SamplerConfig
 from utils.utils import init_object
 
 SPLITTERS_OPT = {
