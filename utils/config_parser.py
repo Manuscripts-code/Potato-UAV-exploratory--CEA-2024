@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 from configs import configs, global_enums, specific_paths
 
@@ -6,13 +6,11 @@ TYPE_DICT2 = dict[str, dict[str, str]]
 TYPE_DICT3 = dict[str, dict[str, dict[str, str]]]
 
 
-@dataclass
-class GeneralConfig:
+class GeneralConfig(BaseModel):
     num_closest_points: int
 
 
-@dataclass
-class MultispectralConfig:
+class MultispectralConfig(BaseModel):
     dates: list[str]
     treatments: list[str]
     channels: list[str]
@@ -39,7 +37,7 @@ class ConfigParser:
         cfg = self.toml_cfg[str(self.general_enum.ROOT)]
         try:
             num_closest_points = cfg[str(self.general_enum.NUM_CLOSEST_POINTS)]
-            general_config = GeneralConfig(num_closest_points)
+            general_config = GeneralConfig(num_closest_points=num_closest_points)
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return general_config
@@ -52,7 +50,12 @@ class ConfigParser:
             channels = cfg[str(self.multispectral_enum.CHANNELS)]
             location_type = cfg[str(self.multispectral_enum.LOCATION_TYPE)]
             multispectral_config = MultispectralConfig(
-                dates, treatments, channels, location_type, self.rasters_paths, self.shapefiles_paths
+                dates=dates,
+                treatments=treatments,
+                channels=channels,
+                location_type=location_type,
+                rasters_paths=self.rasters_paths,
+                shapefiles_paths=self.shapefiles_paths,
             )
         except KeyError:
             raise KeyError("Missing key in toml config file.")
