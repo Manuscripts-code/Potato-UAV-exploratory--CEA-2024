@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from configs import configs, global_enums, specific_paths
 
@@ -25,6 +25,14 @@ class MultispectralConfig(BaseModel):
         return self.dates, self.treatments, self.channels, self.location_type
 
 
+class SamplerConfig(BaseModel):
+    random_state: int = Field(-1, ge=-1)
+    splitter: str
+    shuffle: bool
+    split_size_val: float = Field(0.2, ge=0, le=1)
+    split_size_test: float = Field(0.2, ge=0, le=1)
+
+
 class ConfigParser:
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
@@ -33,7 +41,7 @@ class ConfigParser:
         self.multispectral_enum = global_enums.MultispectralConfigEnum
         self.toml_cfg = configs.CONFIGS_TOML
 
-    def get_general_configs(self):
+    def get_general_configs(self) -> GeneralConfig:
         cfg = self.toml_cfg[str(self.general_enum.ROOT)]
         try:
             num_closest_points = cfg[str(self.general_enum.NUM_CLOSEST_POINTS)]
@@ -42,7 +50,7 @@ class ConfigParser:
             raise KeyError("Missing key in toml config file.")
         return general_config
 
-    def get_multispectral_configs(self):
+    def get_multispectral_configs(self) -> MultispectralConfig:
         cfg = self.toml_cfg[str(self.multispectral_enum.ROOT)]
         try:
             dates = cfg[str(self.multispectral_enum.DATES)]
@@ -60,3 +68,22 @@ class ConfigParser:
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return multispectral_config
+
+    def get_sampler_configs(self) -> SamplerConfig:
+        cfg = self.toml_cfg[str(global_enums.SamplerConfigEnum.ROOT)]
+        try:
+            random_state = cfg[str(global_enums.SamplerConfigEnum.RANDOM_STATE)]
+            splitter = cfg[str(global_enums.SamplerConfigEnum.SPLITTER)]
+            shuffle = cfg[str(global_enums.SamplerConfigEnum.SHUFFLE)]
+            split_size_val = cfg[str(global_enums.SamplerConfigEnum.SPLIT_SIZE_VAL)]
+            split_size_test = cfg[str(global_enums.SamplerConfigEnum.SPLIT_SIZE_TEST)]
+            sampler_config = SamplerConfig(
+                random_state=random_state,
+                splitter=splitter,
+                shuffle=shuffle,
+                split_size_val=split_size_val,
+                split_size_test=split_size_test,
+            )
+        except KeyError:
+            raise KeyError("Missing key in toml config file.")
+        return sampler_config

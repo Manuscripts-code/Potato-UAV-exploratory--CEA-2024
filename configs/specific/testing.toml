@@ -8,3 +8,10 @@ imagings_dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
 treatments = ["eko", "konv"]
 channels = ["blue", "green", "nir", "red_edge", "red"]
 location_type = "measured"
+
+["sampler"]
+splitter = "StratifySplitter"
+shuffle = true
+random_state = 1
+split_size_val = 0.3
+split_size_test = 0.3

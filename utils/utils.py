@@ -54,3 +54,9 @@ def read_pickle(fname):
 
 def save_image(file_name, image, metadata=None):
     sp.envi.save_image(file_name, image, dtype=np.float32, metadata=metadata, force=True)
+
+
+def init_object(options_dict, class_name, *args, **kwargs):
+    if class_name not in options_dict:
+        raise ValueError(f"Key {class_name} not present. Possible options: {options_dict.keys()}")
+    return options_dict[class_name](*args, **kwargs)

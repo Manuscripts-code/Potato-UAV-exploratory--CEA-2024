@@ -21,3 +21,15 @@ class MultispectralConfigEnum(Enum):
 
     def __str__(self):
         return self.value
+
+
+class SamplerConfigEnum(Enum):
+    ROOT = "sampler"
+    RANDOM_STATE = "random_state"
+    SPLITTER = "splitter"
+    SHUFFLE = "shuffle"
+    SPLIT_SIZE_VAL = "split_size_val"
+    SPLIT_SIZE_TEST = "split_size_test"
+
+    def __str__(self):
+        return self.value
