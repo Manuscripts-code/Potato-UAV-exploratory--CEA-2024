@@ -6,7 +6,7 @@ from configs import configs
 from configs.global_enums import SamplerConfigEnum
 from data_manager import samplers
 from data_manager.loaders import StructuredData
-from utils.config_parser import SamplerConfig
+from configs.parser import SamplerConfig
 from utils.utils import init_object
 
 SPLITTERS_OPT = {

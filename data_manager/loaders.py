@@ -7,7 +7,7 @@ from configs.global_enums import MultispectralConfigEnum
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_structures.shapefiles import PointsShapefile
-from utils.config_parser import GeneralConfig, MultispectralConfig
+from configs.parser import GeneralConfig, MultispectralConfig
 from utils.utils import ensure_dir
 
 
@@ -140,7 +140,7 @@ class MultispectralLoader:
 
 
 if __name__ == "__main__":
-    from utils.config_parser import ConfigParser
+    from configs.parser import ConfigParser
 
     config_parser = ConfigParser()
     multispectral_config = config_parser.get_multispectral_configs()

@@ -4,7 +4,7 @@ from zenml import step
 
 from configs import configs
 from data_manager.loaders import MultispectralLoader, StructuredData
-from utils.config_parser import GeneralConfig, MultispectralConfig
+from configs.parser import GeneralConfig, MultispectralConfig
 
 
 @step

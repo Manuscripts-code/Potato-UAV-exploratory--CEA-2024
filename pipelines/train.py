@@ -2,7 +2,7 @@ from zenml import pipeline
 
 from configs import configs
 from steps import data_loader, data_sampler
-from utils.config_parser import ConfigParser
+from configs.parser import ConfigParser
 
 
 @pipeline(enable_cache=configs.CACHING)
