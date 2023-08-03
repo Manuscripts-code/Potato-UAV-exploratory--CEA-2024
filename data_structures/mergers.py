@@ -31,9 +31,9 @@ class RasterPointsMerger:
 
     def run_merge(self):
         # # TEMP!
-        # shapefile_df = self._shapefile.to_pandas()
-        # self._merged_df = shapefile_df.iloc[0:4].copy().reset_index(drop=True)
-        self._merged_df = self._shapefile.to_pandas()
+        shapefile_df = self._shapefile.to_pandas()
+        self._merged_df = shapefile_df.iloc[0:4].copy().reset_index(drop=True)
+        # self._merged_df = self._shapefile.to_pandas()
         # #
         for raster in self._rasters:
             reflectance_list = self._extract_reflectances(

@@ -1,5 +1,8 @@
 # this is testing file
 
+["general"]
+num_closest_points = 10
+
 ["multispectral"]
 imagings_dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
 treatments = ["eko", "konv"]

@@ -1,7 +1,15 @@
 from enum import Enum
 
 
-class MultispectralEnum(Enum):
+class GeneralConfigEnum(Enum):
+    ROOT = "general"
+    NUM_CLOSEST_POINTS = "num_closest_points"
+
+    def __str__(self):
+        return self.value
+
+
+class MultispectralConfigEnum(Enum):
     # settings coupled to /configs/specific/*.toml files and original labels in shapefiles
     ROOT = "multispectral"
     DATES = "imagings_dates"

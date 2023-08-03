@@ -7,6 +7,11 @@ TYPE_DICT3 = dict[str, dict[str, dict[str, str]]]
 
 
 @dataclass
+class GeneralConfig:
+    num_closest_points: int
+
+
+@dataclass
 class MultispectralConfig:
     dates: list[str]
     treatments: list[str]
@@ -26,15 +31,26 @@ class ConfigParser:
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
         self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
-        self.multispectral_enum = global_enums.MultispectralEnum
-        self.cfg = configs.CONFIGS_TOML[str(self.multispectral_enum.ROOT)]
+        self.general_enum = global_enums.GeneralConfigEnum
+        self.multispectral_enum = global_enums.MultispectralConfigEnum
+        self.toml_cfg = configs.CONFIGS_TOML
+
+    def get_general_configs(self):
+        cfg = self.toml_cfg[str(self.general_enum.ROOT)]
+        try:
+            num_closest_points = cfg[str(self.general_enum.NUM_CLOSEST_POINTS)]
+            general_config = GeneralConfig(num_closest_points)
+        except KeyError:
+            raise KeyError("Missing key in toml config file.")
+        return general_config
 
     def get_multispectral_configs(self):
+        cfg = self.toml_cfg[str(self.multispectral_enum.ROOT)]
         try:
-            dates = self.cfg[str(self.multispectral_enum.DATES)]
-            treatments = self.cfg[str(self.multispectral_enum.TREATMENTS)]
-            channels = self.cfg[str(self.multispectral_enum.CHANNELS)]
-            location_type = self.cfg[str(self.multispectral_enum.LOCATION_TYPE)]
+            dates = cfg[str(self.multispectral_enum.DATES)]
+            treatments = cfg[str(self.multispectral_enum.TREATMENTS)]
+            channels = cfg[str(self.multispectral_enum.CHANNELS)]
+            location_type = cfg[str(self.multispectral_enum.LOCATION_TYPE)]
             multispectral_config = MultispectralConfig(
                 dates, treatments, channels, location_type, self.rasters_paths, self.shapefiles_paths
             )

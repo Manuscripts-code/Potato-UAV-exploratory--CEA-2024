@@ -3,11 +3,11 @@ from itertools import product
 
 import pandas as pd
 
-from configs.global_enums import MultispectralEnum
+from configs.global_enums import MultispectralConfigEnum
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_structures.shapefiles import PointsShapefile
-from utils.config_parser import MultispectralConfig
+from utils.config_parser import GeneralConfig, MultispectralConfig
 from utils.utils import ensure_dir
 
 
@@ -21,6 +21,7 @@ class StructuredData:
 class MultispectralLoader:
     def __init__(
         self,
+        general_config: GeneralConfig,
         multispectral_config: MultispectralConfig,
         *,
         save_dir="saved",
@@ -29,7 +30,7 @@ class MultispectralLoader:
     ):
         self.save_dir = ensure_dir(save_dir)
         self.save_coords = save_coords
-        self.num_closest_points = num_closest_points
+        self.num_closest_points = general_config.num_closest_points
 
         self.rasters_paths, self.shapefiles_paths = multispectral_config.parse_specific_paths()
         (
@@ -65,9 +66,9 @@ class MultispectralLoader:
         self._multi_merger.run_merges()
 
     def final_merge(self):
-        columns_meta = MultispectralEnum.COLUMNS_SLO.value + [
-            MultispectralEnum.TREATMENTS.value,
-            MultispectralEnum.DATES.value,
+        columns_meta = MultispectralConfigEnum.COLUMNS_SLO.value + [
+            MultispectralConfigEnum.TREATMENTS.value,
+            MultispectralConfigEnum.DATES.value,
         ]
         columns_data = self.channels
 
@@ -83,7 +84,7 @@ class MultispectralLoader:
         columns = {
             old_name: new_name
             for old_name, new_name in zip(
-                MultispectralEnum.COLUMNS_SLO.value, MultispectralEnum.COLUMNS_ENG.value
+                MultispectralConfigEnum.COLUMNS_SLO.value, MultispectralConfigEnum.COLUMNS_ENG.value
             )
         }
         df_meta_merged.rename(columns=columns, inplace=True, errors="raise")
@@ -99,7 +100,7 @@ class MultispectralLoader:
         return df_data, treatment, date
 
     def _extract_meta(self, merged_df, treatment, date, columns_meta):
-        merged_df[[MultispectralEnum.TREATMENTS.value, MultispectralEnum.DATES.value]] = [
+        merged_df[[MultispectralConfigEnum.TREATMENTS.value, MultispectralConfigEnum.DATES.value]] = [
             treatment,
             date,
         ]

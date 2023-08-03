@@ -18,5 +18,4 @@ SAVE_MERGED_DIR = Path(SAVE_DIR, "merged")
 # DATA CONFIGS
 CACHING = os.getenv("CACHING", "false") == "true"
 SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
-NUM_CLOSEST_POINTS = int(os.getenv("NUM_CLOSEST_POINTS", 10))
 CONFIGS_TOML = read_toml(TOML_DIR / os.getenv("DATA_TOML_NAME", "testing.toml"))
