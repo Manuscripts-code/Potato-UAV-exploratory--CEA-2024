@@ -33,3 +33,12 @@ class SamplerConfigEnum(Enum):
 
     def __str__(self):
         return self.value
+
+
+class FormatterConfigEnum(Enum):
+    ROOT = "formatter"
+    FORMATTER = "formatter"
+    CLASSES = "classes"
+
+    def __str__(self):
+        return self.value

@@ -16,13 +16,14 @@ SPLITTERS_OPT = {
 
 
 @step
-def data_sampler(structured_data: StructuredData, sampler_config: SamplerConfig) -> StructuredData:
+def data_sampler(data: StructuredData, sampler_config: SamplerConfig) -> StructuredData:
     splitter_name = sampler_config.splitter
     splitter = init_object(SPLITTERS_OPT, splitter_name)
     sampler = samplers.Sampler(
         splitter,
+        data,
         split_size_test=sampler_config.split_size_test,
         random_state=sampler_config.random_state,
         shuffle=sampler_config.shuffle,
     )
-    return structured_data
+    return data

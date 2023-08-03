@@ -4,9 +4,9 @@
 num_closest_points = 10
 
 ["multispectral"]
-imagings_dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
-treatments = ["eko", "konv"]
-channels = ["blue", "green", "nir", "red_edge", "red"]
+imagings_dates = ["2022_06_15"]
+treatments = ["eko"]
+channels = ["blue", "green"]
 location_type = "measured"
 
 ["sampler"]
@@ -15,3 +15,7 @@ shuffle = true
 random_state = 1
 split_size_val = 0.3
 split_size_test = 0.3
+
+["formatter"]
+formatter = "ClassificationFormatter"
+classes = ["healthy", "unhealthy"]

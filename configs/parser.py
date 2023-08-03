@@ -33,6 +33,11 @@ class SamplerConfig(BaseModel):
     split_size_test: float = Field(0.2, ge=0, le=1)
 
 
+class FormatterConfig(BaseModel):
+    formatter: str
+    classes: list[str]
+
+
 class ConfigParser:
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
@@ -87,3 +92,13 @@ class ConfigParser:
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return sampler_config
+
+    def get_formatter_configs(self) -> FormatterConfig:
+        cfg = self.toml_cfg[str(global_enums.FormatterConfigEnum.ROOT)]
+        try:
+            formatter = cfg[str(global_enums.FormatterConfigEnum.FORMATTER)]
+            classes = cfg[str(global_enums.FormatterConfigEnum.CLASSES)]
+            formatter_config = FormatterConfig(formatter=formatter, classes=classes)
+        except KeyError:
+            raise KeyError("Missing key in toml config file.")
+        return formatter_config

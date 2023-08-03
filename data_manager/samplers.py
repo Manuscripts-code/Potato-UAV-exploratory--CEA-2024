@@ -4,6 +4,8 @@ import numpy as np
 from sklearn.model_selection import GroupShuffleSplit, train_test_split
 from sklearn.utils import shuffle
 
+from data_manager.loaders import StructuredData
+
 
 class Splitter(Protocol):
     def __call__(self, y_data, labels) -> tuple[np.ndarray, np.ndarray]:
@@ -11,8 +13,17 @@ class Splitter(Protocol):
 
 
 class Sampler:
-    def __init__(self, splitter: Splitter, *, split_size_test=0.2, random_state=-1, shuffle=True):
+    def __init__(
+        self,
+        splitter: Splitter,
+        data: StructuredData,
+        *,
+        split_size_test=0.2,
+        random_state=-1,
+        shuffle=True
+    ):
         self.splitter = splitter
+        self.data = data
         self.split_size_test = split_size_test
         self.random_state = None if random_state == -1 else random_state
         self.shuffle = shuffle
