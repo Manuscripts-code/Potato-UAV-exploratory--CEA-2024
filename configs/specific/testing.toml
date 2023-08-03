@@ -4,7 +4,7 @@
 num_closest_points = 10
 
 ["multispectral"]
-imagings_dates = ["2022_06_15"]
+dates = ["2022_06_15"]
 treatments = ["eko"]
 channels = ["blue", "green"]
 location_type = "measured"

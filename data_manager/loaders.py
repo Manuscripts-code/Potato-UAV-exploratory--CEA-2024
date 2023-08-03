@@ -3,11 +3,12 @@ from itertools import product
 
 import pandas as pd
 
+from configs import configs
 from configs.global_enums import MultispectralConfigEnum
+from configs.parser import GeneralConfig, MultispectralConfig
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_structures.shapefiles import PointsShapefile
-from configs.parser import GeneralConfig, MultispectralConfig
 from utils.utils import ensure_dir
 
 
@@ -143,7 +144,7 @@ if __name__ == "__main__":
     from configs.parser import ConfigParser
 
     config_parser = ConfigParser()
-    multispectral_config = config_parser.get_multispectral_configs()
+    multispectral_config = config_parser.multispectral()
 
     loader = MultispectralLoader(multispectral_config).load()
     pass

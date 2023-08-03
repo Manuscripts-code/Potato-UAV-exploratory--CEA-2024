@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from configs import configs, global_enums, specific_paths
+from configs import configs, specific_paths
 
 TYPE_DICT2 = dict[str, dict[str, str]]
 TYPE_DICT3 = dict[str, dict[str, dict[str, str]]]
@@ -42,63 +42,40 @@ class ConfigParser:
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
         self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
-        self.general_enum = global_enums.GeneralConfigEnum
-        self.multispectral_enum = global_enums.MultispectralConfigEnum
         self.toml_cfg = configs.CONFIGS_TOML
 
-    def get_general_configs(self) -> GeneralConfig:
-        cfg = self.toml_cfg[str(self.general_enum.ROOT)]
+    def general(self) -> GeneralConfig:
+        cfg = self.toml_cfg[configs.GENERAL_CFG_NAME]
         try:
-            num_closest_points = cfg[str(self.general_enum.NUM_CLOSEST_POINTS)]
-            general_config = GeneralConfig(num_closest_points=num_closest_points)
+            general_config = GeneralConfig(**cfg)
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return general_config
 
-    def get_multispectral_configs(self) -> MultispectralConfig:
-        cfg = self.toml_cfg[str(self.multispectral_enum.ROOT)]
+    def multispectral(self) -> MultispectralConfig:
+        cfg = self.toml_cfg[configs.MULTISPECTRAL_CFG_NAME]
         try:
-            dates = cfg[str(self.multispectral_enum.DATES)]
-            treatments = cfg[str(self.multispectral_enum.TREATMENTS)]
-            channels = cfg[str(self.multispectral_enum.CHANNELS)]
-            location_type = cfg[str(self.multispectral_enum.LOCATION_TYPE)]
             multispectral_config = MultispectralConfig(
-                dates=dates,
-                treatments=treatments,
-                channels=channels,
-                location_type=location_type,
                 rasters_paths=self.rasters_paths,
                 shapefiles_paths=self.shapefiles_paths,
+                **cfg,
             )
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return multispectral_config
 
-    def get_sampler_configs(self) -> SamplerConfig:
-        cfg = self.toml_cfg[str(global_enums.SamplerConfigEnum.ROOT)]
+    def sampler(self) -> SamplerConfig:
+        cfg = self.toml_cfg[configs.SAMPLER_CFG_NAME]
         try:
-            random_state = cfg[str(global_enums.SamplerConfigEnum.RANDOM_STATE)]
-            splitter = cfg[str(global_enums.SamplerConfigEnum.SPLITTER)]
-            shuffle = cfg[str(global_enums.SamplerConfigEnum.SHUFFLE)]
-            split_size_val = cfg[str(global_enums.SamplerConfigEnum.SPLIT_SIZE_VAL)]
-            split_size_test = cfg[str(global_enums.SamplerConfigEnum.SPLIT_SIZE_TEST)]
-            sampler_config = SamplerConfig(
-                random_state=random_state,
-                splitter=splitter,
-                shuffle=shuffle,
-                split_size_val=split_size_val,
-                split_size_test=split_size_test,
-            )
+            sampler_config = SamplerConfig(**cfg)
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return sampler_config
 
-    def get_formatter_configs(self) -> FormatterConfig:
-        cfg = self.toml_cfg[str(global_enums.FormatterConfigEnum.ROOT)]
+    def formatter(self) -> FormatterConfig:
+        cfg = self.toml_cfg[configs.FORMATTER_CFG_NAME]
         try:
-            formatter = cfg[str(global_enums.FormatterConfigEnum.FORMATTER)]
-            classes = cfg[str(global_enums.FormatterConfigEnum.CLASSES)]
-            formatter_config = FormatterConfig(formatter=formatter, classes=classes)
+            formatter_config = FormatterConfig(**cfg)
         except KeyError:
             raise KeyError("Missing key in toml config file.")
         return formatter_config
