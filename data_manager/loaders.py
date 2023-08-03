@@ -4,9 +4,9 @@ from itertools import product
 import pandas as pd
 
 from configs.global_enums import MultispectralEnum
-from data_manager.geotiffs import MultiGeotiffRaster
-from data_manager.mergers import MultiRasterPointsMerger, RasterPointsMerger
-from data_manager.shapefiles import PointsShapefile
+from data_structures.geotiffs import MultiGeotiffRaster
+from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
+from data_structures.shapefiles import PointsShapefile
 from utils.config_parser import MultispectralConfig
 from utils.utils import ensure_dir
 

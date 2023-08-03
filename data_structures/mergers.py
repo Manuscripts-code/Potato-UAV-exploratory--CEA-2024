@@ -3,8 +3,8 @@ import pandas as pd
 from rich.progress import track
 from scipy.spatial import distance
 
-from data_manager.geotiffs import GeotiffRaster, MultiGeotiffRaster
-from data_manager.shapefiles import PointsShapefile
+from data_structures.geotiffs import GeotiffRaster, MultiGeotiffRaster
+from data_structures.shapefiles import PointsShapefile
 from utils.utils import ensure_dir
 
 

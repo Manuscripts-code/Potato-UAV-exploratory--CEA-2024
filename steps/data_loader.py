@@ -3,7 +3,7 @@ import logging
 from zenml import step
 
 from configs import configs
-from data_loader.loaders import MultispectralLoader, StructuredData
+from data_manager.loaders import MultispectralLoader, StructuredData
 from utils.config_parser import MultispectralConfig
 
 
