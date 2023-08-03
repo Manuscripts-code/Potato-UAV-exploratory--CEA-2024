@@ -3,7 +3,7 @@ import logging
 from zenml import step
 
 from configs import configs
-from data_manager.loaders import StructuredData
+from data_loader.loaders import StructuredData
 
 
 @step
