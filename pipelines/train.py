@@ -11,7 +11,8 @@ def train_and_register_model_pipeline() -> None:
 
     data = data_loader(cfg_parser.general(), cfg_parser.multispectral())
     data = data_formatter(data, cfg_parser.formatter())
-    data = data_sampler(data, cfg_parser.sampler())
+    data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
+    pass
 
 
 if __name__ == "__main__":

@@ -9,12 +9,12 @@ from configs.parser import GeneralConfig, MultispectralConfig
 
 @step
 def data_loader(
-    general_config: GeneralConfig, multispectral_config: MultispectralConfig
+    general_cfg: GeneralConfig, multispectral_cfg: MultispectralConfig
 ) -> StructuredData:
     logging.info("Loading data...")
     loader = MultispectralLoader(
-        general_config,
-        multispectral_config,
+        general_cfg,
+        multispectral_cfg,
         save_dir=configs.SAVE_MERGED_DIR,
         save_coords=configs.SAVE_COORDS,
     ).load()

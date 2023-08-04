@@ -6,16 +6,17 @@ num_closest_points = 10
 ["multispectral"]
 dates = ["2022_06_15"]
 treatments = ["eko", "konv"]
-channels = ["blue", "green"]
+channels = ["blue"]
 location_type = "measured"
 
 ["sampler"]
-splitter = "StratifySplitter"
-shuffle = true
-random_state = 1
+splitter = "SimpleSplitter"
 split_size_val = 0.3
 split_size_test = 0.3
+shuffle = true
+random_state = 1
+stratify = true
 
 ["formatter"]
 formatter = "ClassificationFormatter"
-Labels_to_encode = ["varieties", "treatments"]
+Labels_to_encode = ["treatments"]

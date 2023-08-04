@@ -19,6 +19,13 @@ class StructuredData:
     label: pd.Series = None
     label_target_relation: pd.Series = None
 
+    def __getitem__(self, indices):
+        data = self.data.iloc[indices]
+        meta = self.meta.iloc[indices]
+        target = self.target.iloc[indices]
+        label = self.label.iloc[indices]
+        return StructuredData(data, meta, target, label, self.label_target_relation)
+
 
 class MultispectralLoader:
     def __init__(

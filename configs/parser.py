@@ -29,10 +29,16 @@ class MultispectralConfig(BaseModel):
 
 class SamplerConfig(BaseModel):
     splitter: str
-    shuffle: bool = True
-    random_state: int = Field(-1, ge=-1)
     split_size_val: float = Field(0.2, ge=0, le=1)
     split_size_test: float = Field(0.2, ge=0, le=1)
+    shuffle: bool = True
+    random_state: int = Field(-1, ge=-1)
+    stratify: bool = True
+
+    def to_dict(self):
+        dict_ = self.dict()
+        dict_.pop("splitter", None)
+        return dict_
 
 
 class FormatterConfig(BaseModel):
