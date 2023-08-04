@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field
+from functools import partial
+
+from pydantic import BaseModel, Field, ValidationError
 
 from configs import configs, specific_paths
 
@@ -26,16 +28,15 @@ class MultispectralConfig(BaseModel):
 
 
 class SamplerConfig(BaseModel):
-    random_state: int = Field(-1, ge=-1)
     splitter: str
-    shuffle: bool
+    shuffle: bool = True
+    random_state: int = Field(-1, ge=-1)
     split_size_val: float = Field(0.2, ge=0, le=1)
     split_size_test: float = Field(0.2, ge=0, le=1)
 
 
 class FormatterConfig(BaseModel):
     formatter: str
-    classes: list[str]
 
 
 class ConfigParser:
@@ -44,38 +45,28 @@ class ConfigParser:
         self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
         self.toml_cfg = configs.CONFIGS_TOML
 
-    def general(self) -> GeneralConfig:
-        cfg = self.toml_cfg[configs.GENERAL_CFG_NAME]
+    def _parse_config(self, config_name: str, config_class: type[BaseModel]) -> BaseModel:
+        specific_cfg = self.toml_cfg[config_name]
         try:
-            general_config = GeneralConfig(**cfg)
-        except KeyError:
-            raise KeyError("Missing key in toml config file.")
-        return general_config
+            config = config_class(**specific_cfg)
+        except ValidationError as err:
+            print(f"Toml configuration error. \nProblem in: {str(err.model)} \n{err}")
+            raise
+        return config
+
+    def general(self) -> GeneralConfig:
+        return self._parse_config(configs.GENERAL_CFG_NAME, GeneralConfig)
 
     def multispectral(self) -> MultispectralConfig:
-        cfg = self.toml_cfg[configs.MULTISPECTRAL_CFG_NAME]
-        try:
-            multispectral_config = MultispectralConfig(
-                rasters_paths=self.rasters_paths,
-                shapefiles_paths=self.shapefiles_paths,
-                **cfg,
-            )
-        except KeyError:
-            raise KeyError("Missing key in toml config file.")
-        return multispectral_config
+        config = partial(
+            MultispectralConfig,
+            rasters_paths=self.rasters_paths,
+            shapefiles_paths=self.shapefiles_paths,
+        )
+        return self._parse_config(configs.MULTISPECTRAL_CFG_NAME, config)
 
     def sampler(self) -> SamplerConfig:
-        cfg = self.toml_cfg[configs.SAMPLER_CFG_NAME]
-        try:
-            sampler_config = SamplerConfig(**cfg)
-        except KeyError:
-            raise KeyError("Missing key in toml config file.")
-        return sampler_config
+        return self._parse_config(configs.SAMPLER_CFG_NAME, SamplerConfig)
 
     def formatter(self) -> FormatterConfig:
-        cfg = self.toml_cfg[configs.FORMATTER_CFG_NAME]
-        try:
-            formatter_config = FormatterConfig(**cfg)
-        except KeyError:
-            raise KeyError("Missing key in toml config file.")
-        return formatter_config
+        return self._parse_config(configs.FORMATTER_CFG_NAME, FormatterConfig)
