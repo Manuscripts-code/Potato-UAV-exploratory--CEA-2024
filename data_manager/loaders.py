@@ -15,7 +15,9 @@ from utils.utils import ensure_dir
 class StructuredData:
     data: pd.DataFrame
     meta: pd.DataFrame
-    target: pd.DataFrame = None
+    target: pd.Series = None
+    label: pd.Series = None
+    label_target_relation: pd.Series = None
 
 
 class MultispectralLoader:

@@ -37,6 +37,7 @@ class SamplerConfig(BaseModel):
 
 class FormatterConfig(BaseModel):
     formatter: str
+    Labels_to_encode: list[str]
 
 
 class ConfigParser:

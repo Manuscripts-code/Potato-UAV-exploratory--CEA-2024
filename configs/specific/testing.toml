@@ -5,7 +5,7 @@ num_closest_points = 10
 
 ["multispectral"]
 dates = ["2022_06_15"]
-treatments = ["eko"]
+treatments = ["eko", "konv"]
 channels = ["blue", "green"]
 location_type = "measured"
 
@@ -18,3 +18,4 @@ split_size_test = 0.3
 
 ["formatter"]
 formatter = "ClassificationFormatter"
+Labels_to_encode = ["varieties", "treatments"]
