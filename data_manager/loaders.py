@@ -1,44 +1,14 @@
-from dataclasses import dataclass
 from itertools import product
 
 import pandas as pd
 
 from configs import configs
 from configs.parser import GeneralConfig, MultispectralConfig
+from data_manager.structure import StructuredData
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_structures.shapefiles import PointsShapefile
 from utils.utils import ensure_dir
-
-
-@dataclass
-class Target:
-    label: pd.Series
-    encoded: pd.Series
-    encoding: pd.Series
-
-    def __getitem__(self, indices):
-        label = self.label.iloc[indices]
-        encoded = self.encoded.iloc[indices]
-        return Target(label, encoded, self.encoding)
-
-    def __len__(self):
-        return len(self.label)
-
-
-@dataclass
-class StructuredData:
-    data: pd.DataFrame
-    meta: pd.DataFrame
-    target: Target = None
-
-    def __getitem__(self, indices):
-        data = self.data.iloc[indices]
-        meta = self.meta.iloc[indices]
-        if self.target is None:
-            return StructuredData(data, meta)
-        target = self.target[indices]
-        return StructuredData(data, meta, target)
 
 
 class MultispectralLoader:

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from data_manager.loaders import StructuredData, Target
+from data_manager.structure import StructuredData, Target
 
 
 class ClassificationFormatter:
