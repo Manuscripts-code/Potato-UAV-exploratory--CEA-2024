@@ -14,5 +14,5 @@ class ClassificationFormatter:
         encoded, encoding = pd.factorize(label)
         encoded = pd.Series(encoded, name="label")
         encoding = pd.Series(encoding, name="encoding")
-        data.target = Target(label, encoded, encoding)
+        data.target = Target(label=label, encoded=encoded, encoding=encoding)
         return data
