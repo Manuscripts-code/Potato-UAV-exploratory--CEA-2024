@@ -1,6 +1,6 @@
 import pandas as pd
 
-from data_manager.loaders import StructuredData
+from data_manager.loaders import StructuredData, Target
 
 
 class ClassificationFormatter:
@@ -9,9 +9,10 @@ class ClassificationFormatter:
 
     def format(self, data: StructuredData) -> StructuredData:
         # create one column labels from multiple columns
-        data.label = data.meta[self.labels_to_encode].apply(tuple, axis=1)
+        label = data.meta[self.labels_to_encode].apply(tuple, axis=1)
         # encode to numbers
-        codes, uniques = pd.factorize(data.label)
-        data.target = pd.Series(codes)
-        data.label_target_relation = pd.Series(uniques)
+        encoded, encoding = pd.factorize(label)
+        encoded = pd.Series(encoded, name="label")
+        encoding = pd.Series(encoding, name="encoding")
+        data.target = Target(label, encoded, encoding)
         return data

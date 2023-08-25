@@ -12,19 +12,33 @@ from utils.utils import ensure_dir
 
 
 @dataclass
+class Target:
+    label: pd.Series
+    encoded: pd.Series
+    encoding: pd.Series
+
+    def __getitem__(self, indices):
+        label = self.label.iloc[indices]
+        encoded = self.encoded.iloc[indices]
+        return Target(label, encoded, self.encoding)
+
+    def __len__(self):
+        return len(self.label)
+
+
+@dataclass
 class StructuredData:
     data: pd.DataFrame
     meta: pd.DataFrame
-    target: pd.Series = None
-    label: pd.Series = None
-    label_target_relation: pd.Series = None
+    target: Target = None
 
     def __getitem__(self, indices):
         data = self.data.iloc[indices]
         meta = self.meta.iloc[indices]
-        target = self.target.iloc[indices]
-        label = self.label.iloc[indices]
-        return StructuredData(data, meta, target, label, self.label_target_relation)
+        if self.target is None:
+            return StructuredData(data, meta)
+        target = self.target[indices]
+        return StructuredData(data, meta, target)
 
 
 class MultispectralLoader:
