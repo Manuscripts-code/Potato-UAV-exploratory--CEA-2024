@@ -19,4 +19,7 @@ stratify = true
 
 ["formatter"]
 formatter = "ClassificationFormatter"
-Labels_to_encode = ["treatments"]
+labels_to_encode = ["treatments"]
+
+["model"]
+pipeline = ["SVC"]

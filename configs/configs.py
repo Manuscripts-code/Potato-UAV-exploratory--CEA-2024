@@ -25,6 +25,7 @@ GENERAL_CFG_NAME = "general"
 MULTISPECTRAL_CFG_NAME = "multispectral"
 SAMPLER_CFG_NAME = "sampler"
 FORMATTER_CFG_NAME = "formatter"
+MODEL_CFG_NAME = "model"
 
 # MULTISPECTRAL LOADER CONFIG
 DATES = "dates"

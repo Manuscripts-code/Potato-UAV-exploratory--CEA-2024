@@ -43,7 +43,12 @@ class SamplerConfig(BaseModel):
 
 class FormatterConfig(BaseModel):
     formatter: str
-    Labels_to_encode: list[str]
+    labels_to_encode: list[str]
+
+
+class ModelConfig(BaseModel):
+    pipeline: list[str]
+    unions: dict[str, list[str]] = {}
 
 
 class ConfigParser:
@@ -77,3 +82,6 @@ class ConfigParser:
 
     def formatter(self) -> FormatterConfig:
         return self._parse_config(configs.FORMATTER_CFG_NAME, FormatterConfig)
+
+    def model(self) -> ModelConfig:
+        return self._parse_config(configs.MODEL_CFG_NAME, ModelConfig)

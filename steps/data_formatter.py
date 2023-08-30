@@ -16,7 +16,7 @@ def data_formatter(data: StructuredData, formatter_cfg: FormatterConfig) -> Stru
     formatter_ = init_object(
         FORMATTER_OPT,
         formatter_name,
-        labels_to_encode=formatter_cfg.Labels_to_encode,
+        labels_to_encode=formatter_cfg.labels_to_encode,
     )
     data = formatter_.format(data)
     return data

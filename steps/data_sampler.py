@@ -1,5 +1,6 @@
 import logging
 
+from typing_extensions import Annotated
 from zenml import step
 
 from configs import configs
@@ -16,7 +17,11 @@ SPLITTERS_OPT = {
 @step
 def data_sampler(
     data: StructuredData, sampler_cfg: SamplerConfig
-) -> tuple[StructuredData, StructuredData, StructuredData]:
+) -> tuple[
+    Annotated[StructuredData, "data_train"],
+    Annotated[StructuredData, "data_val"],
+    Annotated[StructuredData, "data_test"],
+]:
     splitter_name = sampler_cfg.splitter
     splitter = init_object(SPLITTERS_OPT, splitter_name, **sampler_cfg.to_dict())
     sampler = samplers.Sampler(splitter)
