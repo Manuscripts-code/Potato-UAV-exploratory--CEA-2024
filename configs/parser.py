@@ -51,6 +51,28 @@ class ModelConfig(BaseModel):
     unions: dict[str, list[str]] = {}
 
 
+class TunedParametersConfig(BaseModel):
+    rand_int: dict[str, list[int]] = None
+    log_uniform: dict[str, list[float]] = None
+    choice: dict[str, list] = None
+
+
+class ValidatorConfig(BaseModel):
+    validator: str
+    n_splits: str = None
+    n_repeats: str = None
+    random_state: str = None
+
+
+class OptimizerConfig(BaseModel):
+    tuned_parameters: TunedParametersConfig
+    validator: ValidatorConfig
+    mlflow_logger: str
+    num_samples: int
+    scoring_metric: str
+    scoring_mode: str
+
+
 class ConfigParser:
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
@@ -85,3 +107,6 @@ class ConfigParser:
 
     def model(self) -> ModelConfig:
         return self._parse_config(configs.MODEL_CFG_NAME, ModelConfig)
+
+    def optimizer(self) -> OptimizerConfig:
+        return self._parse_config(configs.OPTIMIZER_CFG_NAME, OptimizerConfig)

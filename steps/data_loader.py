@@ -1,5 +1,6 @@
 import logging
 
+from typing_extensions import Annotated
 from zenml import step
 
 from configs import configs
@@ -9,7 +10,9 @@ from data_manager.structure import StructuredData, StructuredDataMaterializer
 
 
 @step(output_materializers=StructuredDataMaterializer)
-def data_loader(general_cfg: GeneralConfig, multispectral_cfg: MultispectralConfig) -> StructuredData:
+def data_loader(
+    general_cfg: GeneralConfig, multispectral_cfg: MultispectralConfig
+) -> Annotated[StructuredData, "data"]:
     logging.info("Loading data...")
     loader = MultispectralLoader(
         general_cfg,

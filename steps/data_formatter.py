@@ -1,3 +1,4 @@
+from typing_extensions import Annotated
 from zenml import step
 
 from configs.parser import FormatterConfig
@@ -11,7 +12,9 @@ FORMATTER_OPT = {
 
 
 @step
-def data_formatter(data: StructuredData, formatter_cfg: FormatterConfig) -> StructuredData:
+def data_formatter(
+    data: StructuredData, formatter_cfg: FormatterConfig
+) -> Annotated[StructuredData, "data"]:
     formatter_name = formatter_cfg.formatter
     formatter_ = init_object(
         FORMATTER_OPT,

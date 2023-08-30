@@ -1,15 +1,15 @@
 # this is testing file
 
-["general"]
+[general]
 num_closest_points = 10
 
-["multispectral"]
+[multispectral]
 dates = ["2022_06_15"]
 treatments = ["eko", "konv"]
 channels = ["blue"]
 location_type = "measured"
 
-["sampler"]
+[sampler]
 splitter = "SimpleSplitter"
 split_size_val = 0.3
 split_size_test = 0.3
@@ -17,9 +17,29 @@ shuffle = true
 random_state = 1
 stratify = true
 
-["formatter"]
+[formatter]
 formatter = "ClassificationFormatter"
 labels_to_encode = ["treatments"]
 
-["model"]
+[model]
 pipeline = ["SVC"]
+
+[optimizer]
+mlflow_logger = "ClassificationLogger"
+num_samples = 10
+scoring_metric = "f1"
+scoring_mode = "max"
+
+[optimizer.tuned_parameters]
+[optimizer.tuned_parameters.rand_int]
+SVC__C = [1, 10]
+[optimizer.tuned_parameters.log_uniform]
+SVC__gamma = [0.001, 0.1]
+[optimizer.tuned_parameters.choice]
+SVC__kernel = ["rbf", "poly", "sigmoid"]
+
+[optimizer.validator]
+validator = "RepeatedStratifiedKFold"
+n_splits = 5
+n_repeats = 3
+random_state = 1
