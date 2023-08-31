@@ -120,3 +120,6 @@ class ConfigParser:
 
     def optimizer(self) -> OptimizerConfig:
         return self._parse_config(configs.OPTIMIZER_CFG_NAME, OptimizerConfig)
+
+    def evaluator(self) -> EvaluatorConfig:
+        return self._parse_config(configs.EVALUATOR_CFG_NAME, EvaluatorConfig)

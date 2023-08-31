@@ -5,18 +5,18 @@ from sklearn.preprocessing import MinMaxScaler, PowerTransformer, StandardScaler
 from sklearn.svm import SVC, SVR
 from xgboost import XGBClassifier, XGBRegressor
 
-from data_manager import formatter, samplers
-from models import loggers, methods
+from data_manager import formatters, samplers
+from models import evaluators, methods
 
 FORMATTERS = {
-    "ClassificationFormatter": formatter.ClassificationFormatter,
+    "ClassificationFormatter": formatters.ClassificationFormatter,
 }
 SPLITTERS = {
     "SimpleSplitter": samplers.SimpleSplitter,
 }
 
 LOGGERS = {
-    "ArtefactLoggerClassification": loggers.ArtifactLoggerClassification,
+    "ArtifactLoggerClassification": evaluators.ArtifactLoggerClassification,
 }
 
 VALIDATORS = {

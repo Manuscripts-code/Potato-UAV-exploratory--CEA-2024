@@ -27,6 +27,7 @@ SAMPLER_CFG_NAME = "sampler"
 FORMATTER_CFG_NAME = "formatter"
 MODEL_CFG_NAME = "model"
 OPTIMIZER_CFG_NAME = "optimizer"
+EVALUATOR_CFG_NAME = "evaluator"
 
 # MULTISPECTRAL LOADER CONFIG
 DATES = "dates"

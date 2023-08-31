@@ -1,9 +1,5 @@
 import logging
-from functools import partial
 
-import joblib
-import mlflow
-import mlflow.sklearn
 import optuna
 from sklearn.base import clone
 from sklearn.model_selection import BaseCrossValidator, cross_val_score
@@ -11,7 +7,6 @@ from sklearn.pipeline import Pipeline
 
 from configs.parser import OptimizerConfig
 from data_manager.structure import StructuredData
-from models.loggers import ArtifactLogger
 
 
 class Optimizer:
@@ -36,14 +31,17 @@ class Optimizer:
         self.scoring_mode = optimizer_cfg.scoring_mode
         self.tuned_params = optimizer_cfg.tuned_parameters
 
+        self._best_model = None
+        self._best_trial = None
+
         # self._run_id = mlflow.active_run().info.run_id
 
     def run(self):
         study = self._perform_search()
-        best_trial = study.best_trial
-        self._refit_model(best_trial.params)
-        logging.info(f"Best {self.scoring_metric}: {best_trial.value}")
-        logging.info(f"Best hyperparameters found were: {best_trial.params}")
+        self._best_trial = study.best_trial
+        self._refit_model(self._best_trial.params)
+        logging.info(f"Best {self.scoring_metric}: {self._best_trial.value}")
+        logging.info(f"Best hyperparameters found were: {self._best_trial.params}")
 
     def _perform_search(self):
         study = optuna.create_study(direction=self.scoring_mode)
@@ -90,10 +88,14 @@ class Optimizer:
         return score.mean()
 
     def _refit_model(self, best_params):
-        self.model = clone(self.model)
-        self.model.set_params(**best_params)
-        self.model.fit(self.data_train.data, self.data_train.target.encoded)
+        self._best_model = clone(self.model)
+        self._best_model.set_params(**best_params)
+        self._best_model.fit(self.data_train.data, self.data_train.target.encoded)
 
     @property
-    def model_best(self):
-        return self.model
+    def best_model(self):
+        return self._best_model
+
+    @property
+    def best_trial(self):
+        return self._best_trial

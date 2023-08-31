@@ -3,7 +3,7 @@ from zenml import step
 
 from configs import options
 from configs.parser import FormatterConfig
-from data_manager import formatter
+from data_manager import formatters
 from data_manager.loaders import StructuredData
 from utils.utils import init_object
 

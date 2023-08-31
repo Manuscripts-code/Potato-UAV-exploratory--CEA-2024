@@ -1,5 +1,6 @@
 import logging
 
+from optuna.trial import FrozenTrial
 from sklearn.pipeline import Pipeline
 from typing_extensions import Annotated
 from zenml import step
@@ -14,7 +15,7 @@ from utils.utils import init_object
 @step(enable_cache=False)
 def model_optimizer(
     model: Pipeline, data_train: StructuredData, data_val: StructuredData, optimizer_cfg: OptimizerConfig
-) -> Annotated[Pipeline, "best_model"]:
+) -> tuple[Annotated[Pipeline, "best_model"], Annotated[FrozenTrial, "best_trial"]]:
     logging.info("Optimizing model...")
 
     validator = init_object(
@@ -31,4 +32,4 @@ def model_optimizer(
         optimizer_cfg=optimizer_cfg,
     )
     optimizer.run()
-    return optimizer.model_best
+    return optimizer.best_model, optimizer.best_trial

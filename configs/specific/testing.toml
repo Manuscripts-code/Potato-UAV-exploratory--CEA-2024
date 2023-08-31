@@ -47,4 +47,4 @@ n_repeats = 3
 random_state = 1
 
 [evaluator]
-logger = "ArtefactLoggerClassification"
+logger = "ArtifactLoggerClassification"
