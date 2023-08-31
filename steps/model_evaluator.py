@@ -22,5 +22,6 @@ def model_evaluator(
     evaluator_cfg: EvaluatorConfig,
 ) -> None:
     logger = init_object(options.LOGGERS, evaluator_cfg.logger)
-    evaluator = Evaluator(logger)
-    evaluator.run()
+    evaluator = Evaluator(best_model, best_trial, logger)
+    evaluator.run(data_train, "train")
+    evaluator.run(data_test, "test")

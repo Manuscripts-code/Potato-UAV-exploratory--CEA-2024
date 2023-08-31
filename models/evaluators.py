@@ -1,3 +1,4 @@
+import logging
 import tempfile
 from pathlib import Path
 from typing import Protocol
@@ -5,38 +6,60 @@ from typing import Protocol
 import joblib
 import mlflow
 import mlflow.sklearn
+from optuna.trial import FrozenTrial
+from sklearn.metrics import classification_report, precision_recall_fscore_support
+from sklearn.pipeline import Pipeline
 
 from configs import configs
+from data_manager.structure import StructuredData
 from utils.utils import ensure_dir, write_json, write_txt
 
 
 class ArtifactLogger(Protocol):
-    def log(self, data: dict):
+    def log_metrics():
         ...
 
 
 class Evaluator:
-    def __init__(self, logger: ArtifactLogger):
+    def __init__(
+        self,
+        best_model: Pipeline,
+        best_trial: FrozenTrial,
+        logger: ArtifactLogger,
+    ):
+        self.best_model = best_model
+        self.best_trial = best_trial
         self.logger = logger
 
-    def run(self):
-        pass
+    def run(self, data: StructuredData, suffix: str = ""):
+        y_pred = self.best_model.predict(data.data)
+        y_true = data.target.encoded
+        label = data.target.label
+        encoding = data.target.encoding
+        meta = data.meta
+        self.logger.log_metrics(self.best_trial, y_pred, y_true, label, encoding, meta, suffix)
 
 
 class ArtifactLoggerClassification:
-    def log(self):
-        # Log metrics and parameters and model
-        # mlflow.sklearn.log_model(self.model, "model")
-        mlflow.log_params(best_params)
-        mlflow.log_metrics({self.scoring_metric: best_metric})
+    def log_metrics(self, best_trial, y_pred, y_true, label, encoding, meta, suffix):
+        mlflow.log_params(best_trial.params)
 
-        performance = calculate_classification_metrics(y_test, y_pred)
-        mlflow.log_metrics({"precision_avg": performance["overall"]["precision"]})
-        mlflow.log_metrics({"recall_avg": performance["overall"]["recall"]})
-        mlflow.log_metrics({"f1_avg": performance["overall"]["f1"]})
-        mlflow.log_metrics({"accuracy_avg": accuracy_score(y_test, y_pred)})
-        clf_report = classification_report(y_test, y_pred)
+        precision, recall, f1, _ = precision_recall_fscore_support(
+            y_true, y_pred, average="weighted", zero_division=0
+        )
+        mlflow.log_metrics(
+            {
+                "precision": precision,
+                "recall": recall,
+                "f1": f1,
+            }
+        )
+        clf_report = classification_report(y_true, y_pred)
 
+        logging.info(f"Hyperparameters used: {best_trial.params}")
+        logging.info(f"Classification report on {suffix} data:\n{clf_report}")
+
+    def log_artifacts(self):
         # Log artifacts
         with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
             ensure_dir(Path(dp) / "results")
@@ -56,9 +79,3 @@ class ArtifactLoggerClassification:
             joblib.dump(self.model, Path(dp, "model/model.pkl"))
 
             mlflow.log_artifacts(dp)
-
-        # log info
-        self.logger.info(f"Best hyperparameters found were: {best_params}")
-        self.logger.info(f"Best {self.scoring_metric}: {best_metric}")
-        self.logger.info(f"Run ID: {self.run_id}")
-        self.logger.info(f"Classification report on train data:\n{clf_report}")
