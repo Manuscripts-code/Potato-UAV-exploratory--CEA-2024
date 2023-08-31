@@ -35,7 +35,7 @@ class SamplerConfig(BaseModel):
     random_state: int = Field(-1, ge=-1)
     stratify: bool = True
 
-    def to_dict(self):
+    def params(self):
         dict_ = self.dict()
         dict_.pop("splitter", None)
         return dict_
@@ -52,25 +52,35 @@ class ModelConfig(BaseModel):
 
 
 class TunedParametersConfig(BaseModel):
-    rand_int: dict[str, list[int]] = None
-    log_uniform: dict[str, list[float]] = None
-    choice: dict[str, list] = None
+    optimize_int: dict[str, list[int]] = None
+    optimize_float: dict[str, list[float]] = None
+    optimize_category: dict[str, list] = None
 
 
 class ValidatorConfig(BaseModel):
     validator: str
-    n_splits: str = None
-    n_repeats: str = None
-    random_state: str = None
+    n_splits: int = None
+    n_repeats: int = None
+    random_state: int = None
+
+    def params(self):
+        dict_ = self.dict()
+        dict_.pop("validator", None)
+        return dict_
 
 
 class OptimizerConfig(BaseModel):
     tuned_parameters: TunedParametersConfig
     validator: ValidatorConfig
-    mlflow_logger: str
-    num_samples: int
+    n_trials: int
+    timeout: int
+    n_jobs: int
     scoring_metric: str
     scoring_mode: str
+
+
+class EvaluatorConfig(BaseModel):
+    logger: str
 
 
 class ConfigParser:

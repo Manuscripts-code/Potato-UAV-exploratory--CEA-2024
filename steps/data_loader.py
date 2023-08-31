@@ -20,5 +20,4 @@ def data_loader(
         save_dir=configs.SAVE_MERGED_DIR,
         save_coords=configs.SAVE_COORDS,
     ).load()
-    logging.info("Done")
     return loader.structured_data

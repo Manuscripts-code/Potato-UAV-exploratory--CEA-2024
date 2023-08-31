@@ -1,7 +1,7 @@
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 
-from models.methods import METHODS
+from configs import options
 
 
 class Model:
@@ -22,7 +22,7 @@ class Model:
         steps = list()
         for model_name in pipeline:
             # add features from pipeline
-            if model_name in METHODS.keys():
+            if model_name in options.METHODS.keys():
                 step = self._make_step(model_name)
                 steps.append(step)
             # add combined features
@@ -30,7 +30,7 @@ class Model:
             elif model_name in unions.keys():
                 steps_cf = list()
                 for model_name_cf in unions[model_name]:
-                    if model_name_cf in METHODS.keys():
+                    if model_name_cf in options.METHODS.keys():
                         step = self._make_step(model_name_cf)
                         steps_cf.append(step)
                 if steps_cf:
@@ -45,9 +45,9 @@ class Model:
         if model_name is None:
             return None
 
-        if isinstance(METHODS[model_name], type):
-            step = [model_name, METHODS[model_name]()]
+        if isinstance(options.METHODS[model_name], type):
+            step = [model_name, options.METHODS[model_name]()]
         else:
             # if already initialized
-            step = [model_name, METHODS[model_name]]
+            step = [model_name, options.METHODS[model_name]]
         return step

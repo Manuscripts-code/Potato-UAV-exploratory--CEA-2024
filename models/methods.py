@@ -2,11 +2,6 @@ import numpy as np
 from scipy.signal import savgol_filter
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.decomposition import PCA
-from sklearn.dummy import DummyRegressor
-from sklearn.preprocessing import MinMaxScaler, PowerTransformer, StandardScaler
-from sklearn.svm import SVC, SVR
-from xgboost import XGBClassifier, XGBRegressor
 
 
 class SavgolWrapper(BaseEstimator, TransformerMixin):
@@ -62,19 +57,3 @@ class MSCWrapper(BaseEstimator, TransformerMixin):
             # Apply correction
             data_msc[i, :] = (X[i, :] - fit[0][1]) / fit[0][0]
         return data_msc
-
-
-METHODS = {
-    "SVC": SVC,
-    "SVR": SVR,
-    "XGB": XGBClassifier,
-    "XGBR": XGBRegressor,
-    "PLS": PLSRegressionWrapper,
-    "savgol": SavgolWrapper,
-    "PCA": PCA,
-    "MSC": MSCWrapper,
-    "DummyRegressor": DummyRegressor,
-    "StandardScaler": StandardScaler,
-    "MinMaxScaler": MinMaxScaler,
-    "PowerTransformer": PowerTransformer,
-}

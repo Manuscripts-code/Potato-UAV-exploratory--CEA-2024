@@ -47,6 +47,10 @@ class SimpleSplitter:
             stratify=stratify,
         )
         stratify = data.target.encoded[train_indices] if self.stratify else None
+
+        if self.split_size_val == 0:
+            return np.sort(train_indices), np.array([]), np.sort(test_indices)
+
         train_indices, val_indices = train_test_split(
             train_indices,
             test_size=self.split_size_val,
