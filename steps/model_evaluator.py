@@ -1,18 +1,16 @@
-import logging
-
 from optuna.trial import FrozenTrial
 from sklearn.pipeline import Pipeline
-from typing_extensions import Annotated
 from zenml import step
+from zenml.client import Client
 
-from configs import options
+from configs import configs, options
 from configs.parser import EvaluatorConfig
 from data_manager.structure import StructuredData
 from models.evaluators import Evaluator
 from utils.utils import init_object
 
 
-@step(enable_cache=False)
+@step(enable_cache=configs.CACHING, experiment_tracker=Client().active_stack.experiment_tracker.name)
 def model_evaluator(
     best_model: Pipeline,
     best_trial: FrozenTrial,

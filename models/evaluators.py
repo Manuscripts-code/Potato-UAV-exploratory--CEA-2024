@@ -48,11 +48,11 @@ class ArtifactLoggerClassification:
             y_true, y_pred, average="weighted", zero_division=0
         )
         mlflow.log_metrics(
-            {
-                "precision": precision,
-                "recall": recall,
-                "f1": f1,
-            }
+            dict(
+                precision=precision,
+                recall=recall,
+                f1=f1,
+            )
         )
         clf_report = classification_report(y_true, y_pred)
 

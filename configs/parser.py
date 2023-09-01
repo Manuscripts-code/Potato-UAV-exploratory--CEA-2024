@@ -79,6 +79,14 @@ class OptimizerConfig(BaseModel):
     scoring_mode: str
 
 
+class RegistryConfig(BaseModel):
+    model_name: str
+    version: str
+    experiment_name: str
+    run_name: str
+    description: str
+
+
 class EvaluatorConfig(BaseModel):
     logger: str
 
@@ -123,3 +131,6 @@ class ConfigParser:
 
     def evaluator(self) -> EvaluatorConfig:
         return self._parse_config(configs.EVALUATOR_CFG_NAME, EvaluatorConfig)
+
+    def registry(self) -> RegistryConfig:
+        return self._parse_config(configs.REGISTRY_CFG_NAME, RegistryConfig)

@@ -28,6 +28,7 @@ FORMATTER_CFG_NAME = "formatter"
 MODEL_CFG_NAME = "model"
 OPTIMIZER_CFG_NAME = "optimizer"
 EVALUATOR_CFG_NAME = "evaluator"
+REGISTRY_CFG_NAME = "registry"
 
 # MULTISPECTRAL LOADER CONFIG
 DATES = "dates"

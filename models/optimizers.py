@@ -1,5 +1,6 @@
 import logging
 
+import mlflow
 import optuna
 from sklearn.base import clone
 from sklearn.model_selection import BaseCrossValidator, cross_val_score
@@ -88,6 +89,7 @@ class Optimizer:
         return score.mean()
 
     def _refit_model(self, best_params):
+        mlflow.sklearn.autolog()
         self._best_model = clone(self.model)
         self._best_model.set_params(**best_params)
         self._best_model.fit(self.data_train.data, self.data_train.target.encoded)

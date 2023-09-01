@@ -36,3 +36,11 @@ zenml stack register ecobreed -a default -o default -d mlflow_deployer -e mlflow
 
 zenml down
 zenml clean
+
+```sh
+## RUN MLFLOW USI
+```
+
+```sh
+mlflow ui --backend-store-uri file:///C:\\Users\\janezla\\AppData\\Roaming\\zenml\\local_stores\\508e55dd-c0c3-4bb9-8e2b-25e97c57bf21\\mlruns   
+```
