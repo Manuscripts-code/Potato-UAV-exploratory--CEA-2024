@@ -81,9 +81,6 @@ class OptimizerConfig(BaseModel):
 
 class RegistryConfig(BaseModel):
     model_name: str
-    version: str
-    experiment_name: str
-    run_name: str
     description: str
 
 

@@ -15,6 +15,9 @@ SHAPEFILES_DIR = Path(DATA_DIR, "shapefiles")
 SAVE_DIR = Path(BASE_DIR, "saved")
 SAVE_MERGED_DIR = Path(SAVE_DIR, "merged")
 
+# MAKE DIRS
+SAVE_DIR.mkdir(parents=True, exist_ok=True)
+
 # DATA CONFIGS
 CACHING = os.getenv("CACHING", "false") == "true"
 SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
