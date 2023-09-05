@@ -10,7 +10,7 @@ from models.evaluators import Evaluator
 from utils.utils import init_object
 
 
-@step(enable_cache=configs.CACHING, experiment_tracker=Client().active_stack.experiment_tracker.name)
+@step(enable_cache=False, experiment_tracker=Client().active_stack.experiment_tracker.name)
 def model_evaluator(
     best_model: Pipeline,
     best_trial: FrozenTrial,

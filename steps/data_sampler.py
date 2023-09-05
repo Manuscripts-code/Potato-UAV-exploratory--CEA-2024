@@ -3,14 +3,14 @@ import logging
 from typing_extensions import Annotated
 from zenml import step
 
-from configs import options
+from configs import configs, options
 from configs.parser import SamplerConfig
 from data_manager import samplers
 from data_manager.loaders import StructuredData
 from utils.utils import init_object
 
 
-@step
+@step(enable_cache=configs.CACHING)
 def data_sampler(
     data: StructuredData, sampler_cfg: SamplerConfig
 ) -> tuple[

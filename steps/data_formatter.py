@@ -1,14 +1,14 @@
 from typing_extensions import Annotated
 from zenml import step
 
-from configs import options
+from configs import configs, options
 from configs.parser import FormatterConfig
 from data_manager import formatters
 from data_manager.loaders import StructuredData
 from utils.utils import init_object
 
 
-@step
+@step(enable_cache=configs.CACHING)
 def data_formatter(
     data: StructuredData, formatter_cfg: FormatterConfig
 ) -> Annotated[StructuredData, "data"]:

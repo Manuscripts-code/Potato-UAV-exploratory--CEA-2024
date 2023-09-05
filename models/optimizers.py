@@ -20,7 +20,7 @@ class Optimizer:
         optimizer_cfg: OptimizerConfig,
     ):
         self.data_train = data_train
-        self.data_val = data_val
+        self.data_val = data_val  # currently unused
         self.model = model
         self.validator = validator
         self.optimizer_cfg = optimizer_cfg
