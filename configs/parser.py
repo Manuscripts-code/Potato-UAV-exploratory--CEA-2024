@@ -52,9 +52,9 @@ class ModelConfig(BaseModel):
 
 
 class TunedParametersConfig(BaseModel):
-    optimize_int: dict[str, list[int]] = None
-    optimize_float: dict[str, list[float]] = None
-    optimize_category: dict[str, list] = None
+    optimize_int: dict[str, list[int]] = {}
+    optimize_float: dict[str, list[float]] = {}
+    optimize_category: dict[str, list] = {}
 
 
 class ValidatorConfig(BaseModel):

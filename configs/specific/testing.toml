@@ -4,9 +4,9 @@
 num_closest_points = 10
 
 [multispectral]
-dates = ["2022_06_15"]
-treatments = ["eko", "konv"]
-channels = ["blue"]
+dates = ["2022_07_20"]
+treatments = ["eko"]
+channels = ["blue", "green", "nir", "red_edge", "red"]
 location_type = "measured"
 
 [sampler]
@@ -19,26 +19,24 @@ stratify = true
 
 [formatter]
 formatter = "ClassificationFormatter"
-labels_to_encode = ["treatments"]
+labels_to_encode = ["varieties"]
 
 [model]
-pipeline = ["SVC"]
+pipeline = ["XGBClassifier"]
 
 [optimizer]
-n_trials = 10
+n_trials = 1
 timeout = 1000
-n_jobs = 1
-scoring_metric = "f1"
+n_jobs = 10
+scoring_metric = "f1_weighted"
 scoring_mode = "maximize"
 
 [optimizer.tuned_parameters]
-[optimizer.tuned_parameters.optimize_int]
-SVC__C = [1, 10]
-SVC__degree = [1, 3]
-[optimizer.tuned_parameters.optimize_float]
-SVC__gamma = [0.001, 0.1]
-[optimizer.tuned_parameters.optimize_category]
-SVC__kernel = ["rbf", "poly", "sigmoid"]
+# [optimizer.tuned_parameters.optimize_float]
+# SVC__C = [0.01, 1.0]
+# SVC__gamma = [1e-5, 1.0]
+# [optimizer.tuned_parameters.optimize_category]
+# SVC__kernel = ["rbf"]
 
 [optimizer.validator]
 validator = "RepeatedStratifiedKFold"
@@ -47,7 +45,7 @@ n_repeats = 3
 random_state = 1
 
 [registry]
-model_name = "SVC"
+model_name = "TestModel"
 description = "Differentiation between eko and konv treatments"
 
 [evaluator]
