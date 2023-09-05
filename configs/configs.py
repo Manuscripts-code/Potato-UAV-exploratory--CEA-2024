@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 
-from utils.utils import read_toml
-
 # PATHS
 BASE_DIR = Path(__file__).parent.parent.absolute()
 LOGS_DIR = Path(BASE_DIR, "logs")
@@ -21,7 +19,8 @@ SAVE_DIR.mkdir(parents=True, exist_ok=True)
 # DATA CONFIGS
 CACHING = os.getenv("CACHING", "false") == "true"
 SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
-CONFIGS_TOML = read_toml(TOML_DIR / os.getenv("DATA_TOML_NAME", "testing.toml"))
+TOML_ENV_NAME = "DATA_TOML_NAME"
+TOML_DEFAULT_FILE_NAME = "testing.toml"
 
 # TOML CONFIG ROOT KEYS
 GENERAL_CFG_NAME = "general"

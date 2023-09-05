@@ -1,8 +1,10 @@
+import os
 from functools import partial
 
 from pydantic import BaseModel, Field, ValidationError
 
 from configs import configs, specific_paths
+from utils.utils import read_toml
 
 TYPE_DICT2 = dict[str, dict[str, str]]
 TYPE_DICT3 = dict[str, dict[str, dict[str, str]]]
@@ -92,7 +94,11 @@ class ConfigParser:
     def __init__(self):
         self.rasters_paths = specific_paths.PATHS_MULTISPECTRAL_IMAGES
         self.shapefiles_paths = specific_paths.PATHS_SHAPEFILES
-        self.toml_cfg = configs.CONFIGS_TOML
+        self.toml_cfg_path = configs.TOML_DIR / os.getenv(
+            configs.TOML_ENV_NAME,
+            configs.TOML_DEFAULT_FILE_NAME,
+        )
+        self.toml_cfg = read_toml(self.toml_cfg_path)
 
     def _parse_config(self, config_name: str, config_class: type[BaseModel]) -> BaseModel:
         specific_cfg = self.toml_cfg[config_name]

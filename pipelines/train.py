@@ -20,6 +20,7 @@ logger = get_logger(__name__)
 @pipeline(enable_cache=configs.CACHING)
 def train_and_register_model_pipeline() -> None:
     cfg_parser = ConfigParser()
+    logger.info(f"Using toml file: {cfg_parser.toml_cfg_path}")
 
     data = data_loader(cfg_parser.general(), cfg_parser.multispectral())
     data = data_formatter(data, cfg_parser.formatter())
