@@ -41,34 +41,59 @@ class Target(BaseModel):
         return cls(label=label, encoded=encoded, encoding=encoding)
 
 
+class Group(BaseModel):
+    label = pd.Series
+    encoded = pd.Series
+    encoding = pd.Series
+
+    def __getitem__(self, indices):
+        label = self.label.iloc[indices]
+        encoded = self.encoded.iloc[indices]
+        return Group(label=label, encoded=encoded, encoding=self.encoding)
+
+    def to_dict(self):
+        return {
+            "label": self.label.to_list(),
+            "encoded": self.encoded.to_list(),
+            "encoding": self.encoding.to_list(),
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        label = pd.Series(data["label"], name="label")
+        encoded = pd.Series(data["encoded"], name="encoded")
+        encoding = pd.Series(data["encoding"], name="encoding")
+        return cls(label=label, encoded=encoded, encoding=encoding)
+
+
 class StructuredData(BaseModel):
     data: pd.DataFrame
     meta: pd.DataFrame
     target: Target | None = None
+    group: Group | None = None
 
     def __getitem__(self, indices):
         data = self.data.iloc[indices]
         meta = self.meta.iloc[indices]
-        if self.target is None:
-            return StructuredData(data=data, meta=meta)
-        target = self.target[indices]
-        return StructuredData(data=data, meta=meta, target=target)
+        target = None if self.target is None else self.target[indices]
+        group = None if self.group is None else self.group[indices]
+        return StructuredData(data=data, meta=meta, target=target, group=group)
 
     def to_dict(self):
         return {
             "data": self.data.to_dict(),
             "meta": self.meta.to_dict(),
             "target": self.target.to_dict() if self.target is not None else None,
+            "group": self.group.to_dict() if self.group is not None else None,
         }
 
     @classmethod
     def from_dict(cls, data):
         data_ = pd.DataFrame(data["data"])
         meta = pd.DataFrame(data["meta"])
-        if data["target"] is None:
-            return cls(data=data_, meta=meta, target=None)
-        target = Target.from_dict(data["target"])
-        return cls(data=data_, meta=meta, target=target)
+        target = None if data["target"] is None else Target.from_dict(data["target"])
+        group = None if data["group"] is None else Group.from_dict(data["group"])
+        return cls(data=data_, meta=meta, target=target, group=group)
 
 
 class StructuredDataMaterializer(BaseMaterializer):
