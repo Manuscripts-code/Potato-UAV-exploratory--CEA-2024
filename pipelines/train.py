@@ -1,5 +1,4 @@
 from zenml import pipeline
-from zenml.integrations.mlflow.steps.mlflow_registry import mlflow_register_model_step
 from zenml.logger import get_logger
 
 from configs import configs

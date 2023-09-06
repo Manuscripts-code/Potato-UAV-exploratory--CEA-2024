@@ -7,7 +7,6 @@ from .model_evaluator import model_evaluator
 from .model_optimizer import model_optimizer
 from .model_predictor import model_predictor
 from .model_register import model_register
-from .model_service import model_service
 
 __all__ = [
     "data_loader",
@@ -19,5 +18,4 @@ __all__ = [
     "model_register",
     "model_deployer",
     "model_predictor",
-    "model_service",
 ]

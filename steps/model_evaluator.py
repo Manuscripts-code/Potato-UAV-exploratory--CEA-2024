@@ -3,7 +3,7 @@ from sklearn.pipeline import Pipeline
 from zenml import step
 from zenml.client import Client
 
-from configs import configs, options
+from configs import options
 from configs.parser import EvaluatorConfig
 from data_manager.structure import StructuredData
 from models.evaluators import Evaluator
