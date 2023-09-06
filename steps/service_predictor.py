@@ -7,7 +7,7 @@ from data_manager.structure import StructuredData
 
 
 @step
-def model_predictor(
+def service_predictor(
     model_service: MLFlowDeploymentService,
     data: StructuredData,
 ) -> None:

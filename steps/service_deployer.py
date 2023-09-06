@@ -5,7 +5,9 @@ from zenml.integrations.mlflow.steps.mlflow_deployer import mlflow_model_registr
 from configs.parser import RegistryConfig
 
 
-def model_deployer(registry_cfg: RegistryConfig) -> Annotated[MLFlowDeploymentService, "model_service"]:
+def service_deployer(
+    registry_cfg: RegistryConfig,
+) -> Annotated[MLFlowDeploymentService, "model_service"]:
     model_service = mlflow_model_registry_deployer_step.with_options(
         parameters=dict(
             registry_model_name=registry_cfg.model_name,
