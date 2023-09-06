@@ -31,16 +31,17 @@ def deployment_inference_pipeline() -> None:
     deployed_model = mlflow_model_registry_deployer_step.with_options(
         parameters=dict(
             registry_model_name=cfg_parser.registry().model_name,
-            registry_model_version=4,
+            registry_model_version=1,
             timeout=300,
             # or you can use the model stage if you have set it in the MLflow registry
             # registered_model_stage="None" # "Staging", "Production", "Archived"
         )
-    )
+    )  # ()
     model_service.after(deployed_model)
     deployed_model()
 
     model_deployment_service = model_service()
+    # model_predictor(deployed_model, data_test)
     model_predictor(model_deployment_service, data_test)
 
 

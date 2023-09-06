@@ -5,6 +5,7 @@ from rich import print
 from zenml.integrations.mlflow.mlflow_utils import get_tracking_uri
 
 from configs import configs
+from pipelines.test import deployment_inference_pipeline
 from pipelines.train import train_and_register_model_pipeline
 
 
@@ -18,6 +19,7 @@ from pipelines.train import train_and_register_model_pipeline
 def main(toml_config_file: str):
     os.environ[configs.TOML_ENV_NAME] = toml_config_file
     train_and_register_model_pipeline()
+    deployment_inference_pipeline()
 
     print(
         "\nYou can run:\n "

@@ -45,7 +45,7 @@ n_repeats = 3
 random_state = 1
 
 [registry]
-model_name = "TestModel"
+model_name = "TestModel111"
 description = "Differentiation between eko and konv treatments"
 
 [evaluator]
