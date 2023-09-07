@@ -28,7 +28,9 @@ def train_and_register_model_pipeline() -> None:
     model = model_creator(cfg_parser.model())
     best_model, best_trial = model_optimizer(model, data_train, data_val, cfg_parser.optimizer())
     model_evaluator(best_model, best_trial, data_train, data_val, data_test, cfg_parser.evaluator())
-    model_register(best_model, cfg_parser.registry())
+
+    if configs.REGISTER_MODEL:
+        model_register(best_model, cfg_parser.registry())
 
 
 if __name__ == "__main__":

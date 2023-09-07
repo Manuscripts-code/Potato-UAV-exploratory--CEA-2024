@@ -25,6 +25,7 @@ CACHING = os.getenv("CACHING", "false") == "true"
 SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
 TOML_ENV_NAME = "DATA_TOML_NAME"
 TOML_DEFAULT_FILE_NAME = "testing.toml"
+REGISTER_MODEL = os.getenv("REGISTER_MODEL", "false") == "true"
 
 # TOML CONFIG ROOT KEYS
 GENERAL_CFG_NAME = "general"
