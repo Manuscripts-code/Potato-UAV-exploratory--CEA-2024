@@ -37,3 +37,10 @@ DATES = "dates"
 TREATMENTS = "treatments"
 COLUMNS_SLO = ["Blok", "Rastlina", "Sorta"]
 COLUMNS_ENG = ["blocks", "plants", "varieties"]
+
+# MLFLOW ARTIFACTS SAVE VARS
+MLFLOW_TRAIN = "train"
+MLFLOW_TEST = "test"
+MLFLOW_RESULTS = "results"
+MLFLOW_CONFIGS = "configs"
+MLFLOW_MODEL = "model"

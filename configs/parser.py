@@ -75,10 +75,10 @@ class OptimizerConfig(BaseModel):
     tuned_parameters: TunedParametersConfig
     validator: ValidatorConfig
     n_trials: int
-    timeout: int
     n_jobs: int
     scoring_metric: str
     scoring_mode: str
+    timeout: int = 1000
 
 
 class RegistryConfig(BaseModel):

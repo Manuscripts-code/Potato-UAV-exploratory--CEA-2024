@@ -3,7 +3,7 @@ from sklearn.pipeline import Pipeline
 from zenml import step
 from zenml.client import Client
 
-from configs import options
+from configs import configs, options
 from configs.parser import EvaluatorConfig
 from data_manager.structure import StructuredData
 from models.evaluators import Evaluator
@@ -21,5 +21,5 @@ def model_evaluator(
 ) -> None:
     logger = init_object(options.LOGGERS, evaluator_cfg.logger)
     evaluator = Evaluator(best_model, best_trial, logger)
-    evaluator.run(data_train, "train")
-    evaluator.run(data_test, "test")
+    evaluator.run(data_train, configs.MLFLOW_TRAIN)
+    evaluator.run(data_test, configs.MLFLOW_TEST)
