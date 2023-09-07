@@ -18,7 +18,7 @@ def deployment_inference_pipeline() -> None:
     data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
 
     model_service = service_deployer(cfg_parser.registry())
-    service_predictor(model_service, data_test)
+    service_predictor(model_service, data_test, cfg_parser.registry())
 
 
 if __name__ == "__main__":

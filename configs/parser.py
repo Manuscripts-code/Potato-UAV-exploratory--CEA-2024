@@ -85,6 +85,7 @@ class RegistryConfig(BaseModel):
     model_name: str
     description: str
     metadata: list[str]
+    timeout: int = 100
 
     @property
     def metadata_dict(self):
