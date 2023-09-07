@@ -45,8 +45,9 @@ n_repeats = 3
 random_state = 1
 
 [registry]
-model_name = "TestModel111"
+model_name = "TestModel"
 description = "Differentiation between eko and konv treatments"
+metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]
 logger = "ArtifactLoggerClassification"

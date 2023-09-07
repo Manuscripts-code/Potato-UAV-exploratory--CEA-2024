@@ -84,6 +84,11 @@ class OptimizerConfig(BaseModel):
 class RegistryConfig(BaseModel):
     model_name: str
     description: str
+    metadata: list[str]
+
+    @property
+    def metadata_dict(self):
+        return dict(param.split("=") for param in self.metadata)
 
 
 class EvaluatorConfig(BaseModel):
