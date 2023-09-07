@@ -5,12 +5,18 @@ from pathlib import Path
 from typing import Protocol
 
 import joblib
+import matplotlib.pyplot as plt
 import mlflow
 import mlflow.sklearn
 import numpy as np
 import pandas as pd
 from optuna.trial import FrozenTrial
-from sklearn.metrics import classification_report, precision_recall_fscore_support
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    classification_report,
+    confusion_matrix,
+    precision_recall_fscore_support,
+)
 from sklearn.pipeline import Pipeline
 
 from configs import configs
@@ -99,5 +105,15 @@ class ArtifactLoggerClassification:
                 classification_report(tobj.y_true, tobj.y_pred),
                 results_path / "classification_report.txt",
             )
+            self.save_confusion_matrix(tobj, results_path)
             # joblib.dump(model_instance, path) # automatically done by mlflow
+
             mlflow.log_artifacts(dp)
+
+    def save_confusion_matrix(self, tobj: TransferObject, results_path: Path):
+        cm = confusion_matrix(tobj.y_true, tobj.y_pred)
+        display_labels = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
+        cm_display = ConfusionMatrixDisplay(cm, display_labels=display_labels)
+        cm_display.plot(cmap="Blues", values_format="d")
+        plt.savefig(results_path / "confusion_matrix.png")
+        plt.close()
