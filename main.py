@@ -17,11 +17,7 @@ from pipelines.train import train_and_register_model_pipeline
         [configs.CMD_TRAIN_AND_REGISTER, configs.CMD_DEPLOY_AND_TEST, configs.CMD_EXECUTE_ALL]
     ),
     default=configs.CMD_EXECUTE_ALL,
-    help="Optionally you can choose to only run the deployment "
-    "pipeline to train and deploy a model (`deploy`), or to "
-    "only run a prediction against the deployed model "
-    "(`predict`). By default both will be run "
-    "(`deploy_and_predict`).",
+    help="Optionally you can choose to only run specific pipelines.",
 )
 @click.option(
     "--toml-config-file",

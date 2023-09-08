@@ -24,7 +24,7 @@ SAVE_DIR.mkdir(parents=True, exist_ok=True)
 CACHING = os.getenv("CACHING", "false") == "true"
 SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
 TOML_ENV_NAME = "DATA_TOML_NAME"
-TOML_DEFAULT_FILE_NAME = "testing.toml"
+TOML_DEFAULT_FILE_NAME = "test_classification.toml"
 REGISTER_MODEL = os.getenv("REGISTER_MODEL", "false") == "true"
 
 # TOML CONFIG ROOT KEYS

@@ -19,13 +19,13 @@ stratify = true
 
 [formatter]
 formatter = "ClassificationFormatter"
-labels_to_encode = ["varieties"]
+classification_labels = ["varieties"]
 
 [model]
 pipeline = ["XGBClassifier"]
 
 [optimizer]
-n_trials = 1
+n_trials = 3
 n_jobs = 10
 scoring_metric = "f1_weighted"
 scoring_mode = "maximize"

@@ -45,7 +45,8 @@ class SamplerConfig(BaseModel):
 
 class FormatterConfig(BaseModel):
     formatter: str
-    labels_to_encode: list[str]
+    regression_label: str = None
+    classification_labels: list[str] = None
 
 
 class ModelConfig(BaseModel):

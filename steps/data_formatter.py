@@ -11,10 +11,10 @@ from utils.utils import init_object
 def data_formatter(
     data: StructuredData, formatter_cfg: FormatterConfig
 ) -> Annotated[StructuredData, "data"]:
-    formatter_ = init_object(
+    formatter = init_object(
         options.FORMATTERS,
         formatter_cfg.formatter,
-        labels_to_encode=formatter_cfg.labels_to_encode,
+        formatter_cfg=formatter_cfg,
     )
-    data = formatter_.format(data)
+    data = formatter.format(data)
     return data
