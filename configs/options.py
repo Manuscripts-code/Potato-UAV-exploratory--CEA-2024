@@ -10,6 +10,7 @@ from models import evaluators, methods
 
 FORMATTERS = {
     "ClassificationFormatter": formatters.ClassificationFormatter,
+    "RegressionFormatter": formatters.RegressionFormatter,
 }
 SPLITTERS = {
     "SimpleSplitter": samplers.SimpleSplitter,

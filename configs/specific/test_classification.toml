@@ -1,11 +1,11 @@
 # this is testing file
 
 [general]
-num_closest_points = 10
-
-[multispectral]
+raster_num_closest_points = 10
 dates = ["2022_07_20"]
 treatments = ["eko"]
+
+[multispectral]
 channels = ["blue", "green", "nir", "red_edge", "red"]
 location_type = "measured"
 

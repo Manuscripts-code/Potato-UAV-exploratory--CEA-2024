@@ -29,3 +29,12 @@ class ClassificationFormatter(Formatter):
         encoding = pd.Series(encoding, name="encoding")
         data.target = Target(label=label, encoded=encoded, encoding=encoding)
         return data
+
+
+class RegressionFormatter(Formatter):
+    def __init__(self, formatter_cfg: FormatterConfig):
+        self.formatter_cfg = formatter_cfg
+        self.regression_label = formatter_cfg.regression_label
+
+    def format(self, data: StructuredData) -> StructuredData:
+        pass

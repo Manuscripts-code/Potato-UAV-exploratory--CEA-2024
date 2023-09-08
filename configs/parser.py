@@ -11,12 +11,12 @@ TYPE_DICT3 = dict[str, dict[str, dict[str, str]]]
 
 
 class GeneralConfig(BaseModel):
-    num_closest_points: int
+    raster_num_closest_points: int
+    dates: list[str]
+    treatments: list[str]
 
 
 class MultispectralConfig(BaseModel):
-    dates: list[str]
-    treatments: list[str]
     channels: list[str]
     location_type: str
     rasters_paths: TYPE_DICT3
@@ -24,9 +24,6 @@ class MultispectralConfig(BaseModel):
 
     def parse_specific_paths(self):
         return self.rasters_paths.copy(), self.shapefiles_paths.copy()
-
-    def parse_toml_config(self):
-        return self.dates, self.treatments, self.channels, self.location_type
 
 
 class SamplerConfig(BaseModel):

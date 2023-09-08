@@ -22,15 +22,13 @@ class MultispectralLoader:
     ):
         self.save_dir = ensure_dir(save_dir)
         self.save_coords = save_coords
-        self.num_closest_points = general_config.num_closest_points
+        self.num_closest_points = general_config.raster_num_closest_points
 
         self.rasters_paths, self.shapefiles_paths = multispectral_config.parse_specific_paths()
-        (
-            self.dates,
-            self.treatments,
-            self.channels,
-            self.location_type,
-        ) = multispectral_config.parse_toml_config()
+        self.dates = general_config.dates
+        self.treatments = general_config.treatments
+        self.channels = multispectral_config.channels
+        self.location_type = multispectral_config.location_type
 
         self._mergers = None
         self._multi_merger = None
