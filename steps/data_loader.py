@@ -19,5 +19,6 @@ def data_loader(
         multispectral_cfg,
         save_dir=configs.SAVE_MERGED_DIR,
         save_coords=configs.SAVE_COORDS,
+        use_reduced_dataset=configs.USE_REDUCED_DATASET,
     ).load()
     return loader.structured_data

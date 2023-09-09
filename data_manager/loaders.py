@@ -19,10 +19,12 @@ class MultispectralLoader:
         *,
         save_dir="saved",
         save_coords=False,
+        use_reduced_dataset=False,
     ):
         self.save_dir = ensure_dir(save_dir)
         self.save_coords = save_coords
         self.num_closest_points = general_config.raster_num_closest_points
+        self.use_reduced_dataset = use_reduced_dataset
 
         self.rasters_paths, self.shapefiles_paths = multispectral_config.parse_specific_paths()
         self.dates = general_config.dates
@@ -104,6 +106,7 @@ class MultispectralLoader:
             save_dir=self.save_dir,
             save_coords=self.save_coords,
             num_closest_points=self.num_closest_points,
+            use_reduced_dataset=self.use_reduced_dataset,
         )
 
     @property

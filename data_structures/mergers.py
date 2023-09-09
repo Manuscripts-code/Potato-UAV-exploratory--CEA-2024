@@ -17,6 +17,7 @@ class RasterPointsMerger:
         save_dir="saved",
         save_coords=False,
         num_closest_points=1,
+        use_reduced_dataset=False,
     ):
         self._rasters = rasters
         self._shapefile = shapefile
@@ -28,13 +29,15 @@ class RasterPointsMerger:
         self.save_dir = ensure_dir(save_dir)
         self.save_coords = save_coords
         self.num_closest_points = num_closest_points
+        self.use_reduced_dataset = use_reduced_dataset
 
     def run_merge(self):
-        # # TEMP!
-        shapefile_df = self._shapefile.to_pandas()
-        self._merged_df = shapefile_df.iloc[0:10].copy().reset_index(drop=True)
-        # self._merged_df = self._shapefile.to_pandas()
-        # #
+        if self.use_reduced_dataset:
+            shapefile_df = self._shapefile.to_pandas()
+            self._merged_df = shapefile_df.iloc[0:10].copy().reset_index(drop=True)
+        else:
+            self._merged_df = self._shapefile.to_pandas()
+
         for raster in self._rasters:
             reflectance_list = self._extract_reflectances(
                 raster,

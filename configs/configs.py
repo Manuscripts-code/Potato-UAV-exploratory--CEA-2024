@@ -27,6 +27,7 @@ SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
 TOML_ENV_NAME = "DATA_TOML_NAME"
 TOML_DEFAULT_FILE_NAME = "test_classification.toml"
 REGISTER_MODEL = os.getenv("REGISTER_MODEL", "false") == "true"
+USE_REDUCED_DATASET = os.getenv("USE_REDUCED_DATASET", "false") == "true"
 
 # TOML CONFIG ROOT KEYS
 GENERAL_CFG_NAME = "general"
