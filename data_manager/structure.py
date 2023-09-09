@@ -13,7 +13,7 @@ class BaseModel(BaseModel):
         arbitrary_types_allowed = True
 
 
-class Target(BaseModel):
+class ClassificationTarget(BaseModel):
     label: pd.Series
     encoded: pd.Series
     encoding: pd.Series
@@ -21,7 +21,7 @@ class Target(BaseModel):
     def __getitem__(self, indices):
         label = self.label.iloc[indices]
         encoded = self.encoded.iloc[indices]
-        return Target(label=label, encoded=encoded, encoding=self.encoding)
+        return ClassificationTarget(label=label, encoded=encoded, encoding=self.encoding)
 
     def __len__(self):
         return len(self.label)
@@ -39,6 +39,30 @@ class Target(BaseModel):
         encoded = pd.Series(data["encoded"], name="encoded")
         encoding = pd.Series(data["encoding"], name="encoding")
         return cls(label=label, encoded=encoded, encoding=encoding)
+
+
+class RegressionTarget(BaseModel):
+    value: pd.Series
+    name: str
+
+    def __getitem__(self, indices):
+        value = self.value.iloc[indices]
+        return RegressionTarget(value=value, name=self.name)
+
+    def __len__(self):
+        return len(self.value)
+
+    def to_dict(self):
+        return {
+            "value": self.value.to_list(),
+            "name": self.name,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        value = pd.Series(data["value"], name="value")
+        name = data["name"]
+        return cls(value=value, name=name)
 
 
 class Group(BaseModel):
@@ -69,7 +93,7 @@ class Group(BaseModel):
 class StructuredData(BaseModel):
     data: pd.DataFrame
     meta: pd.DataFrame
-    target: Target | None = None
+    target: ClassificationTarget | RegressionTarget | None = None
     group: Group | None = None
 
     def __getitem__(self, indices):
@@ -91,9 +115,23 @@ class StructuredData(BaseModel):
     def from_dict(cls, data):
         data_ = pd.DataFrame(data["data"])
         meta = pd.DataFrame(data["meta"])
-        target = None if data["target"] is None else Target.from_dict(data["target"])
+        target = StructuredData.target_from_dict(data["target"])
         group = None if data["group"] is None else Group.from_dict(data["group"])
         return cls(data=data_, meta=meta, target=target, group=group)
+
+    @staticmethod
+    def target_from_dict(data):
+        if data is None:
+            return None
+
+        elif "value" in data:
+            return RegressionTarget.from_dict(data)
+
+        elif "label" in data:
+            return ClassificationTarget.from_dict(data)
+
+        else:
+            raise ValueError("Invalid target dict.")
 
 
 class StructuredDataMaterializer(BaseMaterializer):

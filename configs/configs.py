@@ -38,15 +38,18 @@ OPTIMIZER_CFG_NAME = "optimizer"
 EVALUATOR_CFG_NAME = "evaluator"
 REGISTRY_CFG_NAME = "registry"
 
-# MULTISPECTRAL LOADER CONFIG
-DATES = "dates"
-TREATMENTS = "treatments"
-COLUMNS_SLO = ["Blok", "Rastlina", "Sorta"]
-COLUMNS_ENG = ["blocks", "plants", "varieties"]
+# MULTISPECTRAL AND MEASUREMENTS LOADER CONFIG
+DATE_ENG = "dates"
+TREATMENT_ENG = "treatments"
+BLOCK_ENG = "blocks"
+PLANT_ENG = "plants"
+VARIETY_ENG = "varieties"
 
-# MEASUREMENTS LOADER CONFIG
 DATE_SLO = "Datum"
 TREATMENT_SLO = "Poskus"
+BLOCK_SLO = "Blok"
+PLANT_SLO = "Rastlina"
+VARIETY_SLO = "Sorta"
 
 # MLFLOW ARTIFACTS SAVE VARS
 MLFLOW_TRAIN = "train"

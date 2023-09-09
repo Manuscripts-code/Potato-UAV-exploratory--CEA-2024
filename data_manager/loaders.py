@@ -56,7 +56,9 @@ class MultispectralLoader:
         self._multi_merger.run_merges()
 
     def final_merge(self):
-        columns_meta = configs.COLUMNS_SLO + [configs.TREATMENTS, configs.DATES]
+        columns_slo = [configs.BLOCK_SLO, configs.PLANT_SLO, configs.VARIETY_SLO]
+        columns_eng = [configs.BLOCK_ENG, configs.PLANT_ENG, configs.VARIETY_ENG]
+        columns_meta = columns_slo + [configs.TREATMENT_ENG, configs.DATE_ENG]
         columns_data = self.channels
 
         df_meta_merged = pd.DataFrame(columns=columns_meta)
@@ -68,9 +70,7 @@ class MultispectralLoader:
             df_data_merged = pd.concat([df_data_merged, df_data], axis=0)
             df_meta_merged = pd.concat([df_meta_merged, df_meta], axis=0)
 
-        columns = {
-            old_name: new_name for old_name, new_name in zip(configs.COLUMNS_SLO, configs.COLUMNS_ENG)
-        }
+        columns = {old_name: new_name for old_name, new_name in zip(columns_slo, columns_eng)}
         df_meta_merged.rename(columns=columns, inplace=True, errors="raise")
         df_data_merged.reset_index(drop=True, inplace=True)
         df_meta_merged.reset_index(drop=True, inplace=True)
@@ -84,7 +84,7 @@ class MultispectralLoader:
         return df_data, treatment, date
 
     def _extract_meta(self, merged_df, treatment, date, columns_meta):
-        merged_df[[configs.TREATMENTS, configs.DATES]] = [
+        merged_df[[configs.TREATMENT_ENG, configs.DATE_ENG]] = [
             treatment,
             date,
         ]
