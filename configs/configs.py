@@ -13,6 +13,7 @@ TOML_DIR = Path(BASE_DIR, "configs", "specific")
 
 MUTISPECTRAL_DIR = Path(DATA_DIR, "multispectral_images")
 SHAPEFILES_DIR = Path(DATA_DIR, "shapefiles")
+MEASUREMENTS_DIR = Path(DATA_DIR, "measurements")
 
 SAVE_DIR = Path(BASE_DIR, "saved")
 SAVE_MERGED_DIR = Path(SAVE_DIR, "merged")
@@ -42,6 +43,10 @@ DATES = "dates"
 TREATMENTS = "treatments"
 COLUMNS_SLO = ["Blok", "Rastlina", "Sorta"]
 COLUMNS_ENG = ["blocks", "plants", "varieties"]
+
+# MEASUREMENTS LOADER CONFIG
+DATE_SLO = "Datum"
+TREATMENT_SLO = "Poskus"
 
 # MLFLOW ARTIFACTS SAVE VARS
 MLFLOW_TRAIN = "train"

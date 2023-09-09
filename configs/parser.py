@@ -8,6 +8,7 @@ from utils.utils import read_toml
 
 TYPE_DICT2 = dict[str, dict[str, str]]
 TYPE_DICT3 = dict[str, dict[str, dict[str, str]]]
+TYPE_DICT_TUPL = dict[str, tuple[str, str]]
 
 
 class GeneralConfig(BaseModel):
@@ -42,6 +43,7 @@ class SamplerConfig(BaseModel):
 
 class FormatterConfig(BaseModel):
     formatter: str
+    measurements_paths: TYPE_DICT_TUPL
     regression_label: str = None
     classification_labels: list[str] = None
 
@@ -128,7 +130,11 @@ class ConfigParser:
         return self._parse_config(configs.SAMPLER_CFG_NAME, SamplerConfig)
 
     def formatter(self) -> FormatterConfig:
-        return self._parse_config(configs.FORMATTER_CFG_NAME, FormatterConfig)
+        config = partial(
+            FormatterConfig,
+            measurements_paths=specific_paths.PATHS_MEASUREMENTS,
+        )
+        return self._parse_config(configs.FORMATTER_CFG_NAME, config)
 
     def model(self) -> ModelConfig:
         return self._parse_config(configs.MODEL_CFG_NAME, ModelConfig)

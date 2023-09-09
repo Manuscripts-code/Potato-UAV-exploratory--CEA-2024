@@ -22,7 +22,7 @@ def train_and_register_model_pipeline() -> None:
     logger.info(f"Using toml file: {cfg_parser.toml_cfg_path}")
 
     data = data_loader(cfg_parser.general(), cfg_parser.multispectral())
-    data = data_formatter(data, cfg_parser.formatter())
+    data = data_formatter(data, cfg_parser.general(), cfg_parser.formatter())
     data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
 
     model = model_creator(cfg_parser.model())

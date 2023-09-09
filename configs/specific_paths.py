@@ -153,3 +153,10 @@ PATHS_SHAPEFILES = {
         "measured": str(configs.SHAPEFILES_DIR / "potato_measured_locations_konv.shp"),
     },
 }
+
+PATHS_MEASUREMENTS = {
+    "SPAD": (
+        "SPAD_mean",
+        str(configs.MEASUREMENTS_DIR / "SPAD_Ecobreed_krompir_2022.xlsx"),
+    )
+}
