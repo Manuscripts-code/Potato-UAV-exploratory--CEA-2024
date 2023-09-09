@@ -76,7 +76,7 @@ class Optimizer:
         score = cross_val_score(
             model,
             X=self.data_train.data,
-            y=self.data_train.target.encoded,
+            y=self.data_train.target.value,
             groups=None,
             scoring=self.scoring_metric,
             cv=self.validator,
@@ -95,7 +95,7 @@ class Optimizer:
         # Note: data needs to be numpy array for zenml server to work..
         self._best_model.fit(
             self.data_train.data.to_numpy(),
-            self.data_train.target.encoded.to_numpy(),
+            self.data_train.target.value.to_numpy(),
         )
 
     @property

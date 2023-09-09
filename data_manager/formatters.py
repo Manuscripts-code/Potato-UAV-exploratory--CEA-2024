@@ -29,7 +29,7 @@ class ClassificationFormatter(Formatter):
         encoded, encoding = pd.factorize(label)
         encoded = pd.Series(encoded, name="encoded")
         encoding = pd.Series(encoding, name="encoding")
-        data.target = ClassificationTarget(label=label, encoded=encoded, encoding=encoding)
+        data.target = ClassificationTarget(label=label, value=encoded, encoding=encoding)
         return data
 
 

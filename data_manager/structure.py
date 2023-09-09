@@ -15,13 +15,13 @@ class BaseModel(BaseModel):
 
 class ClassificationTarget(BaseModel):
     label: pd.Series
-    encoded: pd.Series
+    value: pd.Series
     encoding: pd.Series
 
     def __getitem__(self, indices):
         label = self.label.iloc[indices]
-        encoded = self.encoded.iloc[indices]
-        return ClassificationTarget(label=label, encoded=encoded, encoding=self.encoding)
+        value = self.value.iloc[indices]
+        return ClassificationTarget(label=label, value=value, encoding=self.encoding)
 
     def __len__(self):
         return len(self.label)
@@ -29,16 +29,16 @@ class ClassificationTarget(BaseModel):
     def to_dict(self):
         return {
             "label": self.label.to_list(),
-            "encoded": self.encoded.to_list(),
+            "value": self.value.to_list(),
             "encoding": self.encoding.to_list(),
         }
 
     @classmethod
     def from_dict(cls, data):
         label = pd.Series(data["label"], name="label")
-        encoded = pd.Series(data["encoded"], name="encoded")
+        value = pd.Series(data["value"], name="value")
         encoding = pd.Series(data["encoding"], name="encoding")
-        return cls(label=label, encoded=encoded, encoding=encoding)
+        return cls(label=label, value=value, encoding=encoding)
 
 
 class RegressionTarget(BaseModel):
@@ -124,10 +124,10 @@ class StructuredData(BaseModel):
         if data is None:
             return None
 
-        elif "value" in data:
+        elif "name" in data:
             return RegressionTarget.from_dict(data)
 
-        elif "label" in data:
+        elif "encoding" in data:
             return ClassificationTarget.from_dict(data)
 
         else:

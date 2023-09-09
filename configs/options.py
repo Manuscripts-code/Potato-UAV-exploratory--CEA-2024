@@ -18,6 +18,7 @@ SPLITTERS = {
 
 LOGGERS = {
     "ArtifactLoggerClassification": evaluators.ArtifactLoggerClassification,
+    "ArtifactLoggerRegression": evaluators.ArtifactLoggerRegression,
 }
 
 VALIDATORS = {

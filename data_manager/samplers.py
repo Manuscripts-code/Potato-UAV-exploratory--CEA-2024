@@ -37,7 +37,7 @@ class SimpleSplitter:
 
     def __call__(self, data: StructuredData) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         idx_full = np.arange(len(data.target))
-        stratify = data.target.encoded if self.stratify else None
+        stratify = data.target.value if self.stratify else None
 
         train_indices, test_indices = train_test_split(
             idx_full,
@@ -46,7 +46,7 @@ class SimpleSplitter:
             shuffle=self.shuffle,
             stratify=stratify,
         )
-        stratify = data.target.encoded[train_indices] if self.stratify else None
+        stratify = data.target.value[train_indices] if self.stratify else None
 
         if self.split_size_val == 0:
             return np.sort(train_indices), np.array([]), np.sort(test_indices)

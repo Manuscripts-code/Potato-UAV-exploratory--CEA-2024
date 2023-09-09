@@ -20,7 +20,7 @@ from sklearn.metrics import (
 from sklearn.pipeline import Pipeline
 
 from configs import configs
-from data_manager.structure import StructuredData
+from data_manager.structure import ClassificationTarget, StructuredData
 from utils.utils import ensure_dir, write_json, write_txt
 
 
@@ -59,13 +59,20 @@ class Evaluator:
         self.logger = logger
 
     def run(self, data: StructuredData, suffix: str):
+        if isinstance(data.target, ClassificationTarget):
+            label = data.target.label.to_numpy()
+            encoding = data.target.encoding.to_dict()
+        else:
+            label = None
+            encoding = None
+
         transfer_object = TransferObject(
             best_model=self.best_model,
             best_trial=self.best_trial,
             y_pred=self.best_model.predict(data.data),
-            y_true=data.target.encoded.to_numpy(),
-            label=data.target.label.to_numpy(),
-            encoding=data.target.encoding.to_dict(),
+            y_true=data.target.value.to_numpy(),
+            label=label,
+            encoding=encoding,
             meta=data.meta,
             suffix=suffix,
         )
@@ -117,3 +124,27 @@ class ArtifactLoggerClassification:
         cm_display.plot(cmap="Blues", values_format="d")
         plt.savefig(results_path / "confusion_matrix.png")
         plt.close()
+
+
+class ArtifactLoggerRegression:
+    def log_params(self, tobj: TransferObject):
+        mlflow.log_params(tobj.best_trial.params)
+        logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
+
+    def log_metrics(self, tobj: TransferObject):
+        mse = np.mean((tobj.y_true - tobj.y_pred) ** 2)
+        mlflow.log_metrics({f"{tobj.suffix}_mse": mse})
+        logging.info(f"MSE on {tobj.suffix} data: {mse}")
+
+    def log_artifacts(self, tobj: TransferObject):
+        with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
+            results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
+            configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
+
+            write_json(tobj.best_trial.params, configs_path / "best_params.json")
+            write_txt(
+                f"MSE on {tobj.suffix} data: {np.mean((tobj.y_true - tobj.y_pred) ** 2)}",
+                results_path / "mse.txt",
+            )
+
+            mlflow.log_artifacts(dp)
