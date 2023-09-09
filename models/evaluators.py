@@ -37,13 +37,13 @@ class TransferObject:
 
 
 class ArtifactLogger(Protocol):
-    def log_params(params: TransferObject):
+    def log_params(self, tobj: TransferObject):
         ...
 
-    def log_metrics(tobj: TransferObject):
+    def log_metrics(self, tobj: TransferObject):
         ...
 
-    def log_artifacts(tobj: TransferObject):
+    def log_artifacts(self, tobj: TransferObject):
         ...
 
 
