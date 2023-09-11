@@ -61,6 +61,8 @@ class RegressionFormatter(Formatter):
         file_path = measurements_paths[regression_label][1]
 
         measurements = pd.read_excel(file_path)
+        # change date format to match the one in the config
+        measurements[configs.DATE_SLO] = measurements[configs.DATE_SLO].dt.strftime(configs.DATE_FORMAT)
         # keep only rows where the date and treatment are defined in the config
         measurements = measurements[
             measurements[configs.DATE_SLO].isin(self.general_cfg.dates)
