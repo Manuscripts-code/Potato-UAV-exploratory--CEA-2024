@@ -1,6 +1,8 @@
+from autofeat import AutoFeatClassifier, AutoFeatRegressor
 from sklearn import model_selection
 from sklearn.decomposition import PCA
 from sklearn.dummy import DummyRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler, PowerTransformer, StandardScaler
 from sklearn.svm import SVC, SVR
 from xgboost import XGBClassifier, XGBRegressor
@@ -31,6 +33,8 @@ METHODS = {
     "SVR": SVR,
     "XGBClassifier": XGBClassifier,
     "XGBRegressor": XGBRegressor,
+    "RandomForestClassifier": RandomForestClassifier,
+    "RandomForestRegressor": RandomForestRegressor,
     "PLS": methods.PLSRegressionWrapper,
     "savgol": methods.SavgolWrapper,
     "PCA": PCA,
@@ -39,4 +43,6 @@ METHODS = {
     "StandardScaler": StandardScaler,
     "MinMaxScaler": MinMaxScaler,
     "PowerTransformer": PowerTransformer,
+    "AutoFeatClassifier": AutoFeatClassifier,
+    "AutoFeatRegressor": AutoFeatRegressor,
 }

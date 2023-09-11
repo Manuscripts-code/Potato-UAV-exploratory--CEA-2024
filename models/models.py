@@ -1,3 +1,5 @@
+import logging
+
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.pipeline import FeatureUnion, Pipeline
 
@@ -37,8 +39,9 @@ class Model:
                     steps.append([model_name, FeatureUnion(steps_cf)])
 
             else:
-                # if method not found
+                logging.warning(f"Model {model_name} not found in options.METHODS.keys()")
                 steps.append([model_name, None])
+
         return steps
 
     def _make_step(self, model_name):

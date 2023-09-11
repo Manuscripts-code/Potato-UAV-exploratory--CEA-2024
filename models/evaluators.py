@@ -69,7 +69,7 @@ class Evaluator:
         transfer_object = TransferObject(
             best_model=self.best_model,
             best_trial=self.best_trial,
-            y_pred=self.best_model.predict(data.data),
+            y_pred=self.best_model.predict(data.data.to_numpy()),
             y_true=data.target.value.to_numpy(),
             label=label,
             encoding=encoding,
