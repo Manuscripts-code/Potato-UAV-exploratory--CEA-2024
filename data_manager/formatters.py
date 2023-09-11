@@ -19,12 +19,18 @@ class Formatter(ABC):
 
 class ClassificationFormatter(Formatter):
     def __init__(self, general_cfg: GeneralConfig, formatter_cfg: FormatterConfig):
+        self.general_cfg = general_cfg
         self.formatter_cfg = formatter_cfg
-        self.classification_labels = formatter_cfg.classification_labels
 
     def format(self, data: StructuredData) -> StructuredData:
+        # keep only varieties defined in the config
+        indices = data.meta.index[
+            data.meta[configs.VARIETY_ENG].isin(self.general_cfg.varieties)
+        ].to_list()
+        data = data[indices]
+
         # create one column labels from multiple columns
-        label = data.meta[self.classification_labels].apply(tuple, axis=1)
+        label = data.meta[self.formatter_cfg.classification_labels].apply(tuple, axis=1)
         # encode to numbers
         encoded, encoding = pd.factorize(label)
         encoded = pd.Series(encoded, name="encoded")
@@ -63,10 +69,11 @@ class RegressionFormatter(Formatter):
         measurements = pd.read_excel(file_path)
         # change date format to match the one in the config
         measurements[configs.DATE_SLO] = measurements[configs.DATE_SLO].dt.strftime(configs.DATE_FORMAT)
-        # keep only rows where the date and treatment are defined in the config
+        # keep only rows where the date, treatment and varieties are defined in the config
         measurements = measurements[
             measurements[configs.DATE_SLO].isin(self.general_cfg.dates)
             & measurements[configs.TREATMENT_SLO].isin(self.general_cfg.treatments)
+            & measurements[configs.VARIETY_SLO].isin(self.general_cfg.varieties)
         ].reset_index(drop=True)
         measurements.rename(columns=self.columns, inplace=True, errors="raise")
 

@@ -15,6 +15,7 @@ class GeneralConfig(BaseModel):
     raster_num_closest_points: int
     dates: list[str]
     treatments: list[str]
+    varieties: list[str]
 
 
 class MultispectralConfig(BaseModel):
