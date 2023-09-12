@@ -16,6 +16,16 @@ class Formatter(ABC):
     def format(self, data: StructuredData) -> StructuredData:
         pass
 
+    def _filter_data(self, data: StructuredData) -> StructuredData:
+        # keep only rows where the date, treatment and varieties are defined in the toml config
+        # note: date and treatment filtered before, so only varieties are filtered here
+        indices = data.meta.index[
+            data.meta[configs.VARIETY_ENG].isin(self.general_cfg.varieties)
+            & data.meta[configs.TREATMENT_ENG].isin(self.general_cfg.treatments)
+            & data.meta[configs.DATE_ENG].isin(self.general_cfg.dates)
+        ].to_list()
+        return data[indices]
+
 
 class ClassificationFormatter(Formatter):
     def __init__(self, general_cfg: GeneralConfig, formatter_cfg: FormatterConfig):
@@ -23,11 +33,8 @@ class ClassificationFormatter(Formatter):
         self.formatter_cfg = formatter_cfg
 
     def format(self, data: StructuredData) -> StructuredData:
-        # keep only varieties defined in the config
-        indices = data.meta.index[
-            data.meta[configs.VARIETY_ENG].isin(self.general_cfg.varieties)
-        ].to_list()
-        data = data[indices]
+        # keep only varieties defined in the toml config
+        data = self._filter_data(data)
 
         # create one column labels from multiple columns
         label = data.meta[self.formatter_cfg.classification_labels].apply(tuple, axis=1)
@@ -69,13 +76,10 @@ class RegressionFormatter(Formatter):
         measurements = pd.read_excel(file_path)
         # change date format to match the one in the config
         measurements[configs.DATE_SLO] = measurements[configs.DATE_SLO].dt.strftime(configs.DATE_FORMAT)
-        # keep only rows where the date, treatment and varieties are defined in the config
-        measurements = measurements[
-            measurements[configs.DATE_SLO].isin(self.general_cfg.dates)
-            & measurements[configs.TREATMENT_SLO].isin(self.general_cfg.treatments)
-            & measurements[configs.VARIETY_SLO].isin(self.general_cfg.varieties)
-        ].reset_index(drop=True)
         measurements.rename(columns=self.columns, inplace=True, errors="raise")
+
+        # keep only varieties defined in the toml config
+        data = self._filter_data(data)
 
         # match rows from measurements with rows from metadata
         merged_df = pd.merge(

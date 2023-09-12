@@ -16,6 +16,9 @@ class Sampler:
         self.splitter = splitter
 
     def sample(self, data: StructuredData) -> tuple[StructuredData, StructuredData, StructuredData]:
+        assert (
+            len(data.data) == len(data.meta) == len(data.target)
+        ), "'data.data', 'data.meta' and 'data.target' must have the same length!"
         train_indices, val_indices, test_indices = self.splitter(data)
         return data[train_indices], data[val_indices], data[test_indices]
 
