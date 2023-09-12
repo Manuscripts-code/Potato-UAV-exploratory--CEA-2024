@@ -1,3 +1,4 @@
+from .data_facets import data_facets
 from .data_formatter import data_formatter
 from .data_loader import data_loader
 from .data_sampler import data_sampler
@@ -18,4 +19,5 @@ __all__ = [
     "model_register",
     "service_deployer",
     "service_predictor",
+    "data_facets",
 ]
