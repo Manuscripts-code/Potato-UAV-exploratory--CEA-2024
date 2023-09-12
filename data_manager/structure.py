@@ -3,9 +3,13 @@ from typing import Type
 
 import pandas as pd
 from pydantic import BaseModel
-from zenml.enums import ArtifactType
+from zenml.enums import ArtifactType, VisualizationType
+from zenml.io import fileio
 from zenml.materializers.base_materializer import BaseMaterializer
+from zenml.metadata.metadata_types import DType, MetadataType
 from zenml.utils import yaml_utils
+
+from configs import configs
 
 
 class BaseModel(BaseModel):
@@ -138,9 +142,46 @@ class StructuredDataMaterializer(BaseMaterializer):
     ASSOCIATED_TYPES = (StructuredData,)
     ASSOCIATED_ARTIFACT_TYPE = ArtifactType.DATA
 
+    def __init__(self, uri: str):
+        super().__init__(uri)
+
     def load(self, data_type: Type[StructuredData]) -> StructuredData:
-        data = yaml_utils.read_json(os.path.join(self.uri, "structured_data.json"))
+        data = yaml_utils.read_json(os.path.join(self.uri, configs.MATERIALIZER_DATA_JSON))
         return StructuredData.from_dict(data)
 
-    def save(self, my_obj: StructuredData) -> None:
-        yaml_utils.write_json(os.path.join(self.uri, "structured_data.json"), my_obj.to_dict())
+    def save(self, data: StructuredData) -> None:
+        yaml_utils.write_json(os.path.join(self.uri, configs.MATERIALIZER_DATA_JSON), data.to_dict())
+
+    def save_visualizations(self, data: StructuredData) -> dict[str, VisualizationType]:
+        collected_uris = {}
+
+        describe_data_uri = self._get_pandas_describe_uri(
+            data.data, configs.MATERIALIZER_DESCRIBE_DATA_CSV
+        )
+        collected_uris[describe_data_uri] = VisualizationType.CSV
+
+        describe_meta_uri = self._get_pandas_describe_uri(
+            data.meta, configs.MATERIALIZER_DESCRIBE_META_CSV
+        )
+        collected_uris[describe_meta_uri] = VisualizationType.CSV
+
+        if data.target is not None:
+            describe_target_uri = self._get_pandas_describe_uri(
+                pd.DataFrame(data.target.value), configs.MATERIALIZER_DESCRIBE_TARGET_CSV
+            )
+            collected_uris[describe_target_uri] = VisualizationType.CSV
+
+        return collected_uris
+
+    def _get_pandas_describe_uri(self, df: pd.DataFrame, name_csv: str) -> str:
+        describe_uri = os.path.join(self.uri, name_csv)
+        with fileio.open(describe_uri, mode="wb") as f:
+            df.describe().to_csv(f)
+        return describe_uri
+
+    def extract_metadata(self, data: StructuredData) -> dict[str, MetadataType]:
+        metadata: dict[str, MetadataType] = {}
+        metadata["data_shape"] = data.data.shape
+        metadata["data_dtypes"] = data.data.dtypes.apply(lambda x: DType(x.name)).to_dict()
+        metadata["meta_dtypes"] = data.meta.dtypes.apply(lambda x: DType(x.name)).to_dict()
+        return metadata
