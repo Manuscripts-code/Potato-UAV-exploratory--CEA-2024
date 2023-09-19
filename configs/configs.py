@@ -70,5 +70,10 @@ MATERIALIZER_DESCRIBE_DATA_CSV = "describe_data.csv"
 MATERIALIZER_DESCRIBE_META_CSV = "describe_meta.csv"
 MATERIALIZER_DESCRIBE_TARGET_CSV = "describe_target.csv"
 
+# DATABASE CONFIGS
+DB_NAME = os.getenv("DB_NAME", "database.db")
+DB_PATH = Path(SAVE_DIR, DB_NAME)
+DB_ECHO = os.getenv("DB_ECHO", "false") == "true"
+
 # MISCELLANEOUS
 DATE_FORMAT = "%Y_%m_%d"
