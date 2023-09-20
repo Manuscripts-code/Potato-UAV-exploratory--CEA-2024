@@ -1,4 +1,5 @@
 import os
+import pickle
 from typing import Type
 
 import pandas as pd
@@ -115,6 +116,9 @@ class StructuredData(BaseModel):
             "group": self.group.to_dict() if self.group is not None else None,
         }
 
+    def to_bytes(self):
+        return pickle.dumps(self.to_dict())
+
     @classmethod
     def from_dict(cls, data):
         data_ = pd.DataFrame(data["data"])
@@ -136,6 +140,10 @@ class StructuredData(BaseModel):
 
         else:
             raise ValueError("Invalid target dict.")
+
+    @classmethod
+    def from_bytes(cls, data):
+        return cls.from_dict(pickle.loads(data))
 
 
 class StructuredDataMaterializer(BaseMaterializer):

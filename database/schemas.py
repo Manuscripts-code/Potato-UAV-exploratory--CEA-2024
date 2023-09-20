@@ -3,15 +3,6 @@ from typing import Optional
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class Model(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
-    version: str
-
-    record: Optional["Record"] = Relationship(back_populates="models")
-    record_id: Optional[int] = Field(default=None, foreign_key="record.id")
-
-
 class Metric(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
@@ -32,9 +23,20 @@ class Artifact(SQLModel, table=True):
     record_id: Optional[int] = Field(default=None, foreign_key="record.id")
 
 
+class Data(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    data: bytes
+
+    record: Optional["Record"] = Relationship(back_populates="data")
+    record_id: Optional[int] = Field(default=None, foreign_key="record.id")
+
+
 class Record(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    model_name: str = Field(index=True)
+    model_version: str
 
-    models: list["Model"] = Relationship(back_populates="record")
+    data: list["Data"] = Relationship(back_populates="record")
     metrics: list["Metric"] = Relationship(back_populates="record")
     artifacts: list["Artifact"] = Relationship(back_populates="record")
