@@ -20,7 +20,7 @@ from sklearn.metrics import (
 from sklearn.pipeline import Pipeline
 
 from configs import configs
-from data_manager.structure import ClassificationTarget, StructuredData
+from data_structures.schemas import ClassificationTarget, StructuredData
 from utils.utils import ensure_dir, write_json, write_txt
 
 

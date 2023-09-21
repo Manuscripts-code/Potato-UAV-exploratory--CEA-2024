@@ -4,7 +4,7 @@ import pandas as pd
 
 from configs import configs
 from configs.parser import FormatterConfig, GeneralConfig
-from data_manager.structure import ClassificationTarget, RegressionTarget, StructuredData
+from data_structures.schemas import ClassificationTarget, RegressionTarget, StructuredData
 
 
 class Formatter(ABC):

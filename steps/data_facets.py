@@ -3,7 +3,7 @@ from typing_extensions import Annotated
 from zenml import step
 from zenml.integrations.facets.materializers.facets_materializer import FacetsComparison
 
-from data_manager.structure import StructuredData
+from data_structures.schemas import StructuredData
 
 
 @step

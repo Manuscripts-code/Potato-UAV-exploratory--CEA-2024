@@ -7,7 +7,7 @@ from sklearn.model_selection import BaseCrossValidator, cross_val_score
 from sklearn.pipeline import Pipeline
 
 from configs.parser import OptimizerConfig
-from data_manager.structure import StructuredData
+from data_structures.schemas import StructuredData
 
 
 class Optimizer:

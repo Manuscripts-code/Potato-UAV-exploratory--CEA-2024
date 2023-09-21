@@ -4,7 +4,7 @@ import pandas as pd
 
 from configs import configs
 from configs.parser import GeneralConfig, MultispectralConfig
-from data_manager.structure import StructuredData
+from data_structures.schemas import StructuredData
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
 from data_structures.shapefiles import PointsShapefile

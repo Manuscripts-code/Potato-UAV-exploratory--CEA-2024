@@ -4,7 +4,7 @@ from zenml import step
 from zenml.integrations.mlflow.services import MLFlowDeploymentService
 
 from configs.parser import RegistryConfig
-from data_manager.structure import StructuredData
+from data_structures.schemas import StructuredData
 
 
 @step

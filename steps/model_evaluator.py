@@ -5,7 +5,7 @@ from zenml.client import Client
 
 from configs import configs, options
 from configs.parser import EvaluatorConfig
-from data_manager.structure import StructuredData
+from data_structures.schemas import StructuredData
 from models.evaluators import Evaluator
 from utils.utils import init_object
 

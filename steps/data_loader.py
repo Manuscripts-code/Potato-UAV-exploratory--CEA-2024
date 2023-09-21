@@ -6,7 +6,7 @@ from zenml import step
 from configs import configs
 from configs.parser import GeneralConfig, MultispectralConfig
 from data_manager.loaders import MultispectralLoader
-from data_manager.structure import StructuredData, StructuredDataMaterializer
+from data_structures.schemas import StructuredData, StructuredDataMaterializer
 
 
 @step(enable_cache=configs.CACHING, output_materializers=StructuredDataMaterializer)
