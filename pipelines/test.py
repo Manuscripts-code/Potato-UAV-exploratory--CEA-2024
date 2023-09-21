@@ -3,7 +3,14 @@ from zenml.logger import get_logger
 
 from configs import configs
 from configs.parser import ConfigParser
-from steps import data_formatter, data_loader, data_sampler, service_deployer, service_predictor
+from steps import (
+    data_formatter,
+    data_loader,
+    data_sampler,
+    db_saver,
+    service_deployer,
+    service_predictor,
+)
 
 logger = get_logger(__name__)
 
@@ -18,7 +25,9 @@ def deployment_inference_pipeline() -> None:
     data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
 
     model_service = service_deployer(cfg_parser.registry())
-    service_predictor(model_service, data_test, cfg_parser.registry())
+    predictions_train = service_predictor(model_service, data_train, cfg_parser.registry())
+    predictions_test = service_predictor(model_service, data_test, cfg_parser.registry())
+    db_saver(model_service, data_train, data_test, predictions_train, predictions_test)
 
 
 if __name__ == "__main__":

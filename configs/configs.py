@@ -74,6 +74,10 @@ MATERIALIZER_DESCRIBE_TARGET_CSV = "describe_target.csv"
 DB_NAME = os.getenv("DB_NAME", "database.db")
 DB_PATH = Path(SAVE_DIR, DB_NAME)
 DB_ECHO = os.getenv("DB_ECHO", "false") == "true"
+DB_DATA_TRAIN = "data_train"
+DB_DATA_TEST = "data_test"
+DB_PREDICTIONS_TRAIN = "predictions_train"
+DB_PREDICTIONS_TEST = "predictions_test"
 
 # MISCELLANEOUS
 DATE_FORMAT = "%Y_%m_%d"

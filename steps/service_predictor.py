@@ -1,8 +1,11 @@
 import logging
 
+import numpy as np
+from typing_extensions import Annotated
 from zenml import step
 from zenml.integrations.mlflow.services import MLFlowDeploymentService
 
+from configs import configs
 from configs.parser import RegistryConfig
 from data_structures.schemas import StructuredData
 
@@ -12,8 +15,7 @@ def service_predictor(
     model_service: MLFlowDeploymentService,
     data: StructuredData,
     registry_cfg: RegistryConfig,
-) -> None:
+) -> Annotated[np.ndarray, "predictions"]:
     """Run a inference request against a prediction service."""
     model_service.start(timeout=registry_cfg.timeout)  # should be a NOP if already started
-    prediction = model_service.predict(data.data.to_numpy())
-    logging.info(f"Prediction: {prediction}")
+    return model_service.predict(data.data.to_numpy())
