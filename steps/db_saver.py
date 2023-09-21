@@ -20,8 +20,8 @@ def db_saver(
 ) -> None:
     logging.info("Saving data to database...")
     deployer_cfg = model_service.config
-    predictions_train = Prediction(predictions=predictions_train, name=configs.DB_PREDICTIONS_TRAIN)
-    predictions_test = Prediction(predictions=predictions_test, name=configs.DB_PREDICTIONS_TEST)
+    predictions_train = Prediction(predictions=predictions_train)
+    predictions_test = Prediction(predictions=predictions_test)
 
     record_table = prepare_record_table(
         model_name=deployer_cfg.registry_model_name,

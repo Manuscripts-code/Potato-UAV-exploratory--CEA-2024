@@ -1,6 +1,7 @@
 from sqlmodel import Session, SQLModel, create_engine
 
 from configs import configs
+from data_structures.schemas import Prediction, StructuredData
 from database import schemas  # noqa: F401 - needs to be imported for SQLModel to create tables
 
 
@@ -36,42 +37,15 @@ class SQLiteDatabase:
             return records
 
     def get_all_records(self):
-        with Session(self.engine) as session:
+        with Session(self.engine).no_autoflush as session:
             records = session.query(schemas.RecordSchema).all()
+            records = self._modify_records(records)
             return records
 
-
-if __name__ == "__main__":
-    import numpy as np
-    import pandas as pd
-    from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
-
-    from data_structures.schemas import Prediction, StructuredData
-    from database.db import SQLiteDatabase
-
-    # data with random values
-    data = StructuredData(
-        data=pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]}),
-        meta=pd.DataFrame(
-            {"c": [7, 8, 9]},
-        ),
-    )
-
-    arr = np.array([1, 2, 3])
-    prediction = Prediction(predictions=arr, name="test")
-
-    data_table = schemas.DataSchema(name="data", data=data.to_bytes())
-    metric_table1 = schemas.MetricSchema(name="accuracy", value=0.9)
-    metric_table2 = schemas.MetricSchema(name="f1", value=0.8)
-    predictions_table = schemas.PredictionSchema(name="model", predictions=prediction.to_bytes())
-
-    record_table = schemas.RecordSchema(
-        model_name="test",
-        model_version="1.0.0",
-        data=[data_table],
-        # metrics=[metric_table1, metric_table2],
-        predictions=[predictions_table],
-    )
-
-    db = SQLiteDatabase()
-    db.save_record(record_table)
+    def _modify_records(self, records):
+        for record in records:
+            for data in record.data:
+                data.content = StructuredData.from_bytes(data.content)
+            for prediction in record.predictions:
+                prediction.content = Prediction.from_bytes(prediction.content)
+        return records

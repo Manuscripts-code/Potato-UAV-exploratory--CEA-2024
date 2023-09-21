@@ -13,13 +13,13 @@ def prepare_record_table(
     predictions_train: Prediction,
     predictions_test: Prediction,
 ):
-    data_train_table = schemas.DataSchema(name=configs.DB_DATA_TRAIN, data=data_train.to_bytes())
-    data_test_table = schemas.DataSchema(name=configs.DB_DATA_TEST, data=data_test.to_bytes())
+    data_train_table = schemas.DataSchema(name=configs.DB_DATA_TRAIN, content=data_train.to_bytes())
+    data_test_table = schemas.DataSchema(name=configs.DB_DATA_TEST, content=data_test.to_bytes())
     predictions_train_table = schemas.PredictionSchema(
-        name=configs.DB_PREDICTIONS_TRAIN, predictions=predictions_train.to_bytes()
+        name=configs.DB_PREDICTIONS_TRAIN, content=predictions_train.to_bytes()
     )
     predictions_test_table = schemas.PredictionSchema(
-        name=configs.DB_PREDICTIONS_TEST, predictions=predictions_test.to_bytes()
+        name=configs.DB_PREDICTIONS_TEST, content=predictions_test.to_bytes()
     )
     record_table = schemas.RecordSchema(
         model_name=model_name,
