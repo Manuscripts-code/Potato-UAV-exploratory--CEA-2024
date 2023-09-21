@@ -19,15 +19,28 @@ def db_saver(
     predictions_test: np.ndarray,
 ) -> None:
     logging.info("Saving data to database...")
+    deployer_cfg = model_service.config
     predictions_train = Prediction(predictions=predictions_train, name=configs.DB_PREDICTIONS_TRAIN)
     predictions_test = Prediction(predictions=predictions_test, name=configs.DB_PREDICTIONS_TEST)
+
     record_table = prepare_record_table(
-        "iris",
-        "v1",
-        data_train,
-        data_test,
-        predictions_train,
-        predictions_test,
+        model_name=deployer_cfg.registry_model_name,
+        model_version=deployer_cfg.registry_model_version,
+        data_train=data_train,
+        data_test=data_test,
+        predictions_train=predictions_train,
+        predictions_test=predictions_test,
     )
     db = SQLiteDatabase()
-    db.save_record(record_table)
+
+    logging.info(
+        f"Record for model name: '{deployer_cfg.registry_model_name}' with version: "
+        f"'{deployer_cfg.registry_model_version}' is being checked..."
+    )
+    if db.get_record(
+        model_name=deployer_cfg.registry_model_name, model_version=deployer_cfg.registry_model_version
+    ):
+        logging.warning("Record already exists. Skipping...")
+    else:
+        logging.info("Record does not exist. Saving record to database...")
+        db.save_record(record_table)
