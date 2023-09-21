@@ -10,10 +10,11 @@ SQLModel.metadata.create_all(engine)
 
 
 if __name__ == "__main__":
+    import numpy as np
     import pandas as pd
     from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
 
-    from data_manager.structure import StructuredData
+    from data_structures.schemas import Prediction, StructuredData
 
     # data with random values
     data = StructuredData(
@@ -22,21 +23,22 @@ if __name__ == "__main__":
             {"c": [7, 8, 9]},
         ),
     )
-    import pickle
+
+    arr = np.array([1, 2, 3])
+    prediction = Prediction(predictions=arr, name="test")
 
     with Session(engine) as session:
         data_table = schemas.Data(name="data", data=data.to_bytes())
         metric_table1 = schemas.Metric(name="accuracy", value=0.9)
         metric_table2 = schemas.Metric(name="f1", value=0.8)
-        artifact_table1 = schemas.Artifact(name="model", data=b"model")
-        artifact_table2 = schemas.Artifact(name="data", data=b"data")
+        predictions_table = schemas.Prediction(name="model", predictions=prediction.to_bytes())
 
         record_table = schemas.Record(
             model_name="test",
             model_version="1.0.0",
             data=[data_table],
             metrics=[metric_table1, metric_table2],
-            artifacts=[artifact_table1, artifact_table2],
+            predictions=[predictions_table],
         )
         session.add(record_table)
         session.commit()
@@ -44,4 +46,5 @@ if __name__ == "__main__":
         print("Created record:", record_table)
 
         data1 = StructuredData.from_bytes(record_table.data[0].data)
+        prediction1 = Prediction.from_bytes(record_table.predictions[0].predictions)
         pass

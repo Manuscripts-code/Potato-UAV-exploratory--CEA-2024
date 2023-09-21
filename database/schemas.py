@@ -14,12 +14,12 @@ class Metric(SQLModel, table=True):
     record_id: Optional[int] = Field(default=None, foreign_key="record.id")
 
 
-class Artifact(SQLModel, table=True):
+class Prediction(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
-    data: bytes
+    predictions: bytes
 
-    record: Optional["Record"] = Relationship(back_populates="artifacts")
+    record: Optional["Record"] = Relationship(back_populates="predictions")
     record_id: Optional[int] = Field(default=None, foreign_key="record.id")
 
 
@@ -39,4 +39,4 @@ class Record(SQLModel, table=True):
 
     data: list["Data"] = Relationship(back_populates="record")
     metrics: list["Metric"] = Relationship(back_populates="record")
-    artifacts: list["Artifact"] = Relationship(back_populates="record")
+    predictions: list["Prediction"] = Relationship(back_populates="record")

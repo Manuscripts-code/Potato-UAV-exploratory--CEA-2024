@@ -2,6 +2,7 @@ import os
 import pickle
 from typing import Type
 
+import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 from zenml.enums import ArtifactType, VisualizationType
@@ -193,3 +194,27 @@ class StructuredDataMaterializer(BaseMaterializer):
         metadata["data_dtypes"] = data.data.dtypes.apply(lambda x: DType(x.name)).to_dict()
         metadata["meta_dtypes"] = data.meta.dtypes.apply(lambda x: DType(x.name)).to_dict()
         return metadata
+
+
+class Prediction(BaseModel):
+    predictions: np.ndarray
+    name: str = ""
+
+    def to_dict(self):
+        return {
+            "predictions": self.predictions,
+            "name": self.name,
+        }
+
+    def to_bytes(self):
+        return pickle.dumps(self.to_dict())
+
+    @classmethod
+    def from_dict(cls, data):
+        predictions = np.array(data["predictions"])
+        name = data["name"]
+        return cls(predictions=predictions, name=name)
+
+    @classmethod
+    def from_bytes(cls, data):
+        return cls.from_dict(pickle.loads(data))
