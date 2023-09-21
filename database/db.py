@@ -19,21 +19,25 @@ class SQLiteDatabase:
     def get_record(self, model_name, model_version):
         with Session(self.engine) as session:
             record = (
-                session.query(schemas.Record)
-                .filter(schemas.Record.model_name == model_name)
-                .filter(schemas.Record.model_version == model_version)
+                session.query(schemas.RecordSchema)
+                .filter(schemas.RecordSchema.model_name == model_name)
+                .filter(schemas.RecordSchema.model_version == model_version)
                 .first()
             )
             return record
 
     def get_records(self, model_name):
         with Session(self.engine) as session:
-            records = session.query(schemas.Record).filter(schemas.Record.model_name == model_name).all()
+            records = (
+                session.query(schemas.RecordSchema)
+                .filter(schemas.RecordSchema.model_name == model_name)
+                .all()
+            )
             return records
 
     def get_all_records(self):
         with Session(self.engine) as session:
-            records = session.query(schemas.Record).all()
+            records = session.query(schemas.RecordSchema).all()
             return records
 
 
@@ -56,12 +60,12 @@ if __name__ == "__main__":
     arr = np.array([1, 2, 3])
     prediction = Prediction(predictions=arr, name="test")
 
-    data_table = schemas.Data(name="data", data=data.to_bytes())
-    metric_table1 = schemas.Metric(name="accuracy", value=0.9)
-    metric_table2 = schemas.Metric(name="f1", value=0.8)
-    predictions_table = schemas.Prediction(name="model", predictions=prediction.to_bytes())
+    data_table = schemas.DataSchema(name="data", data=data.to_bytes())
+    metric_table1 = schemas.MetricSchema(name="accuracy", value=0.9)
+    metric_table2 = schemas.MetricSchema(name="f1", value=0.8)
+    predictions_table = schemas.PredictionSchema(name="model", predictions=prediction.to_bytes())
 
-    record_table = schemas.Record(
+    record_table = schemas.RecordSchema(
         model_name="test",
         model_version="1.0.0",
         data=[data_table],
