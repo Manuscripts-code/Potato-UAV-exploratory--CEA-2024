@@ -36,6 +36,7 @@ class RecordSchema(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     model_name: str = Field(index=True)
     model_version: str
+    is_latest: bool = Field(default=True)
 
     data: list["DataSchema"] = Relationship(back_populates="record")
     metrics: list["MetricSchema"] = Relationship(back_populates="record")
