@@ -27,15 +27,6 @@ class SQLiteDatabase:
             )
             return record
 
-    def get_records(self, model_name):
-        with Session(self.engine) as session:
-            records = (
-                session.query(schemas.RecordSchema)
-                .filter(schemas.RecordSchema.model_name == model_name)
-                .all()
-            )
-            return records
-
     def get_all_records(self):
         with Session(self.engine).no_autoflush as session:
             records = session.query(schemas.RecordSchema).all()
