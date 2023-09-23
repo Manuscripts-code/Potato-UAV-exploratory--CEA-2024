@@ -5,6 +5,7 @@ from rich import print
 
 from data_structures.schemas import ClassificationTarget, RegressionTarget
 from database.db import SQLiteDatabase
+from database.schemas import RecordSchema
 from utils.metrics import calculate_classification_metrics, calculate_regression_metrics
 
 
@@ -49,6 +50,27 @@ class Report:
     def __init__(self):
         self._df_clf = pd.DataFrame(columns=pd.MultiIndex.from_tuples(ClassificationColumn.to_list()))
         self._df_reg = pd.DataFrame(columns=pd.MultiIndex.from_tuples(RegressionColumn.to_list()))
+
+    def add_records(self, records: RecordSchema):
+        for record in records:
+            model_name = record.model_name
+            model_version = record.model_version
+            model_is_latest = record.is_latest
+
+            for data, predictions in zip(record.data, record.predictions):
+                data_name = data.name
+                data_content = data.content
+                pred_name = predictions.name
+                pred_content = predictions.content
+                self.add_record(
+                    model_name,
+                    model_version,
+                    model_is_latest,
+                    data_name,
+                    data_content,
+                    pred_name,
+                    pred_content,
+                )
 
     def add_record(
         self,
@@ -105,32 +127,27 @@ class Report:
         columns = {**model_columns, **metrics_columns}
         self._df_reg = pd.concat([self._df_reg, pd.DataFrame.from_dict(columns)], ignore_index=True)
 
+    @property
+    def df_clf(self):
+        return self._df_clf
+
+    @property
+    def df_reg(self):
+        return self._df_reg
+
 
 if __name__ == "__main__":
     db = SQLiteDatabase()
-    report = Report()
 
     records = db.get_all_records()
     records_latest = db.get_latest_records()
 
-    for record in records:
-        model_name = record.model_name
-        model_version = record.model_version
-        model_is_latest = record.is_latest
+    report = Report()
+    report.add_records(records)
+    print(report.df_clf)
+    print(report.df_reg)
 
-        for data, predictions in zip(record.data, record.predictions):
-            data_name = data.name
-            data_content = data.content
-            pred_name = predictions.name
-            pred_content = predictions.content
-            report.add_record(
-                model_name,
-                model_version,
-                model_is_latest,
-                data_name,
-                data_content,
-                pred_name,
-                pred_content,
-            )
-
-    pass
+    report = Report()
+    report.add_records(records_latest)
+    print(report.df_clf)
+    print(report.df_reg)
