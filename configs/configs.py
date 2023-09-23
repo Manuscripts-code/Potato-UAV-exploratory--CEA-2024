@@ -17,6 +17,7 @@ MEASUREMENTS_DIR = Path(DATA_DIR, "measurements")
 
 SAVE_DIR = Path(BASE_DIR, "saved")
 SAVE_MERGED_DIR = Path(SAVE_DIR, "merged")
+SAVE_RESULTS_DIR = Path(SAVE_DIR, "results")
 
 # MAKE DIRS
 SAVE_DIR.mkdir(parents=True, exist_ok=True)

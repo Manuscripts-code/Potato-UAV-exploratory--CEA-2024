@@ -1,6 +1,6 @@
-from types import SimpleNamespace
 from typing import NamedTuple
 
+import numpy as np
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
@@ -19,9 +19,8 @@ class ClassificationMetrics(NamedTuple):
     precision: float
     recall: float
     f1: float
-    specificity: float
     roc_auc: float
-    confusion_matrix: SimpleNamespace
+    confusion_mtx: np.ndarray
 
 
 class RegressionMetrics(NamedTuple):
@@ -37,16 +36,14 @@ def calculate_classification_metrics(y_true, y_pred):
     recall = recall_score(y_true, y_pred, average="weighted")
     f1 = f1_score(y_true, y_pred, average="weighted")
     roc_auc = roc_auc_score(y_true, y_pred, average="weighted")
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
-    specificity = tn / (tn + fp)
+    confusion_mtx = confusion_matrix(y_true, y_pred)
     return ClassificationMetrics(
         accuracy=accuracy,
         precision=precision,
         recall=recall,
         f1=f1,
-        specificity=specificity,
         roc_auc=roc_auc,
-        confusion_matrix=SimpleNamespace(tn=tn, fp=fp, fn=fn, tp=tp),
+        confusion_mtx=confusion_mtx,
     )
 
 
