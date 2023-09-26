@@ -10,9 +10,9 @@ def save_features_plot(
     features_names: list[str],
     labels: np.ndarray,
     *,
-    save_path="saved_features.png",
-    x_label="Spectral bands",
-    y_label="",
+    save_path: str = "saved_features.pdf",
+    x_label: str = "Spectral bands",
+    y_label: str = "",
 ):
     assert len(features) == len(labels), "Features and labels must have the same length!"
 
@@ -47,12 +47,18 @@ def save_features_plot(
 
     ax.legend(custom_lines, [str(num) for num in unique_labels], fontsize=22)
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
+    plt.close()
 
 
-def save_confusion_matrix():
-    cm = confusion_matrix(tobj.y_true, tobj.y_pred)
-    display_labels = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
-    cm_display = ConfusionMatrixDisplay(cm, display_labels=display_labels)
-    cm_display.plot(cmap="Blues", values_format="d")
-    plt.savefig(results_path / "confusion_matrix.png")
+def save_confusion_matrix(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    y_names: list[str],
+    save_path: str = "saved_features.pdf",
+):
+    cm_display = ConfusionMatrixDisplay.from_predictions(
+        y_true, y_pred, display_labels=y_names, normalize="true"
+    )
+    cm_display.plot(cmap="Blues", values_format=".2f")
+    plt.savefig(save_path, format="pdf", bbox_inches="tight")
     plt.close()

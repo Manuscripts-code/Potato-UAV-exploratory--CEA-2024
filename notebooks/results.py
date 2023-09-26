@@ -1,5 +1,7 @@
 import sys
 
+from sklearn.metrics import classification_report
+
 sys.path.insert(0, "..")
 
 from dataclasses import dataclass
@@ -18,8 +20,8 @@ from utils.metrics import (
     calculate_classification_metrics,
     calculate_regression_metrics,
 )
-from utils.plot_utils import save_features_plot
-from utils.utils import ensure_dir
+from utils.plot_utils import save_confusion_matrix, save_features_plot
+from utils.utils import ensure_dir, write_txt
 
 
 @dataclass(frozen=True, slots=True)
@@ -110,11 +112,18 @@ class Report:
         save_dir = ensure_dir(Path(configs.SAVE_RESULTS_DIR, model_name, model_version, data_name))
 
         if isinstance(target, ClassificationTarget):
-            y_label = target.label.apply(lambda row: "__".join(row)).to_numpy()
-            save_features_plot(
-                data, data.columns.tolist(), y_label, save_path=save_dir / "features_plot.pdf"
-            )
-            pass
+            row_formatter = lambda row: "__".join(row)
+            y_label = target.label.apply(row_formatter).to_numpy()
+            encoding = target.encoding.apply(row_formatter).to_dict()
+            y_names = [encoding[key] for key in sorted(encoding.keys())]
+
+            save_features_plot(data, data.columns.tolist(), y_label, save_path=save_dir / "features_plot.pdf")  # type: ignore # noqa
+            save_confusion_matrix(y_true, y_pred, y_names, save_path=save_dir / "confusion_matrix.pdf")
+            write_txt(classification_report(y_true, y_pred, target_names=y_names), save_dir / "classification_report.txt")  # type: ignore # noqa
+            write_txt(data.describe().to_string(), save_dir / "describe_data.txt")
+            write_txt(meta.describe().to_string(), save_dir / "describe_meta.txt")
+            write_txt(target.label.describe().to_string(), save_dir / "describe_target.txt")
+
         elif isinstance(target, RegressionTarget):
             pass
         else:
