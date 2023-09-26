@@ -164,10 +164,11 @@ class StructuredDataMaterializer(BaseMaterializer):
     def save_visualizations(self, data: StructuredData) -> dict[str, VisualizationType]:
         collected_uris = {}
 
-        describe_data_uri = self._get_pandas_describe_uri(
-            data.data, configs.MATERIALIZER_DESCRIBE_DATA_CSV
-        )
-        collected_uris[describe_data_uri] = VisualizationType.CSV
+        #! commented because only one dataframe can be shown obviously
+        # describe_data_uri = self._get_pandas_describe_uri(
+        #     data.data, configs.MATERIALIZER_DESCRIBE_DATA_CSV
+        # )
+        # collected_uris[describe_data_uri] = VisualizationType.CSV
 
         describe_meta_uri = self._get_pandas_describe_uri(
             data.meta, configs.MATERIALIZER_DESCRIBE_META_CSV

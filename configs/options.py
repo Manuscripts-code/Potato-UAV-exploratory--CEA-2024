@@ -1,7 +1,7 @@
 from autofeat import AutoFeatClassifier, AutoFeatRegressor
 from sklearn import model_selection
 from sklearn.decomposition import PCA
-from sklearn.dummy import DummyRegressor
+from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler, PowerTransformer, StandardScaler
 from sklearn.svm import SVC, SVR
@@ -40,6 +40,7 @@ METHODS = {
     "PCA": PCA,
     "MSC": methods.MSCWrapper,
     "DummyRegressor": DummyRegressor,
+    "DummyClassifier": DummyClassifier,
     "StandardScaler": StandardScaler,
     "MinMaxScaler": MinMaxScaler,
     "PowerTransformer": PowerTransformer,

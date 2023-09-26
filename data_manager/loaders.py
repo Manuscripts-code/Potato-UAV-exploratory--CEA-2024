@@ -4,11 +4,10 @@ import pandas as pd
 
 from configs import configs
 from configs.parser import GeneralConfig, MultispectralConfig
-from data_structures.schemas import StructuredData
 from data_structures.geotiffs import MultiGeotiffRaster
 from data_structures.mergers import MultiRasterPointsMerger, RasterPointsMerger
+from data_structures.schemas import StructuredData
 from data_structures.shapefiles import PointsShapefile
-from utils.utils import ensure_dir
 
 
 class MultispectralLoader:
@@ -21,7 +20,7 @@ class MultispectralLoader:
         save_coords=False,
         use_reduced_dataset=False,
     ):
-        self.save_dir = ensure_dir(save_dir)
+        self.save_dir = save_dir
         self.save_coords = save_coords
         self.num_closest_points = general_config.raster_num_closest_points
         self.use_reduced_dataset = use_reduced_dataset
