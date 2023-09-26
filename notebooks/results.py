@@ -3,10 +3,12 @@ import sys
 sys.path.insert(0, "..")
 
 from dataclasses import dataclass
+from pathlib import Path
 
 import pandas as pd
 from rich import print
 
+from configs import configs
 from data_structures.schemas import ClassificationTarget, Prediction, RegressionTarget, StructuredData
 from database.db import SQLiteDatabase
 from database.schemas import RecordSchema
@@ -16,6 +18,8 @@ from utils.metrics import (
     calculate_classification_metrics,
     calculate_regression_metrics,
 )
+from utils.plot_utils import save_features_plot
+from utils.utils import ensure_dir
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,6 +84,42 @@ class Report:
                     pred_content=pred_content,
                 )
 
+                self.save_record_artifacts(
+                    model_name=model_name,
+                    model_version=model_version,
+                    data_name=data_name,
+                    data_content=data_content,
+                    pred_content=pred_content,
+                )
+
+    def save_record_artifacts(
+        self,
+        model_name: str,
+        model_version: str,
+        data_name: str,
+        data_content: StructuredData,
+        pred_content: Prediction,
+    ):
+        data = data_content.data
+        meta = data_content.meta
+        target = data_content.target
+
+        y_true = target.value.to_numpy()
+        y_pred = pred_content.predictions
+
+        save_dir = ensure_dir(Path(configs.SAVE_RESULTS_DIR, model_name, model_version, data_name))
+
+        if isinstance(target, ClassificationTarget):
+            y_label = target.label.apply(lambda row: "__".join(row)).to_numpy()
+            save_features_plot(
+                data, data.columns.tolist(), y_label, save_path=save_dir / "features_plot.pdf"
+            )
+            pass
+        elif isinstance(target, RegressionTarget):
+            pass
+        else:
+            raise ValueError(f"Unknown target type: {type(target)}")
+
     def add_record(
         self,
         model_name: str,
@@ -90,8 +130,6 @@ class Report:
         pred_name: str,
         pred_content: Prediction,
     ):
-        data = data_content.data
-        meta = data_content.meta
         target = data_content.target
 
         y_true = target.value.to_numpy()
@@ -112,7 +150,7 @@ class Report:
             metrics = calculate_regression_metrics(y_true, y_pred)
             self._add_regression_record(model_columns, metrics)
         else:
-            raise ValueError("Unknown target type")
+            raise ValueError(f"Unknown target type: {type(target)}")
 
     def _add_classification_record(
         self,
@@ -143,11 +181,11 @@ class Report:
         self._df_reg = pd.concat([self._df_reg, pd.DataFrame.from_dict(columns)], ignore_index=True)
 
     @property
-    def df_clf(self):
+    def df_classification(self):
         return self._df_clf
 
     @property
-    def df_reg(self):
+    def df_regression(self):
         return self._df_reg
 
 
@@ -157,12 +195,12 @@ if __name__ == "__main__":
     records = db.get_all_records()
     records_latest = db.get_latest_records()
 
-    report = Report()
-    report.add_records(records)
-    print(report.df_clf)
-    print(report.df_reg)
+    # report = Report()
+    # report.add_records(records)
+    # print(report.df_classification)
+    # print(report.df_regression)
 
     report = Report()
     report.add_records(records_latest)
-    print(report.df_clf)
-    print(report.df_reg)
+    print(report.df_classification)
+    print(report.df_regression)
