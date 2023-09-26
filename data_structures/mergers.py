@@ -26,7 +26,7 @@ class RasterPointsMerger:
         self.shapefile_Y = self._shapefile.Y
 
         self._merged_df = None
-        self.save_dir = ensure_dir(save_dir)
+        self.save_dir = save_dir
         self.save_coords = save_coords
         self.num_closest_points = num_closest_points
         self.use_reduced_dataset = use_reduced_dataset
@@ -91,7 +91,9 @@ class RasterPointsMerger:
     def _save_coords(self, coordinates_list, save_name=""):
         coordinates = np.concatenate(coordinates_list, axis=0)
         coordinates_df = pd.DataFrame(coordinates, columns=[self.shapefile_X, self.shapefile_Y])
-        coordinates_df.to_csv(self.save_dir / f"{save_name}_coordinates_closest.csv", index=False)
+        coordinates_df.to_csv(
+            ensure_dir(self.save_dir) / f"{save_name}_coordinates_closest.csv", index=False
+        )
 
     def merged_df(self):
         return self._merged_df

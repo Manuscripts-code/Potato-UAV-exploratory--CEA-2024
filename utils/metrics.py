@@ -10,7 +10,6 @@ from sklearn.metrics import (
     precision_score,
     r2_score,
     recall_score,
-    roc_auc_score,
 )
 
 
@@ -19,7 +18,6 @@ class ClassificationMetrics(NamedTuple):
     precision: float
     recall: float
     f1: float
-    roc_auc: float
     confusion_mtx: np.ndarray
 
 
@@ -35,14 +33,12 @@ def calculate_classification_metrics(y_true, y_pred):
     precision = precision_score(y_true, y_pred, average="weighted")
     recall = recall_score(y_true, y_pred, average="weighted")
     f1 = f1_score(y_true, y_pred, average="weighted")
-    roc_auc = roc_auc_score(y_true, y_pred, average="weighted")
     confusion_mtx = confusion_matrix(y_true, y_pred)
     return ClassificationMetrics(
         accuracy=accuracy,
         precision=precision,
         recall=recall,
         f1=f1,
-        roc_auc=roc_auc,
         confusion_mtx=confusion_mtx,
     )
 
