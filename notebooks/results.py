@@ -111,21 +111,24 @@ class Report:
 
         save_dir = ensure_dir(Path(configs.SAVE_RESULTS_DIR, model_name, model_version, data_name))
 
+        write_txt(data.describe().to_string(), save_dir / "describe_data.txt")
+        write_txt(data.to_string(), save_dir / "data_data.txt")
+        write_txt(meta.to_string(), save_dir / "data_meta.txt")
+
         if isinstance(target, ClassificationTarget):
             row_formatter = lambda row: "__".join(row)
-            y_label = target.label.apply(row_formatter).to_numpy()
+            target_label = target.label.apply(row_formatter)
             encoding = target.encoding.apply(row_formatter).to_dict()
-            y_names = [encoding[key] for key in sorted(encoding.keys())]
+            target_names = [encoding[key] for key in sorted(encoding.keys())]
 
-            save_features_plot(data, data.columns.tolist(), y_label, save_path=save_dir / "features_plot.pdf")  # type: ignore # noqa
-            save_confusion_matrix(y_true, y_pred, y_names, save_path=save_dir / "confusion_matrix.pdf")
-            write_txt(classification_report(y_true, y_pred, target_names=y_names), save_dir / "classification_report.txt")  # type: ignore # noqa
-            write_txt(data.describe().to_string(), save_dir / "describe_data.txt")
-            write_txt(meta.describe().to_string(), save_dir / "describe_meta.txt")
-            write_txt(target.label.describe().to_string(), save_dir / "describe_target.txt")
+            save_features_plot(data, data.columns.tolist(), target_label.to_numpy(), save_path=save_dir / "features_plot.pdf")  # type: ignore # noqa
+            save_confusion_matrix(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
+            write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
+            write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
 
         elif isinstance(target, RegressionTarget):
-            pass
+            write_txt(target.value.to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
+
         else:
             raise ValueError(f"Unknown target type: {type(target)}")
 

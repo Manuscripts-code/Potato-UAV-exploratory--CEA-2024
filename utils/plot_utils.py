@@ -53,11 +53,11 @@ def save_features_plot(
 def save_confusion_matrix(
     y_true: np.ndarray,
     y_pred: np.ndarray,
-    y_names: list[str],
+    target_names: list[str],
     save_path: str = "saved_features.pdf",
 ):
     cm_display = ConfusionMatrixDisplay.from_predictions(
-        y_true, y_pred, display_labels=y_names, normalize="true"
+        y_true, y_pred, display_labels=target_names, normalize="true"
     )
     cm_display.plot(cmap="Blues", values_format=".2f")
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
