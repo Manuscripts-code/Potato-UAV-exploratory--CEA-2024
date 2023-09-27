@@ -22,8 +22,11 @@ from utils.metrics import (
 )
 from utils.plot_utils import (
     save_confusion_matrix_display,
+    save_data_visualization,
     save_features_plot,
+    save_meta_visualization,
     save_prediction_errors_display,
+    save_target_visualization,
 )
 from utils.utils import ensure_dir, write_txt
 
@@ -118,8 +121,11 @@ class Report:
         save_dir = ensure_dir(Path(configs.SAVE_RESULTS_DIR, model_name, model_version, data_name))
 
         write_txt(data.describe().to_string(), save_dir / "describe_data.txt")
+        write_txt(meta.groupby([configs.TREATMENT_ENG, configs.DATE_ENG, configs.BLOCK_ENG]).size().to_string(), save_dir / "describe_meta.txt")  # type: ignore # noqa
         write_txt(data.to_string(), save_dir / "data_data.txt")
         write_txt(meta.to_string(), save_dir / "data_meta.txt")
+        save_data_visualization(data, meta, save_path=save_dir / "visualization_data.pdf")
+        save_meta_visualization(meta, save_path=save_dir / "visualization_meta.pdf")
 
         if isinstance(target, ClassificationTarget):
             row_formatter = lambda row: "__".join(row)
@@ -131,11 +137,13 @@ class Report:
             save_confusion_matrix_display(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
             write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
             write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
+            save_target_visualization(meta, target_values=target.value, target_labels=target.label, save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
 
         elif isinstance(target, RegressionTarget):
             save_prediction_errors_display(y_true, y_pred, kind="residual_vs_predicted", save_path=save_dir / "prediction_errors_rvp.pdf")  # type: ignore # noqa
             save_prediction_errors_display(y_true, y_pred, kind="actual_vs_predicted", save_path=save_dir / "prediction_errors_avp.pdf")  # type: ignore # noqa
             write_txt(target.value.to_string(), save_dir / "data_target.txt")
+            save_target_visualization(meta, target_values=target.value, save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
 
         else:
             raise ValueError(f"Unknown target type: {type(target)}")

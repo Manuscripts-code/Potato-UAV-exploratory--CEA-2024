@@ -1,8 +1,13 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from matplotlib.lines import Line2D
-from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay, confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay
+
+from configs import configs
 
 
 def save_features_plot(
@@ -10,7 +15,7 @@ def save_features_plot(
     features_names: list[str],
     labels: np.ndarray,
     *,
-    save_path: str = "features_plot.pdf",
+    save_path: str | Path = "features_plot.pdf",
     x_label: str = "Spectral bands",
     y_label: str = "",
 ):
@@ -54,7 +59,7 @@ def save_confusion_matrix_display(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     target_names: list[str],
-    save_path: str = "confusion_matrix.pdf",
+    save_path: str | Path = "confusion_matrix.pdf",
 ):
     cm_display = ConfusionMatrixDisplay.from_predictions(
         y_true, y_pred, display_labels=target_names, normalize="true"
@@ -67,10 +72,58 @@ def save_confusion_matrix_display(
 def save_prediction_errors_display(
     y_true: np.ndarray,
     y_pred: np.ndarray,
-    save_path: str = "prediction_errors.pdf",
+    save_path: str | Path = "prediction_errors.pdf",
     kind: str = "residual_vs_predicted",
 ):
     pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
     pe_display.plot(kind=kind)
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
     plt.close()
+
+
+def save_data_visualization(
+    data: pd.DataFrame,
+    meta: pd.DataFrame,
+    save_path: str | Path = "visualization_data.pdf",
+):
+    pass
+
+
+def save_meta_visualization(
+    meta: pd.DataFrame,
+    save_path: str | Path = "visualization_meta.pdf",
+):
+    for treatment in pd.unique(meta[configs.TREATMENT_ENG]):
+        plt.subplots(figsize=(8, 7), dpi=300)
+        ax = sns.countplot(
+            data=meta,
+            x=configs.DATE_ENG,
+            hue=configs.VARIETY_ENG,
+            alpha=0.8,
+        )
+        ax.set_ylabel("Count", fontsize=16)
+        ax.set_xlabel(configs.DATE_ENG, fontsize=16)
+        ax.tick_params(axis="both", which="major", labelsize=14)
+        ax.tick_params(axis="both", which="minor", labelsize=14)
+        ax.tick_params(axis="x", labelrotation=0)
+        ax.grid(False)
+        ax.spines["bottom"].set_linewidth(2)
+        ax.spines["left"].set_linewidth(2)
+        ax.spines[["right", "top"]].set_visible(False)
+        for container in ax.containers:
+            ax.bar_label(container, fontsize=12, padding=3)
+        plt.savefig(
+            save_path.with_name("".join([save_path.stem, f"_{treatment}", save_path.suffix])),
+            format="pdf",
+            bbox_inches="tight",
+        )
+        plt.close()
+
+
+def save_target_visualization(
+    meta: pd.DataFrame,
+    target_values: pd.Series,
+    target_labels: pd.Series = None,
+    save_path: str | Path = "visualization_target.pdf",
+):
+    pass
