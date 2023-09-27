@@ -55,8 +55,8 @@ class PointsShapefile:
 
 
 if __name__ == "__main__":
-    from configs import specific_paths
+    from configs import paths
 
-    file = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
+    file = paths.PATHS_SHAPEFILES["eko"]["measured"]
     shapefile = PointsShapefile.from_path(file)
     print(shapefile)

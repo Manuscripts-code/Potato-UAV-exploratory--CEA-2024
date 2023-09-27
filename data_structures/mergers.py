@@ -169,10 +169,10 @@ class MultiRasterPointsMerger:
 
 
 if __name__ == "__main__":
-    from configs import specific_paths
+    from configs import paths
 
     date = "2022_06_15"
-    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"][date]
+    base_path = paths.PATHS_MULTISPECTRAL_IMAGES["eko"][date]
     paths = {
         "blue": base_path["blue"],
         "green": base_path["green"],
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     raster = MultiGeotiffRaster.from_paths(paths)
     raster.set_name(date)
 
-    path_shape = specific_paths.PATHS_SHAPEFILES["eko"]["measured"]
+    path_shape = paths.PATHS_SHAPEFILES["eko"]["measured"]
     shapefile = PointsShapefile.from_path(path_shape)
 
     merger1 = RasterPointsMerger(raster, shapefile)
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     ###############
 
     date = "2022_07_11"
-    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"][date]
+    base_path = paths.PATHS_MULTISPECTRAL_IMAGES["eko"][date]
     paths = {
         "blue": base_path["blue"],
         "green": base_path["green"],

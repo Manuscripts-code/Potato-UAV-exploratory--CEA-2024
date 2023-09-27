@@ -112,9 +112,9 @@ class MultiGeotiffRaster:
 
 
 if __name__ == "__main__":
-    from configs import specific_paths
+    from configs import paths
 
-    base_path = specific_paths.PATHS_MULTISPECTRAL_IMAGES["eko"]["2022_06_15"]
+    base_path = paths.PATHS_MULTISPECTRAL_IMAGES["eko"]["2022_06_15"]
     blue = base_path["blue"]
     green = base_path["green"]
 
