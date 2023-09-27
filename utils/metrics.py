@@ -5,7 +5,9 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     f1_score,
+    max_error,
     mean_absolute_error,
+    mean_absolute_percentage_error,
     mean_squared_error,
     precision_score,
     r2_score,
@@ -26,6 +28,8 @@ class RegressionMetrics(NamedTuple):
     mse: float
     rmse: float
     r2: float
+    mape: float
+    maxe: float
 
 
 def calculate_classification_metrics(y_true, y_pred):
@@ -48,4 +52,13 @@ def calculate_regression_metrics(y_true, y_pred):
     mse = mean_squared_error(y_true, y_pred, squared=True)
     rmse = mean_squared_error(y_true, y_pred, squared=False)
     r2 = r2_score(y_true, y_pred)
-    return RegressionMetrics(mae=mae, mse=mse, rmse=rmse, r2=r2)
+    mape = mean_absolute_percentage_error(y_true, y_pred)
+    maxe = max_error(y_true, y_pred)
+    return RegressionMetrics(
+        mae=mae,
+        mse=mse,
+        rmse=rmse,
+        r2=r2,
+        mape=mape,
+        maxe=maxe,
+    )

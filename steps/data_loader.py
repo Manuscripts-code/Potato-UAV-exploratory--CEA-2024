@@ -9,7 +9,7 @@ from data_manager.loaders import MultispectralLoader
 from data_structures.schemas import StructuredData, StructuredDataMaterializer
 
 
-@step(enable_cache=configs.CACHING, output_materializers=StructuredDataMaterializer)
+@step(enable_cache=True, output_materializers=StructuredDataMaterializer)
 def data_loader(
     general_cfg: GeneralConfig, multispectral_cfg: MultispectralConfig
 ) -> Annotated[StructuredData, "data"]:

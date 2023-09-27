@@ -53,6 +53,8 @@ class RegressionColumn(Column):
     metrics_regression_mse = ("metrics_reg", "mse")
     metrics_regression_rmse = ("metrics_reg", "rmse")
     metrics_regression_r2 = ("metrics_reg", "r2")
+    metrics_regression_mape = ("metrics_reg", "mape")
+    metrics_regression_maxe = ("metrics_reg", "maxe")
 
 
 Column = Column()
@@ -188,6 +190,8 @@ class Report:
             RegressionColumn.metrics_regression_mse: [metrics.mse],
             RegressionColumn.metrics_regression_rmse: [metrics.rmse],
             RegressionColumn.metrics_regression_r2: [metrics.r2],
+            RegressionColumn.metrics_regression_mape: [metrics.mape],
+            RegressionColumn.metrics_regression_maxe: [metrics.maxe],
         }
         columns = {**model_columns, **metrics_columns}
         self._df_reg = pd.concat([self._df_reg, pd.DataFrame.from_dict(columns)], ignore_index=True)
