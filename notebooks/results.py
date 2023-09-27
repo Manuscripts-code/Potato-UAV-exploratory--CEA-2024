@@ -20,7 +20,11 @@ from utils.metrics import (
     calculate_classification_metrics,
     calculate_regression_metrics,
 )
-from utils.plot_utils import save_confusion_matrix, save_features_plot
+from utils.plot_utils import (
+    save_confusion_matrix_display,
+    save_features_plot,
+    save_prediction_errors_display,
+)
 from utils.utils import ensure_dir, write_txt
 
 
@@ -124,12 +128,14 @@ class Report:
             target_names = [encoding[key] for key in sorted(encoding.keys())]
 
             save_features_plot(data, data.columns.tolist(), target_label.to_numpy(), save_path=save_dir / "features_plot.pdf")  # type: ignore # noqa
-            save_confusion_matrix(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
+            save_confusion_matrix_display(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
             write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
             write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
 
         elif isinstance(target, RegressionTarget):
-            write_txt(target.value.to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
+            save_prediction_errors_display(y_true, y_pred, kind="residual_vs_predicted", save_path=save_dir / "prediction_errors_rvp.pdf")  # type: ignore # noqa
+            save_prediction_errors_display(y_true, y_pred, kind="actual_vs_predicted", save_path=save_dir / "prediction_errors_avp.pdf")  # type: ignore # noqa
+            write_txt(target.value.to_string(), save_dir / "data_target.txt")
 
         else:
             raise ValueError(f"Unknown target type: {type(target)}")

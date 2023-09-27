@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.lines import Line2D
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay, confusion_matrix
 
 
 def save_features_plot(
@@ -10,7 +10,7 @@ def save_features_plot(
     features_names: list[str],
     labels: np.ndarray,
     *,
-    save_path: str = "saved_features.pdf",
+    save_path: str = "features_plot.pdf",
     x_label: str = "Spectral bands",
     y_label: str = "",
 ):
@@ -50,15 +50,27 @@ def save_features_plot(
     plt.close()
 
 
-def save_confusion_matrix(
+def save_confusion_matrix_display(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     target_names: list[str],
-    save_path: str = "saved_features.pdf",
+    save_path: str = "confusion_matrix.pdf",
 ):
     cm_display = ConfusionMatrixDisplay.from_predictions(
         y_true, y_pred, display_labels=target_names, normalize="true"
     )
-    cm_display.plot(cmap="Blues", values_format=".2f")
+    cm_display.plot()
+    plt.savefig(save_path, format="pdf", bbox_inches="tight")
+    plt.close()
+
+
+def save_prediction_errors_display(
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    save_path: str = "prediction_errors.pdf",
+    kind: str = "residual_vs_predicted",
+):
+    pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
+    pe_display.plot(kind=kind)
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
     plt.close()
