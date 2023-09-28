@@ -6,6 +6,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.lines import Line2D
 from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay
+from yellowbrick.features import RadViz
 
 from configs import configs
 
@@ -83,10 +84,17 @@ def save_prediction_errors_display(
 
 def save_data_visualization(
     data: pd.DataFrame,
-    meta: pd.DataFrame,
+    y_data_encoded: np.ndarray,
+    classes: list = None,
     save_path: str | Path = "visualization_data.pdf",
 ):
-    pass
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = RadViz(classes=classes, features=data.columns.tolist(), alpha=0.7, colormap="viridis")
+    visualizer.fit(data, y_data_encoded)
+    visualizer.transform(data)
+    visualizer.show()
+    plt.savefig(save_path, format="pdf", bbox_inches="tight")
+    plt.close()
 
 
 def save_meta_visualization(

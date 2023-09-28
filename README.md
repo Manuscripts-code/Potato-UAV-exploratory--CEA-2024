@@ -37,3 +37,9 @@ python3 main.py
 zenml down
 zenml clean
 
+
+# Visualization error:
+(findfont: Generic family 'sans-serif' not found because none of the following families were found: Arial, Liberation Sans, Bitstream Vera Sans, sans-serif)
+
+$ sudo apt install msttcorefonts -qq
+$ rm ~/.cache/matplotlib -rf
