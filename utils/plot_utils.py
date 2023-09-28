@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -22,6 +23,7 @@ def save_features_plot(
 ):
     assert len(features) == len(labels), "Features and labels must have the same length!"
 
+    mpl.rcParams.update(mpl.rcParamsDefault)
     fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
     ax.set_ylabel(y_label, fontsize=24)
     ax.set_xlabel(x_label, fontsize=24)
@@ -62,6 +64,7 @@ def save_confusion_matrix_display(
     target_names: list[str],
     save_path: str | Path = "confusion_matrix.pdf",
 ):
+    mpl.rcParams.update(mpl.rcParamsDefault)
     cm_display = ConfusionMatrixDisplay.from_predictions(
         y_true, y_pred, display_labels=target_names, normalize="true"
     )
@@ -76,6 +79,7 @@ def save_prediction_errors_display(
     save_path: str | Path = "prediction_errors.pdf",
     kind: str = "residual_vs_predicted",
 ):
+    mpl.rcParams.update(mpl.rcParamsDefault)
     pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
     pe_display.plot(kind=kind)
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
@@ -88,6 +92,7 @@ def save_data_visualization(
     classes: list = None,
     save_path: str | Path = "visualization_data.pdf",
 ):
+    mpl.rcParams.update(mpl.rcParamsDefault)
     plt.subplots(figsize=(8, 7), dpi=300)
     visualizer = RadViz(classes=classes, features=data.columns.tolist(), alpha=0.7, colormap="viridis")
     visualizer.fit(data, y_data_encoded)
@@ -101,6 +106,7 @@ def save_meta_visualization(
     meta: pd.DataFrame,
     save_path: str | Path = "visualization_meta.pdf",
 ):
+    mpl.rcParams.update(mpl.rcParamsDefault)
     for treatment in pd.unique(meta[configs.TREATMENT_ENG]):
         plt.subplots(figsize=(8, 7), dpi=300)
         ax = sns.countplot(
@@ -118,6 +124,7 @@ def save_meta_visualization(
         ax.spines["bottom"].set_linewidth(2)
         ax.spines["left"].set_linewidth(2)
         ax.spines[["right", "top"]].set_visible(False)
+        ax.legend(loc="lower right", fontsize=12, framealpha=1)
         for container in ax.containers:
             ax.bar_label(container, fontsize=12, padding=3)
         plt.savefig(
@@ -134,4 +141,5 @@ def save_target_visualization(
     target_labels: pd.Series = None,
     save_path: str | Path = "visualization_target.pdf",
 ):
+    mpl.rcParams.update(mpl.rcParamsDefault)
     pass
