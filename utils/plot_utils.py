@@ -136,10 +136,38 @@ def save_meta_visualization(
 
 
 def save_target_visualization(
-    meta: pd.DataFrame,
-    target_values: pd.Series,
-    target_labels: pd.Series = None,
+    target_values: np.ndarray,
+    target_labels: np.ndarray = None,
+    target_type: str = "classification",
     save_path: str | Path = "visualization_target.pdf",
 ):
     mpl.rcParams.update(mpl.rcParamsDefault)
-    pass
+    _TARGET_VAL = "Target values"
+    _TARGET_LAB = "Target"
+    data = pd.DataFrame.from_dict({_TARGET_VAL: target_values, _TARGET_LAB: target_labels})
+
+    plt.subplots(figsize=(8, 7), dpi=300)
+    if target_type == "classification":
+        ax = sns.countplot(
+            data=data,
+            x=_TARGET_LAB,
+            alpha=0.8,
+        )
+    elif target_type == "regression":
+        ax = sns.histplot(data=data, x=_TARGET_VAL, hue=_TARGET_LAB, alpha=0.8)
+        # ax.legend()
+    else:
+        raise ValueError(f"Unknown target type: {target_type}")
+
+    ax.set_xlabel(_TARGET_LAB, fontsize=16)
+    ax.set_ylabel("Count", fontsize=16)
+    ax.tick_params(axis="both", which="major", labelsize=14)
+    ax.tick_params(axis="both", which="minor", labelsize=14)
+    ax.tick_params(axis="x", labelrotation=0)
+    ax.grid(False)
+    ax.spines["bottom"].set_linewidth(2)
+    ax.spines["left"].set_linewidth(2)
+    ax.spines[["right", "top"]].set_visible(False)
+
+    plt.savefig(save_path, format="pdf", bbox_inches="tight")
+    plt.close()

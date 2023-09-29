@@ -136,7 +136,7 @@ class Report:
             write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
             write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
             save_data_visualization(data, y_data_encoded=y_true, classes=target_names, save_path=save_dir / "visualization_data.pdf")  # type: ignore # noqa
-            save_target_visualization(meta, target_values=target.value, target_labels=target.label, save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
+            save_target_visualization(target_values=y_true, target_labels=target_label.to_numpy(), save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
 
         elif isinstance(target, RegressionTarget):
             target_label = meta[configs.VARIETY_ENG]
@@ -147,7 +147,7 @@ class Report:
             save_prediction_errors_display(y_true, y_pred, kind="actual_vs_predicted", save_path=save_dir / "prediction_errors_avp.pdf")  # type: ignore # noqa
             write_txt(target.value.to_string(), save_dir / "data_target.txt")
             save_data_visualization(data, y_data_encoded=target_label_encoded, classes=target_label_classes, save_path=save_dir / "visualization_data.pdf")  # type: ignore # noqa
-            save_target_visualization(meta, target_values=target.value, save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
+            save_target_visualization(target_values=y_true, target_labels=target_label.to_numpy(), target_type="regression", save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
 
         else:
             raise ValueError(f"Unknown target type: {type(target)}")
