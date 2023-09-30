@@ -26,21 +26,16 @@ classification_labels = ["varieties"]
 pipeline = ["XGBClassifier"]
 
 [optimizer]
-n_trials = 3
+n_trials = 50
 n_jobs = 10
 scoring_metric = "f1_weighted"
 scoring_mode = "maximize"
 
 [optimizer.tuned_parameters]
-# [optimizer.tuned_parameters.optimize_float]
-# SVC__C = [0.01, 1.0]
-# SVC__gamma = [1e-5, 1.0]
-# [optimizer.tuned_parameters.optimize_category]
-# SVC__kernel = ["rbf"]
 
 [optimizer.validator]
 validator = "RepeatedStratifiedKFold"
-n_splits = 3
+n_splits = 5
 n_repeats = 3
 random_state = 1
 
