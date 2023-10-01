@@ -55,7 +55,7 @@ def save_features_plot(
 
     ax.legend(custom_lines, [str(num) for num in unique_labels], fontsize=22)
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close()
+    plt.close("all")
 
 
 def save_confusion_matrix_display(
@@ -70,7 +70,7 @@ def save_confusion_matrix_display(
     )
     cm_display.plot()
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close()
+    plt.close("all")
 
 
 def save_prediction_errors_display(
@@ -83,7 +83,7 @@ def save_prediction_errors_display(
     pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
     pe_display.plot(kind=kind)
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close()
+    plt.close("all")
 
 
 def save_data_visualization(
@@ -99,7 +99,7 @@ def save_data_visualization(
     visualizer.transform(data)
     visualizer.show()
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close()
+    plt.close("all")
 
 
 def save_meta_visualization(
@@ -132,7 +132,7 @@ def save_meta_visualization(
             format="pdf",
             bbox_inches="tight",
         )
-        plt.close()
+        plt.close("all")
 
 
 def save_target_visualization(
@@ -170,4 +170,4 @@ def save_target_visualization(
     ax.spines[["right", "top"]].set_visible(False)
 
     plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close()
+    plt.close("all")
