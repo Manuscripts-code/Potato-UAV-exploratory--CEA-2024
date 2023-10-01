@@ -35,15 +35,16 @@ scoring_mode = "maximize"
 
 [optimizer.tuned_parameters.optimize_int]
 XGBRegressor__n_estimators = [100, 1000]
-XGBRegressor__max_depth = [5, 50]
+XGBRegressor__max_depth = [3, 10]
 
 [optimizer.tuned_parameters.optimize_float]
 XGBRegressor__learning_rate = [0.001, 0.1]
-XGBRegressor__subsample = [0.1, 1.0]
-XGBRegressor__colsample_bytree = [0.1, 1.0]
+XGBRegressor__min_child_weight = [1.0, 10.0]
 XGBRegressor__gamma = [0.001, 1.0]
-XGBRegressor__reg_alpha = [0.001, 10.0]
-XGBRegressor__reg_lambda = [0.001, 10.0]
+XGBRegressor__subsample = [0.5, 1.0]
+XGBRegressor__colsample_bytree = [0.5, 1.0]
+XGBRegressor__reg_alpha = [0.001, 1.0]
+XGBRegressor__reg_lambda = [0.001, 1.0]
 
 [optimizer.tuned_parameters.optimize_category]
 AutoFeatRegressor__feateng_steps = [2]
