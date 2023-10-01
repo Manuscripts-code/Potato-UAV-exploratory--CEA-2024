@@ -79,7 +79,7 @@ class OptimizerConfig(BaseModel):
     n_jobs: int
     scoring_metric: str
     scoring_mode: str
-    timeout: int = 1000
+    timeout: int = None
 
 
 class RegistryConfig(BaseModel):
