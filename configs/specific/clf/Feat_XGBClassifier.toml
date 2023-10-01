@@ -1,0 +1,65 @@
+# this is testing file
+
+[general]
+raster_num_closest_points = 10
+dates = ["2022_07_20"]
+treatments = ["eko"]
+varieties = ["KIS_Tamar", "KIS_Blegos"]
+
+[multispectral]
+channels = ["blue", "green", "nir", "red_edge", "red"]
+location_type = "measured"
+
+[sampler]
+splitter = "SimpleSplitter"
+split_size_val = 0.0
+split_size_test = 0.3
+shuffle = true
+random_state = 1
+stratify = true
+
+[formatter]
+formatter = "ClassificationFormatter"
+classification_labels = ["varieties"]
+
+[model]
+pipeline = ["AutoFeatClassifier", "XGBClassifier"]
+
+[optimizer]
+n_trials = 200
+n_jobs = 10
+scoring_metric = "f1_weighted"
+scoring_mode = "maximize"
+
+[optimizer.tuned_parameters]
+
+[optimizer.tuned_parameters.optimize_int]
+XGBClassifier__n_estimators = [100, 500]
+XGBClassifier__max_depth = [3, 5]
+
+[optimizer.tuned_parameters.optimize_float]
+XGBClassifier__learning_rate = [0.01, 0.1]
+XGBClassifier__min_child_weight = [1, 5]
+XGBClassifier__gamma = [0, 0.1]
+XGBClassifier__subsample = [0.5, 1]
+XGBClassifier__colsample_bytree = [0.5, 1]
+XGBClassifier__reg_alpha = [0, 0.1]
+XGBClassifier__reg_lambda = [0, 0.1]
+
+[optimizer.tuned_parameters.optimize_category]
+AutoFeatRegressor__feateng_steps = [2]
+AutoFeatRegressor__verbose = [1]
+
+[optimizer.validator]
+validator = "RepeatedStratifiedKFold"
+n_splits = 5
+n_repeats = 3
+random_state = 1
+
+[registry]
+model_name = "Feat_XGBClassifier"
+description = "Differentiation between eko and konv treatments"
+metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
+
+[evaluator]
+logger = "ArtifactLoggerClassification"

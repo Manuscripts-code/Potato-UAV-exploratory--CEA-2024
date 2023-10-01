@@ -1,0 +1,48 @@
+# this is testing file
+
+[general]
+raster_num_closest_points = 10
+dates = ["2022_07_20"]
+treatments = ["eko"]
+varieties = ["KIS_Tamar", "KIS_Blegos"]
+
+[multispectral]
+channels = ["blue", "green", "nir", "red_edge", "red"]
+location_type = "measured"
+
+[sampler]
+splitter = "SimpleSplitter"
+split_size_val = 0.0
+split_size_test = 0.3
+shuffle = true
+random_state = 1
+stratify = false
+
+[formatter]
+formatter = "RegressionFormatter"
+regression_label = "SPAD"
+
+[model]
+pipeline = ["DummyRegressor"]
+
+[optimizer]
+n_trials = 1
+n_jobs = 1
+scoring_metric = "neg_root_mean_squared_error"
+scoring_mode = "maximize"
+
+[optimizer.tuned_parameters]
+
+[optimizer.validator]
+validator = "RepeatedKFold"
+n_splits = 5
+n_repeats = 3
+random_state = 1
+
+[registry]
+model_name = "DummyRegressor"
+description = "Regression"
+metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
+
+[evaluator]
+logger = "ArtifactLoggerRegression"
