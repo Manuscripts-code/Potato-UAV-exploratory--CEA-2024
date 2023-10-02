@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 import mlflow
 import optuna
@@ -6,6 +7,7 @@ from sklearn.base import clone
 from sklearn.model_selection import BaseCrossValidator, cross_val_score
 from sklearn.pipeline import Pipeline
 
+from configs import configs
 from configs.parser import OptimizerConfig
 from data_structures.schemas import StructuredData
 
@@ -45,7 +47,12 @@ class Optimizer:
         logging.info(f"Best hyperparameters found were: {self._best_trial.params}")
 
     def _perform_search(self):
-        study = optuna.create_study(direction=self.scoring_mode)
+        study = optuna.create_study(
+            direction=self.scoring_mode,
+            storage=f"sqlite:///{configs.DB_PATH}",
+            study_name=f"trial--{datetime.now().strftime(''.join([configs.DATE_FORMAT, '__', configs.TIME_FORMAT]))}",
+            # load_if_exists=True,
+        )
         study.optimize(self._trainable, n_trials=self.n_trials, timeout=self.timeout, n_jobs=self.n_jobs)
         return study
 

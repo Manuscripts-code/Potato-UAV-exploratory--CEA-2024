@@ -40,11 +40,10 @@ def main(config: str, toml_config_file: str):
 
     print(
         "\nYou can run:\n "
-        f"[italic green]    mlflow ui --backend-store-uri {get_tracking_uri()}"
-        "[/italic green]\n ...to inspect your experiment runs within the MLflow"
-        " UI.\nYou can find your runs tracked within the "
-        "`mlflow_example_pipeline` experiment. There you'll also be able to "
-        "compare two or more runs.\n\n"
+        f"[italic green]    mlflow ui --backend-store-uri {get_tracking_uri()} [/italic green]\n"
+        "--> to inspect your experiment runs within the MLflow UI.\n"
+        f"[italic green]    optuna-dashboard sqlite:///{configs.DB_PATH} [/italic green]\n"
+        "--> to inspect your optuna study run within the Optuna dashboard.\n"
     )
 
 

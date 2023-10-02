@@ -15,6 +15,7 @@ sqlmodel==0.0.8
 
 # ML
 optuna==3.2.0
+optuna-dashboard==0.12.0
 scikit_learn==1.2.2
 zenml==0.44.1
 zenml[server]
