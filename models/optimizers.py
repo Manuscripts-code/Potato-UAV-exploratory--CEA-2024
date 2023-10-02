@@ -10,6 +10,7 @@ from sklearn.pipeline import Pipeline
 from configs import configs
 from configs.parser import OptimizerConfig
 from data_structures.schemas import StructuredData
+from database import schemas  # noqa: F401 - needs to be imported for SQLModel to create tables
 
 
 class Optimizer:
@@ -50,7 +51,7 @@ class Optimizer:
         study = optuna.create_study(
             direction=self.scoring_mode,
             storage=f"sqlite:///{configs.DB_PATH}",
-            study_name=f"trial--{datetime.now().strftime(''.join([configs.DATE_FORMAT, '__', configs.TIME_FORMAT]))}",
+            study_name=f"trial--{datetime.now().strftime(configs.DATETIME_FORMAT)}",
             # load_if_exists=True,
         )
         study.optimize(self._trainable, n_trials=self.n_trials, timeout=self.timeout, n_jobs=self.n_jobs)

@@ -35,6 +35,7 @@ class Column:
     model_name = ("model", "name")
     model_version = ("model", "version")
     model_is_latest = ("model", "is_latest")
+    model_created_at = ("model", "created_at")
     model_data_name = ("model", "data_name")
     model_prediction_name = ("model", "prediction_name")
 
@@ -78,6 +79,7 @@ class Report:
             model_name = record.model_name
             model_version = record.model_version
             model_is_latest = record.is_latest
+            model_created_at = record.created_at
 
             for data, predictions in zip(record.data, record.predictions):
                 data_name = data.name
@@ -88,6 +90,7 @@ class Report:
                     model_name=model_name,
                     model_version=model_version,
                     model_is_latest=model_is_latest,
+                    model_created_at=model_created_at,
                     data_name=data_name,
                     data_content=data_content,
                     pred_name=pred_name,
@@ -157,6 +160,7 @@ class Report:
         model_name: str,
         model_version: str,
         model_is_latest: bool,
+        model_created_at: str,
         data_name: str,
         data_content: StructuredData,
         pred_name: str,
@@ -171,6 +175,7 @@ class Report:
             Column.model_name: model_name,
             Column.model_version: model_version,
             Column.model_is_latest: model_is_latest,
+            Column.model_created_at: model_created_at,
             Column.model_data_name: data_name,
             Column.model_prediction_name: pred_name,
         }

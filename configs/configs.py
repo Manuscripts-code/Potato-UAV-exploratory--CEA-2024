@@ -83,3 +83,4 @@ DB_PREDICTIONS_TEST = "predictions_test"
 # MISCELLANEOUS
 DATE_FORMAT = "%Y_%m_%d"
 TIME_FORMAT = "%H_%M_%S"
+DATETIME_FORMAT = "".join([DATE_FORMAT, "__", TIME_FORMAT])
