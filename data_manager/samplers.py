@@ -1,4 +1,4 @@
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 import numpy as np
 from sklearn.model_selection import GroupShuffleSplit, train_test_split
@@ -6,9 +6,24 @@ from sklearn.model_selection import GroupShuffleSplit, train_test_split
 from data_manager.loaders import StructuredData
 
 
-class Splitter(Protocol):
+class Splitter(ABC):
+    def __init__(
+        self,
+        split_size_val: float = 0.2,
+        split_size_test: float = 0.2,
+        random_state: int = -1,
+        shuffle: bool = True,
+        stratify: bool = True,
+    ):
+        self.split_size_val = split_size_val
+        self.split_size_test = split_size_test
+        self.random_state = None if random_state == -1 else random_state
+        self.shuffle = shuffle
+        self.stratify = stratify
+
+    @abstractmethod
     def __call__(self, data: StructuredData) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        ...
+        pass
 
 
 class Sampler:
@@ -23,21 +38,7 @@ class Sampler:
         return data[train_indices], data[val_indices], data[test_indices]
 
 
-class SimpleSplitter:
-    def __init__(
-        self,
-        split_size_val=0.2,
-        split_size_test=0.2,
-        random_state=-1,
-        shuffle=True,
-        stratify=True,
-    ):
-        self.split_size_val = split_size_val
-        self.split_size_test = split_size_test
-        self.random_state = None if random_state == -1 else random_state
-        self.shuffle = shuffle
-        self.stratify = stratify
-
+class SimpleSplitter(Splitter):
     def __call__(self, data: StructuredData) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         idx_full = np.arange(len(data.target))
         stratify = data.target.value if self.stratify else None

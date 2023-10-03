@@ -10,6 +10,9 @@ How to install:
 
 ZenML:
 
+# Disconnect first if you closed PC
+zenml disconnect
+
 # Initialize ZenML
 zenml init
 
