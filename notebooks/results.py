@@ -123,7 +123,7 @@ class Report:
         save_dir = ensure_dir(Path(configs.SAVE_RESULTS_DIR, model_name, model_version, data_name))
 
         write_txt(data.describe().to_string(), save_dir / "describe_data.txt")
-        write_txt(meta.groupby([configs.TREATMENT_ENG, configs.DATE_ENG, configs.BLOCK_ENG]).size().to_string(), save_dir / "describe_meta.txt")  # type: ignore # noqa
+        write_txt(meta.groupby([configs.TREATMENT_ENG, configs.DATE_ENG, configs.BLOCK_ENG, configs.VARIETY_ENG]).size().to_string(), save_dir / "describe_meta.txt")  # type: ignore # noqa
         write_txt(data.to_string(), save_dir / "data_data.txt")
         write_txt(meta.to_string(), save_dir / "data_meta.txt")
         save_meta_visualization(meta, save_path=save_dir / "visualization_meta.pdf")
