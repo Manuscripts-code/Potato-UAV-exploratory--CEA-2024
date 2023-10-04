@@ -16,6 +16,7 @@ FORMATTERS = {
 }
 SPLITTERS = {
     "SimpleSplitter": samplers.SimpleSplitter,
+    "StratifyAllSplitter": samplers.StratifyAllSplitter,
 }
 
 LOGGERS = {

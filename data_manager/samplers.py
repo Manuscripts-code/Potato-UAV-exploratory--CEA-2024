@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from sklearn.model_selection import GroupShuffleSplit, train_test_split
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
+from configs import configs
 from data_manager.loaders import StructuredData
 
 
@@ -41,25 +43,63 @@ class Sampler:
 class SimpleSplitter(Splitter):
     def __call__(self, data: StructuredData) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         idx_full = np.arange(len(data.target))
-        stratify = data.target.value if self.stratify else None
+        stratify_indices = data.target.value if self.stratify else None
 
         train_indices, test_indices = train_test_split(
             idx_full,
             test_size=self.split_size_test,
             random_state=self.random_state,
             shuffle=self.shuffle,
-            stratify=stratify,
+            stratify=stratify_indices,
         )
-        stratify = data.target.value[train_indices] if self.stratify else None
 
         if self.split_size_val == 0:
             return np.sort(train_indices), np.array([]), np.sort(test_indices)
+
+        stratify_indices = data.target.value[train_indices] if self.stratify else None
 
         train_indices, val_indices = train_test_split(
             train_indices,
             test_size=self.split_size_val,
             random_state=self.random_state,
             shuffle=self.shuffle,
-            stratify=stratify,
+            stratify=stratify_indices,
         )
         return np.sort(train_indices), np.sort(val_indices), np.sort(test_indices)
+
+
+class StratifyAllSplitter(Splitter):
+    def __call__(self, data: StructuredData) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        idx_full = np.arange(len(data.target))
+        stratify_indices = self._create_stratify_indices(data.meta)
+
+        train_indices, test_indices = train_test_split(
+            idx_full,
+            test_size=self.split_size_test,
+            random_state=self.random_state,
+            shuffle=self.shuffle,
+            stratify=stratify_indices,
+        )
+
+        if self.split_size_val == 0:
+            return np.sort(train_indices), np.array([]), np.sort(test_indices)
+
+        stratify_indices = self._create_stratify_indices(data.meta.iloc[train_indices])
+
+        train_indices, val_indices = train_test_split(
+            train_indices,
+            test_size=self.split_size_val,
+            random_state=self.random_state,
+            shuffle=self.shuffle,
+            stratify=stratify_indices,
+        )
+        return np.sort(train_indices), np.sort(val_indices), np.sort(test_indices)
+
+    def _create_stratify_indices(self, data: pd.DataFrame) -> np.ndarray:
+        # create one label from multiple columns
+        label = data[
+            [configs.BLOCK_ENG, configs.VARIETY_ENG, configs.TREATMENT_ENG, configs.DATE_ENG]
+        ].apply(tuple, axis=1)
+        # encode to numbers
+        stratify_indices, _ = pd.factorize(label)
+        return stratify_indices
