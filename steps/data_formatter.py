@@ -7,7 +7,7 @@ from data_manager.loaders import StructuredData
 from utils.utils import init_object
 
 
-@step(enable_cache=configs.CACHING)
+@step(enable_cache=False)
 def data_formatter(
     data: StructuredData, general_cfg: GeneralConfig, formatter_cfg: FormatterConfig
 ) -> Annotated[StructuredData, "data"]:

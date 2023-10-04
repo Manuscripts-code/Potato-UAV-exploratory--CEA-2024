@@ -8,7 +8,7 @@ from data_manager.loaders import StructuredData
 from utils.utils import init_object
 
 
-@step(enable_cache=configs.CACHING)
+@step(enable_cache=False)
 def data_sampler(
     data: StructuredData, sampler_cfg: SamplerConfig
 ) -> tuple[

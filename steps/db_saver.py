@@ -10,7 +10,7 @@ from database.db import SQLiteDatabase
 from database.utils import prepare_record_table
 
 
-@step(enable_cache=configs.CACHING)
+@step(enable_cache=False)
 def db_saver(
     model_service: MLFlowDeploymentService,
     data_train: StructuredData,

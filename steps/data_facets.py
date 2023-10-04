@@ -6,7 +6,7 @@ from zenml.integrations.facets.materializers.facets_materializer import FacetsCo
 from data_structures.schemas import StructuredData
 
 
-@step
+@step(enable_cache=True)
 def data_facets(
     data_train: StructuredData, data_val: StructuredData, data_test: StructuredData
 ) -> tuple[

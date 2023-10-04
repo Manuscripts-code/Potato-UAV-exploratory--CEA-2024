@@ -13,7 +13,7 @@ from models.optimizers import Optimizer
 from utils.utils import init_object
 
 
-@step(enable_cache=True, experiment_tracker=Client().active_stack.experiment_tracker.name)
+@step(enable_cache=False, experiment_tracker=Client().active_stack.experiment_tracker.name)
 def model_optimizer(
     model: Pipeline, data_train: StructuredData, data_val: StructuredData, optimizer_cfg: OptimizerConfig
 ) -> tuple[Annotated[Pipeline, "best_model"], Annotated[FrozenTrial, "best_trial"]]:
