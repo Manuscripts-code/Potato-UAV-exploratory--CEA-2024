@@ -39,6 +39,13 @@ class ClassificationTarget(BaseModel):
             "encoding": self.encoding.to_list(),
         }
 
+    def reset_index(self):
+        return ClassificationTarget(
+            label=self.label.reset_index(drop=True),
+            value=self.value.reset_index(drop=True),
+            encoding=self.encoding,
+        )
+
     @classmethod
     def from_dict(cls, data):
         label = pd.Series(data["label"], name="label")
@@ -64,6 +71,9 @@ class RegressionTarget(BaseModel):
             "name": self.name,
         }
 
+    def reset_index(self):
+        return RegressionTarget(value=self.value.reset_index(drop=True), name=self.name)
+
     @classmethod
     def from_dict(cls, data):
         value = pd.Series(data["value"], name="value")
@@ -71,62 +81,40 @@ class RegressionTarget(BaseModel):
         return cls(value=value, name=name)
 
 
-class Group(BaseModel):
-    label = pd.Series
-    encoded = pd.Series
-    encoding = pd.Series
-
-    def __getitem__(self, indices):
-        label = self.label.iloc[indices]
-        encoded = self.encoded.iloc[indices]
-        return Group(label=label, encoded=encoded, encoding=self.encoding)
-
-    def to_dict(self):
-        return {
-            "label": self.label.to_list(),
-            "encoded": self.encoded.to_list(),
-            "encoding": self.encoding.to_list(),
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        label = pd.Series(data["label"], name="label")
-        encoded = pd.Series(data["encoded"], name="encoded")
-        encoding = pd.Series(data["encoding"], name="encoding")
-        return cls(label=label, encoded=encoded, encoding=encoding)
-
-
 class StructuredData(BaseModel):
     data: pd.DataFrame
     meta: pd.DataFrame
     target: ClassificationTarget | RegressionTarget | None = None
-    group: Group | None = None
 
     def __getitem__(self, indices):
         data = self.data.iloc[indices]
         meta = self.meta.iloc[indices]
         target = None if self.target is None else self.target[indices]
-        group = None if self.group is None else self.group[indices]
-        return StructuredData(data=data, meta=meta, target=target, group=group)
+        return StructuredData(data=data, meta=meta, target=target)
 
     def to_dict(self):
         return {
             "data": self.data.to_dict(),
             "meta": self.meta.to_dict(),
             "target": self.target.to_dict() if self.target is not None else None,
-            "group": self.group.to_dict() if self.group is not None else None,
         }
 
     def to_bytes(self):
         return pickle.dumps(self.to_dict())
+
+    def reset_index(self):
+        return StructuredData(
+            data=self.data.reset_index(drop=True),
+            meta=self.meta.reset_index(drop=True),
+            target=self.target.reset_index() if self.target is not None else None,
+        )
 
     @classmethod
     def from_dict(cls, data):
         data_ = pd.DataFrame(data["data"])
         meta = pd.DataFrame(data["meta"])
         target = StructuredData.target_from_dict(data["target"])
-        group = None if data["group"] is None else Group.from_dict(data["group"])
-        return cls(data=data_, meta=meta, target=target, group=group)
+        return cls(data=data_, meta=meta, target=target)
 
     @staticmethod
     def target_from_dict(data):

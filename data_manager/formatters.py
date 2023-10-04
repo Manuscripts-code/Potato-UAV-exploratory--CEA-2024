@@ -24,7 +24,7 @@ class Formatter(ABC):
             & data.meta[configs.TREATMENT_ENG].isin(self.general_cfg.treatments)
             & data.meta[configs.DATE_ENG].isin(self.general_cfg.dates)
         ].to_list()
-        return data[indices]
+        return data[indices].reset_index()
 
 
 class ClassificationFormatter(Formatter):
