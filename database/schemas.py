@@ -40,7 +40,7 @@ class RecordSchema(SQLModel, table=True):
     model_name: str = Field(index=True)
     model_version: str
     is_latest: bool = Field(default=True)
-    created_at: str = Field(default=datetime.now().strftime(configs.DATETIME_FORMAT))
+    created_at: datetime = Field(default=datetime.now())
 
     data: list["DataSchema"] = Relationship(back_populates="record")
     metrics: list["MetricSchema"] = Relationship(back_populates="record")
