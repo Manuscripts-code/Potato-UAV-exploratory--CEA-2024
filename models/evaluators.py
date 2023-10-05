@@ -85,77 +85,8 @@ class Evaluator:
         self.logger.log_artifacts(transfer_object)
 
 
-class ArtifactLoggerClassification:
-    def log_params(self, tobj: TransferObject):
-        mlflow.log_params(tobj.best_trial.params)
-        logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
-
-    def log_metrics(self, tobj: TransferObject):
-        precision, recall, f1, _ = precision_recall_fscore_support(
-            tobj.y_true, tobj.y_pred, average="weighted", zero_division=0
-        )
-        mlflow.log_metrics(
-            {
-                f"{tobj.suffix}_precision": precision,
-                f"{tobj.suffix}_recall": recall,
-                f"{tobj.suffix}_f1": f1,
-            }
-        )
-        logging.info(
-            f"Classification report on {tobj.suffix} data:\n"
-            f"{classification_report(tobj.y_true, tobj.y_pred)}"
-        )
-
-    def log_artifacts(self, tobj: TransferObject):
-        with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
-            results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
-            configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
-
-            write_json(tobj.best_trial.params, configs_path / "best_params.json")
-            write_txt(
-                classification_report(tobj.y_true, tobj.y_pred),
-                results_path / "classification_report.txt",
-            )
-            self._save_confusion_matrix(tobj, results_path)
-            # joblib.dump(model_instance, path) # automatically done by mlflow
-
-            mlflow.log_artifacts(dp)
-
-    def _save_confusion_matrix(self, tobj: TransferObject, results_path: Path):
-        cm = confusion_matrix(tobj.y_true, tobj.y_pred)
-        display_labels = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
-        cm_display = ConfusionMatrixDisplay(cm, display_labels=display_labels)
-        cm_display.plot(cmap="Blues", values_format="d")
-        plt.savefig(results_path / "confusion_matrix.png")
-        plt.close("all")
-
-
-class ArtifactLoggerRegression:
-    def log_params(self, tobj: TransferObject):
-        mlflow.log_params(tobj.best_trial.params)
-        logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
-
-    def log_metrics(self, tobj: TransferObject):
-        mse = np.mean((tobj.y_true - tobj.y_pred) ** 2)
-        mlflow.log_metrics({f"{tobj.suffix}_mse": mse})
-        logging.info(f"MSE on {tobj.suffix} data: {mse}")
-
-    def log_artifacts(self, tobj: TransferObject):
-        with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
-            model_path = ensure_dir(Path(dp, configs.MLFLOW_MODEL))  # ignore for now  # noqa
-            explainer_path = ensure_dir(Path(dp, configs.MLFLOW_EXPLAINER, tobj.suffix))
-            results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
-            configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
-
-            write_json(tobj.best_trial.params, configs_path / "best_params.json")
-            write_txt(
-                f"MSE on {tobj.suffix} data: {np.mean((tobj.y_true - tobj.y_pred) ** 2)}",
-                results_path / "mse.txt",
-            )
-            self._save_explanations(tobj, explainer_path)
-            mlflow.log_artifacts(dp)
-
-    def _save_explanations(self, tobj: TransferObject, explainer_path: Path):
+class LoggerMixin:
+    def save_explanations(self, tobj: TransferObject, explainer_path: Path):
         if len(tobj.best_model.steps) > 1:
             model_temp = deepcopy(tobj.best_model)
             model_temp.steps.pop(-1)
@@ -183,3 +114,77 @@ class ArtifactLoggerRegression:
         shap.summary_plot(shap_values, data, plot_type=plot_type)
         plt.savefig(explainer_path / f"shap_summary_plot_{plot_type}.png")
         plt.close("all")
+
+
+class ArtifactLoggerClassification(LoggerMixin):
+    def log_params(self, tobj: TransferObject):
+        mlflow.log_params(tobj.best_trial.params)
+        logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
+
+    def log_metrics(self, tobj: TransferObject):
+        precision, recall, f1, _ = precision_recall_fscore_support(
+            tobj.y_true, tobj.y_pred, average="weighted", zero_division=0
+        )
+        mlflow.log_metrics(
+            {
+                f"{tobj.suffix}_precision": precision,
+                f"{tobj.suffix}_recall": recall,
+                f"{tobj.suffix}_f1": f1,
+            }
+        )
+        logging.info(
+            f"Classification report on {tobj.suffix} data:\n"
+            f"{classification_report(tobj.y_true, tobj.y_pred)}"
+        )
+
+    def log_artifacts(self, tobj: TransferObject):
+        with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
+            model_path = ensure_dir(Path(dp, configs.MLFLOW_MODEL))  # ignore for now  # noqa
+            explainer_path = ensure_dir(Path(dp, configs.MLFLOW_EXPLAINER, tobj.suffix))
+            results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
+            configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
+
+            write_json(tobj.best_trial.params, configs_path / "best_params.json")
+            write_txt(
+                classification_report(tobj.y_true, tobj.y_pred),
+                results_path / "classification_report.txt",
+            )
+            self._save_confusion_matrix(tobj, results_path)
+            # joblib.dump(model_instance, path) # automatically done by mlflow
+
+            self.save_explanations(tobj, explainer_path)
+            mlflow.log_artifacts(dp)
+
+    def _save_confusion_matrix(self, tobj: TransferObject, results_path: Path):
+        cm = confusion_matrix(tobj.y_true, tobj.y_pred)
+        display_labels = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
+        cm_display = ConfusionMatrixDisplay(cm, display_labels=display_labels)
+        cm_display.plot(cmap="Blues", values_format="d")
+        plt.savefig(results_path / "confusion_matrix.png")
+        plt.close("all")
+
+
+class ArtifactLoggerRegression(LoggerMixin):
+    def log_params(self, tobj: TransferObject):
+        mlflow.log_params(tobj.best_trial.params)
+        logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
+
+    def log_metrics(self, tobj: TransferObject):
+        mse = np.mean((tobj.y_true - tobj.y_pred) ** 2)
+        mlflow.log_metrics({f"{tobj.suffix}_mse": mse})
+        logging.info(f"MSE on {tobj.suffix} data: {mse}")
+
+    def log_artifacts(self, tobj: TransferObject):
+        with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
+            model_path = ensure_dir(Path(dp, configs.MLFLOW_MODEL))  # ignore for now  # noqa
+            explainer_path = ensure_dir(Path(dp, configs.MLFLOW_EXPLAINER, tobj.suffix))
+            results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
+            configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
+
+            write_json(tobj.best_trial.params, configs_path / "best_params.json")
+            write_txt(
+                f"MSE on {tobj.suffix} data: {np.mean((tobj.y_true - tobj.y_pred) ** 2)}",
+                results_path / "mse.txt",
+            )
+            self.save_explanations(tobj, explainer_path)
+            mlflow.log_artifacts(dp)
