@@ -7,7 +7,7 @@ from zenml.integrations.mlflow.services import MLFlowDeploymentService
 from configs import configs
 from data_structures.schemas import Prediction, StructuredData
 from database.db import SQLiteDatabase
-from database.utils import prepare_record_table
+from database.service import DBService, RecordAttributes
 
 
 @step(enable_cache=False)
@@ -24,25 +24,16 @@ def db_saver(
     predictions_test = Prediction(predictions=predictions_test)
 
     db = SQLiteDatabase()
-
-    logging.info(
-        f"Record for model name: '{deployer_cfg.registry_model_name}' with version: "
-        f"'{deployer_cfg.registry_model_version}' is being checked..."
-    )
-    if db.get_record(
-        model_name=deployer_cfg.registry_model_name, model_version=deployer_cfg.registry_model_version
-    ):
-        logging.warning("Record already exists. Skipping...")
-        return
-
-    logging.info("Record does not exist. Saving record to database...")
-    record_table = prepare_record_table(
-        model_name=deployer_cfg.registry_model_name,
-        model_version=deployer_cfg.registry_model_version,
+    db_service = DBService(database=db)
+    record_attrs = RecordAttributes(
         data_train=data_train,
         data_test=data_test,
         predictions_train=predictions_train,
         predictions_test=predictions_test,
     )
-    db.reset_latest_record(model_name=deployer_cfg.registry_model_name)
-    db.save_record(record_table)
+
+    db_service.save_record(
+        model_name=deployer_cfg.registry_model_name,
+        model_version=deployer_cfg.registry_model_version,
+        record_attrs=record_attrs,
+    )
