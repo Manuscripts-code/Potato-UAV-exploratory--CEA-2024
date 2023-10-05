@@ -59,6 +59,7 @@ MLFLOW_TEST = "test"
 MLFLOW_RESULTS = "results"
 MLFLOW_CONFIGS = "configs"
 MLFLOW_MODEL = "model"
+MLFLOW_EXPLAINER = "explainer"
 
 # COMMAND LINE CONFIGS
 CMD_TRAIN_AND_REGISTER = "train"

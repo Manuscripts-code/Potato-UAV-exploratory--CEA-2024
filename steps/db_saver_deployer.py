@@ -11,7 +11,7 @@ from database.service import DBService, RecordAttributes
 
 
 @step(enable_cache=False)
-def db_saver(
+def db_saver_deployer(
     model_service: MLFlowDeploymentService,
     data_train: StructuredData,
     data_test: StructuredData,

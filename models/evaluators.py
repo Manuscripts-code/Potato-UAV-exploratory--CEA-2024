@@ -1,5 +1,6 @@
 import logging
 import tempfile
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -10,6 +11,7 @@ import mlflow
 import mlflow.sklearn
 import numpy as np
 import pandas as pd
+import shap
 from optuna.trial import FrozenTrial
 from sklearn.metrics import (
     ConfusionMatrixDisplay,
@@ -32,6 +34,7 @@ class TransferObject:
     y_true: np.ndarray
     label: np.ndarray
     encoding: dict
+    data: pd.DataFrame
     meta: pd.DataFrame
     suffix: str
 
@@ -73,6 +76,7 @@ class Evaluator:
             y_true=data.target.value.to_numpy(),
             label=label,
             encoding=encoding,
+            data=data.data,
             meta=data.meta,
             suffix=suffix,
         )
@@ -112,18 +116,18 @@ class ArtifactLoggerClassification:
                 classification_report(tobj.y_true, tobj.y_pred),
                 results_path / "classification_report.txt",
             )
-            self.save_confusion_matrix(tobj, results_path)
+            self._save_confusion_matrix(tobj, results_path)
             # joblib.dump(model_instance, path) # automatically done by mlflow
 
             mlflow.log_artifacts(dp)
 
-    def save_confusion_matrix(self, tobj: TransferObject, results_path: Path):
+    def _save_confusion_matrix(self, tobj: TransferObject, results_path: Path):
         cm = confusion_matrix(tobj.y_true, tobj.y_pred)
         display_labels = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
         cm_display = ConfusionMatrixDisplay(cm, display_labels=display_labels)
         cm_display.plot(cmap="Blues", values_format="d")
         plt.savefig(results_path / "confusion_matrix.png")
-        plt.close()
+        plt.close("all")
 
 
 class ArtifactLoggerRegression:
@@ -138,6 +142,8 @@ class ArtifactLoggerRegression:
 
     def log_artifacts(self, tobj: TransferObject):
         with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
+            model_path = ensure_dir(Path(dp, configs.MLFLOW_MODEL))  # ignore for now  # noqa
+            explainer_path = ensure_dir(Path(dp, configs.MLFLOW_EXPLAINER, tobj.suffix))
             results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
             configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
 
@@ -146,5 +152,32 @@ class ArtifactLoggerRegression:
                 f"MSE on {tobj.suffix} data: {np.mean((tobj.y_true - tobj.y_pred) ** 2)}",
                 results_path / "mse.txt",
             )
-
+            self._save_explanations(tobj, explainer_path)
             mlflow.log_artifacts(dp)
+
+    def _save_explanations(self, tobj: TransferObject, explainer_path: Path):
+        if len(tobj.best_model.steps) > 1:
+            model_temp = deepcopy(tobj.best_model)
+            model_temp.steps.pop(-1)
+            data_transformed = model_temp.transform(tobj.data.to_numpy())
+            # column_map = {f"x{idx:03d}": col for idx, col in enumerate(tobj.data.columns)}
+            # data_transformed.columns = [col.replace(column_map) for col in data_transformed.columns]
+
+        else:
+            data_transformed = tobj.data.copy()
+
+        reg = tobj.best_model.steps[-1][-1]  # decision function (regressor)
+        explainer = shap.TreeExplainer(reg)
+        joblib.dump(explainer, explainer_path / "explainer.joblib")
+
+        # save shap artifacts
+        shap_values = explainer.shap_values(data_transformed)
+        self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot")
+        self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar")
+        self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin")
+
+    def _save_shap_figure(self, shap_values, data, explainer_path, plot_type):
+        plt.figure()
+        shap.summary_plot(shap_values, data, plot_type=plot_type)
+        plt.savefig(explainer_path / f"shap_summary_plot_{plot_type}.png")
+        plt.close("all")
