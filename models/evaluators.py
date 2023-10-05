@@ -23,7 +23,7 @@ from sklearn.pipeline import Pipeline
 
 from configs import configs
 from data_structures.schemas import ClassificationTarget, StructuredData
-from utils.utils import ensure_dir, write_json, write_txt
+from utils.utils import ensure_dir, replace_substring, write_json, write_txt
 
 
 @dataclass
@@ -160,8 +160,10 @@ class ArtifactLoggerRegression:
             model_temp = deepcopy(tobj.best_model)
             model_temp.steps.pop(-1)
             data_transformed = model_temp.transform(tobj.data.to_numpy())
-            # column_map = {f"x{idx:03d}": col for idx, col in enumerate(tobj.data.columns)}
-            # data_transformed.columns = [col.replace(column_map) for col in data_transformed.columns]
+            column_map = {f"x{idx:03d}": col for idx, col in enumerate(tobj.data.columns)}
+            data_transformed.columns = [
+                replace_substring(column_map, col) for col in data_transformed.columns
+            ]
 
         else:
             data_transformed = tobj.data.copy()

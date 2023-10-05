@@ -60,3 +60,9 @@ def init_object(options_dict, class_name, *args, **kwargs):
     if class_name not in options_dict:
         raise ValueError(f"Key {class_name} not present. Possible options: {options_dict.keys()}")
     return options_dict[class_name](*args, **kwargs)
+
+
+def replace_substring(mapping: dict[str, str], string: str):
+    for key, value in mapping.items():
+        string = string.replace(key, value)
+    return string
