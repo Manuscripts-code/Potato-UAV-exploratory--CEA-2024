@@ -19,14 +19,11 @@ class SQLiteDatabase:
         def decorator(func):
             @wraps(func)
             def wrapper(self, *args, **kwargs):
-                if no_autoflush:
-                    with Session(self.engine).no_autoflush as session:
-                        self.session = session
-                        return func(self, *args, **kwargs)
-                else:
-                    with Session(self.engine) as session:
-                        self.session = session
-                        return func(self, *args, **kwargs)
+                with Session(self.engine) as session:
+                    self.session = session
+                    if no_autoflush:
+                        self.session.autoflush = False
+                    return func(self, *args, **kwargs)
 
             return wrapper
 
