@@ -44,35 +44,37 @@ class SQLiteDatabase:
         self.session.refresh(record)
 
     @_with_session()
-    def get_record(self, model_name: str, model_version: str):
-        record = (
-            self.session.query(RecordSchema)
-            .filter(RecordSchema.model_name == model_name)
-            .filter(RecordSchema.model_version == model_version)
-            .first()
-        )
-        return record
+    def update_record(
+        self,
+        model_name: str,
+        to_update: dict[str, any],
+        model_version: str = None,
+        is_latest: bool = None,
+    ):
+        query = self.session.query(RecordSchema).filter(RecordSchema.model_name == model_name)
+        if is_latest is not None:
+            query = query.filter(RecordSchema.is_latest == is_latest)
+        else:
+            query = query.filter(RecordSchema.model_version == model_version)
 
-    @_with_session()
-    def reset_latest_record(self, model_name: str):
-        (
-            self.session.query(RecordSchema)
-            .filter(RecordSchema.model_name == model_name)
-            .filter(RecordSchema.is_latest == True)  # noqa: E712
-            .update({"is_latest": False})
-        )
+        if query.count() != 1:
+            raise ValueError(f"Expected 1 record, found {query.count()}.")
+
+        record = query.first()
+        for key, value in to_update.items():
+            setattr(record, key, value)
+
         self.session.commit()
+        self.session.refresh(record)
 
     @_with_session(no_autoflush=True)
-    def get_all_records(self):
-        records = self.session.query(RecordSchema).all()
-        records = self._modify_records(records)
-        return records
-
-    @_with_session(no_autoflush=True)
-    def get_latest_records(self):
-        records = (
-            self.session.query(RecordSchema).filter(RecordSchema.is_latest == True).all()  # noqa: E712
-        )
-        records = self._modify_records(records)
-        return records
+    def get_records(self, model_name: str = None, model_version: str = None, is_latest=None):
+        query = self.session.query(RecordSchema)
+        if model_name is not None:
+            query = query.filter(RecordSchema.model_name == model_name)
+        if model_version is not None:
+            query = query.filter(RecordSchema.model_version == model_version)
+        if is_latest is not None:
+            query = query.filter(RecordSchema.is_latest == is_latest)
+        records = query.all()
+        return self._modify_records(records)

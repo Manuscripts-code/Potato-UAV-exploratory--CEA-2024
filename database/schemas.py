@@ -39,6 +39,8 @@ class RecordSchema(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     model_name: str = Field(index=True)
     model_version: str
+    mlflow_uri: str
+    dashboard_url: str
     is_latest: bool = Field(default=True)
     created_at: datetime = Field(default=datetime.now())
 

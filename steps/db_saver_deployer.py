@@ -32,7 +32,7 @@ def db_saver_deployer(
         predictions_test=predictions_test,
     )
 
-    db_service.save_record(
+    db_service.update_record(
         model_name=deployer_cfg.registry_model_name,
         model_version=deployer_cfg.registry_model_version,
         record_attrs=record_attrs,
