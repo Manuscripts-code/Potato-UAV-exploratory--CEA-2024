@@ -33,7 +33,8 @@ def train_and_register_model_pipeline() -> None:
     model_evaluator(best_model, best_trial, data_train, data_val, data_test, cfg_parser.evaluator())
 
     if configs.REGISTER_MODEL:
-        model_register(best_model, cfg_parser.registry())
+        register_step = model_register(best_model, cfg_parser.registry())
+        db_saver_register.after(register_step)
         db_saver_register(cfg_parser.registry())
 
 

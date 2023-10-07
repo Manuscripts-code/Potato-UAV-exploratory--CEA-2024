@@ -6,7 +6,7 @@ from zenml.model_registries.base_model_registry import ModelRegistryModelMetadat
 from configs.parser import RegistryConfig
 
 
-def model_register(best_model: Pipeline, registry_cfg: RegistryConfig) -> None:
+def model_register(best_model: Pipeline, registry_cfg: RegistryConfig) -> step:
     register = mlflow_register_model_step.with_options(
         parameters=dict(
             name=registry_cfg.model_name,
@@ -15,3 +15,4 @@ def model_register(best_model: Pipeline, registry_cfg: RegistryConfig) -> None:
         )
     )
     register(best_model)
+    return register

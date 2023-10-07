@@ -37,12 +37,11 @@ class DBService:
         return wrapper
 
     @record_check
-    def create_record(self, model_name: str, record_attrs: RecordAttributes):
+    def create_record(self, model_name: str, model_version: str, record_attrs: RecordAttributes):
         logging.info("Record does not exist. Saving record to database...")
         records = self.db.get_records(model_name=model_name)
         if records:
             self.db.update_record(model_name=model_name, to_update={"is_latest": False}, is_latest=True)
-        model_version = len(records) + 1
         record_table = self._create_record_table(
             model_name=model_name, model_version=model_version, record_attrs=record_attrs
         )
