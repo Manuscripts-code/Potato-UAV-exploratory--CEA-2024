@@ -107,7 +107,10 @@ class LoggerMixin:
         shap_values = explainer.shap_values(data_transformed)
         self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot")
         self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar")
-        self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin")
+        try:
+            self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin")
+        except Exception as e:
+            logging.warning(f"Could not save violin plot: {e}")
 
     def _save_shap_figure(self, shap_values, data, explainer_path, plot_type):
         plt.figure()

@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 
 import pandas as pd
@@ -85,5 +86,12 @@ class RegressionFormatter(Formatter):
         merged_df = pd.merge(
             data.meta, measurements, on=self.columns_eng, how="inner", validate="one_to_one"
         )
+        if len(data.meta) != len(merged_df):
+            logging.error(
+                f"Number of rows in metadata and measurements do not match.\n"
+                f"Metadata: {len(data.meta)}, measurements: {len(merged_df)}."
+            )
+            raise ValueError("Number of rows in metadata and measurements do not match.")
+
         data.target = RegressionTarget(name=target_column_label, value=merged_df[target_column_label])
         return data
