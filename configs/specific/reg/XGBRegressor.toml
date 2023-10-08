@@ -2,18 +2,18 @@
 
 [general]
 raster_num_closest_points = 10
-dates = ["2022_07_20"]
+dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
 treatments = ["eko"]
-varieties = ["KIS_Tamar", "KIS_Blegos"]
+varieties = ["KIS_Tamar"]
 
 [multispectral]
 channels = ["blue", "green", "nir", "red_edge", "red"]
 location_type = "measured"
 
 [sampler]
-splitter = "SimpleSplitter"
+splitter = "StratifyAllSplitter"
 split_size_val = 0.0
-split_size_test = 0.3
+split_size_test = 0.25
 shuffle = true
 random_state = 1
 stratify = false
@@ -55,7 +55,7 @@ random_state = 1
 [registry]
 model_name = "XGBRegressor"
 description = "Regression"
-metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
+metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]
 logger = "ArtifactLoggerRegression"
