@@ -1,13 +1,14 @@
+import shutil
 import sys
-
-sys.path.insert(0, "..")
-
 from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 from rich import print
 from sklearn.metrics import classification_report
+
+sys.path.insert(0, "..")
+
 
 from configs import configs
 from data_structures.schemas import ClassificationTarget, Prediction, RegressionTarget, StructuredData
@@ -37,7 +38,6 @@ class Column:
     model_is_latest = ("model", "is_latest")
     model_created_at = ("model", "created_at")
     model_data_name = ("model", "data_name")
-    model_prediction_name = ("model", "prediction_name")
 
     def to_list(self):
         # get all attributes values of the class and remove this method
@@ -78,13 +78,13 @@ class Report:
         for record in records:
             model_name = record.model_name
             model_version = record.model_version
+            model_mlflow_uri = record.mlflow_uri
             model_is_latest = record.is_latest
             model_created_at = record.created_at
 
             for data, predictions in zip(record.data, record.predictions):
                 data_name = data.name
                 data_content = data.content
-                pred_name = predictions.name
                 pred_content = predictions.content
                 self.add_record(
                     model_name=model_name,
@@ -93,13 +93,13 @@ class Report:
                     model_created_at=model_created_at,
                     data_name=data_name,
                     data_content=data_content,
-                    pred_name=pred_name,
                     pred_content=pred_content,
                 )
 
                 self.save_record_artifacts(
                     model_name=model_name,
                     model_version=model_version,
+                    model_mlflow_uri=model_mlflow_uri,
                     data_name=data_name,
                     data_content=data_content,
                     pred_content=pred_content,
@@ -109,6 +109,7 @@ class Report:
         self,
         model_name: str,
         model_version: str,
+        model_mlflow_uri: str,
         data_name: str,
         data_content: StructuredData,
         pred_content: Prediction,
@@ -127,6 +128,7 @@ class Report:
         write_txt(data.to_string(), save_dir / "data_data.txt")
         write_txt(meta.to_string(), save_dir / "data_meta.txt")
         save_meta_visualization(meta, save_path=save_dir / "visualization_meta.pdf")
+        self._copy_shap_artifacts(Path(model_mlflow_uri) / configs.MLFLOW_EXPLAINER / data_name, save_dir)  # type: ignore # noqa
 
         if isinstance(target, ClassificationTarget):
             row_formatter = lambda row: "__".join(row)
@@ -155,6 +157,11 @@ class Report:
         else:
             raise ValueError(f"Unknown target type: {type(target)}")
 
+    def _copy_shap_artifacts(self, explainer_artifacts_uri: str, save_dir: Path):
+        explainer_artifacts_uri = Path(explainer_artifacts_uri)
+        explainer_artifacts_uri = Path("/", *explainer_artifacts_uri.parts[1:])
+        shutil.copytree(explainer_artifacts_uri, save_dir, dirs_exist_ok=True)
+
     def add_record(
         self,
         model_name: str,
@@ -163,7 +170,6 @@ class Report:
         model_created_at: str,
         data_name: str,
         data_content: StructuredData,
-        pred_name: str,
         pred_content: Prediction,
     ):
         target = data_content.target
@@ -177,7 +183,6 @@ class Report:
             Column.model_is_latest: model_is_latest,
             Column.model_created_at: model_created_at,
             Column.model_data_name: data_name,
-            Column.model_prediction_name: pred_name,
         }
 
         if isinstance(target, ClassificationTarget):
@@ -231,13 +236,13 @@ class Report:
 if __name__ == "__main__":
     db = SQLiteDatabase()
 
-    records = db.get_all_records()
-    records_latest = db.get_latest_records()
+    records = db.get_records()
+    records_latest = db.get_records(is_latest=True)
 
-    # report = Report()
-    # report.add_records(records)
-    # print(report.df_classification)
-    # print(report.df_regression)
+    report = Report()
+    report.add_records(records)
+    print(report.df_classification)
+    print(report.df_regression)
 
     report = Report()
     report.add_records(records_latest)

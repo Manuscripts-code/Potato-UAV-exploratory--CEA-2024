@@ -53,9 +53,16 @@ BLOCK_SLO = "Blok"
 PLANT_SLO = "Rastlina"
 VARIETY_SLO = "Sorta"
 
+# MISCELLANEOUS
+DATE_FORMAT = "%Y_%m_%d"
+TIME_FORMAT = "%H_%M_%S"
+DATETIME_FORMAT = "".join([DATE_FORMAT, "__", TIME_FORMAT])
+TRAIN_STR = "train"
+TEST_STR = "test"
+
 # MLFLOW ARTIFACTS SAVE VARS
-MLFLOW_TRAIN = "train"
-MLFLOW_TEST = "test"
+MLFLOW_TRAIN = TRAIN_STR
+MLFLOW_TEST = TEST_STR
 MLFLOW_RESULTS = "results"
 MLFLOW_CONFIGS = "configs"
 MLFLOW_MODEL = "model"
@@ -76,12 +83,8 @@ MATERIALIZER_DESCRIBE_TARGET_CSV = "describe_target.csv"
 DB_NAME = os.getenv("DB_NAME", "database.db")
 DB_PATH = Path(SAVE_DIR, DB_NAME)
 DB_ECHO = os.getenv("DB_ECHO", "false") == "true"
-DB_DATA_TRAIN = "data_train"
-DB_DATA_TEST = "data_test"
-DB_PREDICTIONS_TRAIN = "predictions_train"
-DB_PREDICTIONS_TEST = "predictions_test"
+DB_DATA_TRAIN = TRAIN_STR
+DB_DATA_TEST = TEST_STR
+DB_PREDICTIONS_TRAIN = TRAIN_STR
+DB_PREDICTIONS_TEST = TEST_STR
 
-# MISCELLANEOUS
-DATE_FORMAT = "%Y_%m_%d"
-TIME_FORMAT = "%H_%M_%S"
-DATETIME_FORMAT = "".join([DATE_FORMAT, "__", TIME_FORMAT])
