@@ -105,6 +105,12 @@ class Report:
                     pred_content=pred_content,
                 )
 
+        self.save_records_summary()
+
+    def save_records_summary(self):
+        write_txt(self.df_classification.to_string(), configs.SAVE_DIR / "classification.txt")
+        write_txt(self.df_regression.to_string(), configs.SAVE_DIR / "regression.txt")
+
     def save_record_artifacts(
         self,
         model_name: str,
@@ -239,10 +245,10 @@ if __name__ == "__main__":
     records = db.get_records()
     records_latest = db.get_records(is_latest=True)
 
-    report = Report()
-    report.add_records(records)
-    print(report.df_classification)
-    print(report.df_regression)
+    # report = Report()
+    # report.add_records(records)
+    # print(report.df_classification)
+    # print(report.df_regression)
 
     report = Report()
     report.add_records(records_latest)
