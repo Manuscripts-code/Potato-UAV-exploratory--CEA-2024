@@ -99,18 +99,18 @@ class LoggerMixin:
         else:
             data_transformed = tobj.data.copy()
 
-        reg = tobj.best_model.steps[-1][-1]  # decision function (regressor)
-        explainer = shap.TreeExplainer(reg)
-        joblib.dump(explainer, explainer_path / "explainer.joblib")
-
-        # save shap artifacts
-        shap_values = explainer.shap_values(data_transformed)
-        self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot")
-        self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar")
         try:
+            reg = tobj.best_model.steps[-1][-1]  # decision function (regressor)
+            explainer = shap.TreeExplainer(reg)
+            joblib.dump(explainer, explainer_path / "explainer.joblib")
+
+            # save shap artifacts
+            shap_values = explainer.shap_values(data_transformed)
+            self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot")
+            self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar")
             self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin")
         except Exception as e:
-            logging.warning(f"Could not save violin plot: {e}")
+            logging.warning(f"Could not save save shap artifacts: {e}")
 
     def _save_shap_figure(self, shap_values, data, explainer_path, plot_type):
         plt.figure()
