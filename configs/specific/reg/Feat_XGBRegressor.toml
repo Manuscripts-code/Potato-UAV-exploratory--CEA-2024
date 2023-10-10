@@ -2,9 +2,18 @@
 
 [general]
 raster_num_closest_points = 10
-dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
+dates = ["2022_07_20"]
 treatments = ["eko"]
-varieties = ["KIS_Tamar"]
+varieties = [
+	"Carolus",
+	"Alouette",
+	"Twister",
+	"Otolia",
+	"KIS_Tamar",
+	"KIS_Blegos",
+	"KIS_Kokra",
+	"Levante",
+]
 
 [multispectral]
 channels = ["blue", "green", "nir", "red_edge", "red"]
@@ -18,12 +27,17 @@ shuffle = true
 random_state = 1
 stratify = false
 
+[features_generator]
+features_engineer = "AutoFeatRegressor"
+feateng_steps = 2
+verbose = 1
+
 [formatter]
 formatter = "RegressionFormatter"
-regression_label = "SPAD"
+regression_label = "Alternaria"
 
 [model]
-pipeline = ["AutoFeatRegressor", "XGBRegressor"]
+pipeline = ["XGBRegressor"]
 
 [optimizer]
 n_trials = 100
@@ -45,10 +59,6 @@ XGBRegressor__subsample = [0.5, 1.0]
 XGBRegressor__colsample_bytree = [0.5, 1.0]
 XGBRegressor__reg_alpha = [0.001, 1.0]
 XGBRegressor__reg_lambda = [0.001, 1.0]
-
-[optimizer.tuned_parameters.optimize_category]
-AutoFeatRegressor__feateng_steps = [2]
-AutoFeatRegressor__verbose = [1]
 
 [optimizer.validator]
 validator = "RepeatedKFold"

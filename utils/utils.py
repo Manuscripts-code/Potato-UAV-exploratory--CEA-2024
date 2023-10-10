@@ -1,5 +1,6 @@
 import json
 import pickle
+import random
 from collections import OrderedDict
 from itertools import repeat
 from pathlib import Path
@@ -66,3 +67,8 @@ def replace_substring(mapping: dict[str, str], string: str):
     for key, value in mapping.items():
         string = string.replace(key, value)
     return string
+
+
+def set_random_seed(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)

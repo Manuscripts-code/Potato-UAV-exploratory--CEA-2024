@@ -1,7 +1,7 @@
 from typing_extensions import Annotated
 from zenml import step
 
-from configs import configs, options
+from configs import options
 from configs.parser import SamplerConfig
 from data_manager import samplers
 from data_manager.loaders import StructuredData

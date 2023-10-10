@@ -19,6 +19,11 @@ SPLITTERS = {
     "StratifyAllSplitter": samplers.StratifyAllSplitter,
 }
 
+FEATURE_ENGINEERS = {
+    "AutoFeatClassifier": AutoFeatClassifier,
+    "AutoFeatRegressor": AutoFeatRegressor,
+}
+
 LOGGERS = {
     "ArtifactLoggerClassification": evaluators.ArtifactLoggerClassification,
     "ArtifactLoggerRegression": evaluators.ArtifactLoggerRegression,
@@ -45,6 +50,4 @@ METHODS = {
     "StandardScaler": StandardScaler,
     "MinMaxScaler": MinMaxScaler,
     "PowerTransformer": PowerTransformer,
-    "AutoFeatClassifier": AutoFeatClassifier,
-    "AutoFeatRegressor": AutoFeatRegressor,
 }

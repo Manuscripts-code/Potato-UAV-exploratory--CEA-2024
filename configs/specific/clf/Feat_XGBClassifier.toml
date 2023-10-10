@@ -2,28 +2,42 @@
 
 [general]
 raster_num_closest_points = 10
-dates = ["2022_07_20"]
+dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
 treatments = ["eko"]
-varieties = ["KIS_Tamar", "KIS_Blegos"]
+varieties = [
+	"Carolus",
+	"Alouette",
+	"Twister",
+	"Otolia",
+	"KIS_Tamar",
+	"KIS_Blegos",
+	"KIS_Kokra",
+	"Levante",
+]
 
 [multispectral]
 channels = ["blue", "green", "nir", "red_edge", "red"]
 location_type = "measured"
 
 [sampler]
-splitter = "SimpleSplitter"
+splitter = "StratifyAllSplitter"
 split_size_val = 0.0
-split_size_test = 0.3
+split_size_test = 0.25
 shuffle = true
 random_state = 1
 stratify = true
+
+[features_generator]
+features_engineer = "AutoFeatClassifier"
+feateng_steps = 2
+verbose = 1
 
 [formatter]
 formatter = "ClassificationFormatter"
 classification_labels = ["varieties"]
 
 [model]
-pipeline = ["AutoFeatClassifier", "XGBClassifier"]
+pipeline = ["XGBClassifier"]
 
 [optimizer]
 n_trials = 200
@@ -46,10 +60,6 @@ XGBClassifier__colsample_bytree = [0.5, 1.0]
 XGBClassifier__reg_alpha = [0.001, 1.0]
 XGBClassifier__reg_lambda = [0.001, 1.0]
 
-[optimizer.tuned_parameters.optimize_category]
-AutoFeatClassifier__feateng_steps = [2]
-AutoFeatClassifier__verbose = [1]
-
 [optimizer.validator]
 validator = "RepeatedStratifiedKFold"
 n_splits = 5
@@ -59,7 +69,7 @@ random_state = 1
 [registry]
 model_name = "Feat_XGBClassifier"
 description = "Differentiation between eko and konv treatments"
-metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
+metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]
 logger = "ArtifactLoggerClassification"

@@ -88,6 +88,7 @@ class Evaluator:
 class LoggerMixin:
     def save_explanations(self, tobj: TransferObject, explainer_path: Path):
         if len(tobj.best_model.steps) > 1:
+            # ? probably not needed anymore
             model_temp = deepcopy(tobj.best_model)
             model_temp.steps.pop(-1)
             data_transformed = model_temp.transform(tobj.data.to_numpy())
@@ -106,16 +107,23 @@ class LoggerMixin:
 
             # save shap artifacts
             shap_values = explainer.shap_values(data_transformed)
-            self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar")
-            self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot")
-            self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin")
+            class_names = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
+            self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar", class_names)
+            self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot", class_names)
+            self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin", class_names)
         except Exception as e:
             logging.warning(f"Could not save save shap artifacts: {e}")
+            plt.close("all")
 
-    def _save_shap_figure(self, shap_values, data, explainer_path, plot_type):
+    def _save_shap_figure(self, shap_values, data, explainer_path, plot_type, class_names=None):
         plt.figure()
-        shap.summary_plot(shap_values, data, plot_type=plot_type)
-        plt.savefig(explainer_path / f"shap_summary_plot_{plot_type}.png")
+        # TODO: add class names
+        shap.summary_plot(shap_values, data, plot_type=plot_type, class_names=class_names)
+        plt.savefig(
+            explainer_path / f"shap_summary_plot_{plot_type}.pdf",
+            format="pdf",
+            bbox_inches="tight",
+        )
         plt.close("all")
 
 
@@ -147,6 +155,7 @@ class ArtifactLoggerClassification(LoggerMixin):
             results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
             configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
 
+            write_txt(tobj.data.to_string(), Path(dp) / f"data_{tobj.suffix}.txt")
             write_json(tobj.best_trial.params, configs_path / "best_params.json")
             write_txt(
                 classification_report(tobj.y_true, tobj.y_pred),
@@ -184,6 +193,7 @@ class ArtifactLoggerRegression(LoggerMixin):
             results_path = ensure_dir(Path(dp, configs.MLFLOW_RESULTS, tobj.suffix))
             configs_path = ensure_dir(Path(dp, configs.MLFLOW_CONFIGS))
 
+            write_txt(tobj.data.to_string(), Path(dp) / f"data_{tobj.suffix}.txt")
             write_json(tobj.best_trial.params, configs_path / "best_params.json")
             write_txt(
                 f"MSE on {tobj.suffix} data: {np.mean((tobj.y_true - tobj.y_pred) ** 2)}",

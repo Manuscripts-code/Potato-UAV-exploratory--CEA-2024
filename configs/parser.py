@@ -42,6 +42,17 @@ class SamplerConfig(BaseModel):
         return dict_
 
 
+class FeaturesConfig(BaseModel):
+    features_engineer: str
+    feateng_steps: int = 1
+    verbose: int = 0
+
+    def params(self):
+        dict_ = self.dict()
+        dict_.pop("features_engineer", None)
+        return dict_
+
+
 class FormatterConfig(BaseModel):
     formatter: str
     measurements_paths: TYPE_DICT_TUPL
@@ -129,6 +140,9 @@ class ConfigParser:
 
     def sampler(self) -> SamplerConfig:
         return self._parse_config(configs.SAMPLER_CFG_NAME, SamplerConfig)
+
+    def features(self) -> FeaturesConfig:
+        return self._parse_config(configs.FEATURES_CFG_NAME, FeaturesConfig)
 
     def formatter(self) -> FormatterConfig:
         config = partial(

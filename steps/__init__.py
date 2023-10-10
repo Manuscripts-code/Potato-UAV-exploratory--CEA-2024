@@ -1,4 +1,5 @@
 from .data_facets import data_facets
+from .data_features import data_features
 from .data_formatter import data_formatter
 from .data_loader import data_loader
 from .data_sampler import data_sampler
@@ -24,4 +25,5 @@ __all__ = [
     "data_facets",
     "db_saver_deployer",
     "db_saver_register",
+    "data_features",
 ]

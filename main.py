@@ -7,6 +7,7 @@ from zenml.integrations.mlflow.mlflow_utils import get_tracking_uri
 from configs import configs
 from pipelines.test import deployment_inference_pipeline
 from pipelines.train import train_and_register_model_pipeline
+from utils.utils import set_random_seed
 
 
 @click.command()
@@ -26,6 +27,7 @@ from pipelines.train import train_and_register_model_pipeline
     help="Select among possible toml configs located in 'configs/specific/*.toml'",
 )
 def main(config: str, toml_config_file: str):
+    set_random_seed(configs.RANDOM_SEED)
     # Set the TOML config file as an environment variable (parsed in the pipelines)
     os.environ[configs.TOML_ENV_NAME] = toml_config_file
 

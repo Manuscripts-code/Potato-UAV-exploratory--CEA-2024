@@ -5,6 +5,7 @@ from configs import configs
 from configs.parser import ConfigParser
 from steps import (
     data_facets,
+    data_features,
     data_formatter,
     data_loader,
     data_sampler,
@@ -26,6 +27,7 @@ def train_and_register_model_pipeline() -> None:
     data = data_loader(cfg_parser.general(), cfg_parser.multispectral())
     data = data_formatter(data, cfg_parser.general(), cfg_parser.formatter())
     data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
+    data_train, data_val, data_test = data_features(data_train, data_val, data_test, cfg_parser.features())  # type: ignore # noqa
     data_facets(data_train, data_val, data_test)
 
     model = model_creator(cfg_parser.model())
