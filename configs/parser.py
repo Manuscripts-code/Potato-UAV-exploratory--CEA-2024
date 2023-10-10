@@ -16,7 +16,10 @@ class GeneralConfig(BaseModel):
     raster_num_closest_points: int
     dates: list[str]
     treatments: list[str]
-    varieties: list[str]
+    varieties: list[str] | None
+
+    def without_varieties(self):
+        return self.copy(update={"varieties": None})
 
 
 class MultispectralConfig(BaseModel):

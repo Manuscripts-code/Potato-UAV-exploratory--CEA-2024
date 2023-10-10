@@ -24,7 +24,7 @@ def train_and_register_model_pipeline() -> None:
     cfg_parser = ConfigParser()
     logger.info(f"Using toml file: {cfg_parser.toml_cfg_path}")
 
-    data = data_loader(cfg_parser.general(), cfg_parser.multispectral())
+    data = data_loader(cfg_parser.general().without_varieties(), cfg_parser.multispectral())
     data = data_formatter(data, cfg_parser.general(), cfg_parser.formatter())
     data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
     data_train, data_val, data_test = data_features(data_train, data_val, data_test, cfg_parser.features())  # type: ignore # noqa
