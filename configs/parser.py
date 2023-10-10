@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 from pydantic import BaseModel, Field, ValidationError
+from rich import print
 
 from configs import configs, paths
 from utils.utils import read_toml
@@ -43,7 +44,7 @@ class SamplerConfig(BaseModel):
 
 
 class FeaturesConfig(BaseModel):
-    features_engineer: str
+    features_engineer: str = None
     feateng_steps: int = 1
     verbose: int = 0
 
@@ -119,11 +120,15 @@ class ConfigParser:
         self.toml_cfg = read_toml(self.toml_cfg_path)
 
     def _parse_config(self, config_name: str, config_class: type[BaseModel]) -> BaseModel:
-        specific_cfg = self.toml_cfg[config_name]
+        try:
+            specific_cfg = self.toml_cfg[config_name]
+        except KeyError as err:
+            print(f"Warning: Config name not found in toml file: {err}")
+            return config_class()
         try:
             config = config_class(**specific_cfg)
         except ValidationError as err:
-            print(f"Toml configuration error. \nProblem in: {str(err.model)} \n{err}")
+            print(f"Error: Toml configuration problem: {str(err.model)} \n{err}")
             raise
         return config
 

@@ -18,6 +18,9 @@ def data_features(
     Annotated[StructuredData, "data_val"],
     Annotated[StructuredData, "data_test"],
 ]:
+    if features_cfg.features_engineer is None:
+        return data_train, data_val, data_test
+
     features_engineer = init_object(
         options.FEATURE_ENGINEERS, features_cfg.features_engineer, **features_cfg.params()
     )
