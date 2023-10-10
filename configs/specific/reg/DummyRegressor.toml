@@ -7,20 +7,20 @@ treatments = ["eko"]
 varieties = ["KIS_Tamar", "KIS_Blegos"]
 
 [multispectral]
-channels = ["blue", "green", "nir", "red_edge", "red"]
+channels = ["blue", "green", "red", "red_edge", "nir"]
 location_type = "measured"
 
 [sampler]
-splitter = "SimpleSplitter"
+splitter = "StratifyAllSplitter"
 split_size_val = 0.0
-split_size_test = 0.3
+split_size_test = 0.25
 shuffle = true
 random_state = 1
 stratify = false
 
 [formatter]
 formatter = "RegressionFormatter"
-regression_label = "SPAD"
+regression_label = "Alternaria"
 
 [model]
 pipeline = ["DummyRegressor"]
@@ -42,7 +42,7 @@ random_state = 1
 [registry]
 model_name = "DummyRegressor"
 description = "Regression"
-metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
+metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]
 logger = "ArtifactLoggerRegression"

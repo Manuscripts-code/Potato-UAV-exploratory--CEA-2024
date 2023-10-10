@@ -7,7 +7,7 @@ treatments = ["eko"]
 varieties = ["KIS_Tamar", "KIS_Blegos"]
 
 [multispectral]
-channels = ["blue", "green", "nir", "red_edge", "red"]
+channels = ["blue", "green", "red", "red_edge", "nir"]
 location_type = "measured"
 
 [sampler]

@@ -7,7 +7,7 @@ treatments = ["eko"]
 varieties = ["KIS_Tamar"]
 
 [multispectral]
-channels = ["blue", "green", "nir", "red_edge", "red"]
+channels = ["blue", "green", "red", "red_edge", "nir"]
 location_type = "measured"
 
 [sampler]
@@ -20,7 +20,7 @@ stratify = false
 
 [formatter]
 formatter = "RegressionFormatter"
-regression_label = "SPAD"
+regression_label = "Alternaria"
 
 [model]
 pipeline = ["XGBRegressor"]
