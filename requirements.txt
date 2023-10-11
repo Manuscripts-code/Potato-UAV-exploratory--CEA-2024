@@ -35,3 +35,4 @@ rioxarray==0.14.1
 
 # Spectral
 spectral==0.23.1
+spyndex==0.5.0

@@ -7,13 +7,14 @@ from sklearn.preprocessing import MinMaxScaler, PowerTransformer, StandardScaler
 from sklearn.svm import SVC, SVR
 from xgboost import XGBClassifier, XGBRegressor
 
-from data_manager import formatters, samplers
+from data_manager import features, formatters, samplers
 from models import evaluators, methods
 
 FORMATTERS = {
     "ClassificationFormatter": formatters.ClassificationFormatter,
     "RegressionFormatter": formatters.RegressionFormatter,
 }
+
 SPLITTERS = {
     "SimpleSplitter": samplers.SimpleSplitter,
     "StratifyAllSplitter": samplers.StratifyAllSplitter,
@@ -22,6 +23,7 @@ SPLITTERS = {
 FEATURE_ENGINEERS = {
     "AutoFeatClassifier": AutoFeatClassifier,
     "AutoFeatRegressor": AutoFeatRegressor,
+    "AutoSpectralIndicesClassification": features.AutoSpectralIndicesClassification,
 }
 
 LOGGERS = {
