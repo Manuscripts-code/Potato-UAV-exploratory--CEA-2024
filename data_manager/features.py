@@ -66,11 +66,11 @@ def feature_selector_factory(
     return make_pipeline(RobustScaler(), sfs)
 
 
-class AutoSpectralIndicesClassification(BaseEstimator, TransformerMixin):
-    def __init__(self, verbose: int = 0, n_jobs=1, merge_with_original: bool = True, **kwargs):
+class AutoSpectralIndices(BaseEstimator, TransformerMixin):
+    def __init__(self, problem_type, verbose: int = 0, n_jobs=1, merge_with_original: bool = True):
         self.merge_with_original = merge_with_original
         self.selector = feature_selector_factory(
-            problem_type="classification", verbose=verbose, n_jobs=n_jobs
+            problem_type=problem_type, verbose=verbose, n_jobs=n_jobs
         )
 
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
@@ -96,3 +96,23 @@ class AutoSpectralIndicesClassification(BaseEstimator, TransformerMixin):
     def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
         self.fit(data, target)
         return self.transform(data)
+
+
+class AutoSpectralIndicesClassification(AutoSpectralIndices):
+    def __init__(self, verbose: int = 0, n_jobs=1, merge_with_original: bool = True, **kwargs):
+        super().__init__(
+            problem_type="classification",
+            verbose=verbose,
+            n_jobs=n_jobs,
+            merge_with_original=merge_with_original,
+        )
+
+
+class AutoSpectralIndicesRegression(AutoSpectralIndices):
+    def __init__(self, verbose: int = 0, n_jobs=1, merge_with_original: bool = True, **kwargs):
+        super().__init__(
+            problem_type="regression",
+            verbose=verbose,
+            n_jobs=n_jobs,
+            merge_with_original=merge_with_original,
+        )

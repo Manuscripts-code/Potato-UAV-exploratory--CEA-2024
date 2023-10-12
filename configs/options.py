@@ -24,6 +24,7 @@ FEATURE_ENGINEERS = {
     "AutoFeatClassifier": AutoFeatClassifier,
     "AutoFeatRegressor": AutoFeatRegressor,
     "AutoSpectralIndicesClassification": features.AutoSpectralIndicesClassification,
+    "AutoSpectralIndicesRegression": features.AutoSpectralIndicesRegression,
 }
 
 LOGGERS = {
