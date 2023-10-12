@@ -50,6 +50,7 @@ class FeaturesConfig(BaseModel):
     features_engineer: str = None
     feateng_steps: int = 1
     verbose: int = 0
+    n_jobs: int = 1
 
     def params(self):
         dict_ = self.dict()
@@ -91,9 +92,9 @@ class OptimizerConfig(BaseModel):
     tuned_parameters: TunedParametersConfig
     validator: ValidatorConfig
     n_trials: int
-    n_jobs: int
     scoring_metric: str
     scoring_mode: str
+    n_jobs: int = 1
     timeout: int = None
 
 

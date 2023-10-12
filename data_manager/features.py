@@ -1,16 +1,21 @@
+from typing import Literal
+
 import numpy as np
 import pandas as pd
 import spyndex
-from autofeat import AutoFeatClassifier, AutoFeatRegressor, FeatureSelector
+from autofeat import AutoFeatClassifier, AutoFeatRegressor
+from mlxtend.feature_selection import SequentialFeatureSelector as SFS
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.linear_model import Ridge, RidgeClassifier, LogisticRegression, LinearRegression
 
 from configs import configs
 from configs.constants import SPECTRAL_INDICES
-from utils.utils import init_object, set_random_seed
 
 
 def compute_indices(data: pd.DataFrame) -> pd.DataFrame:
-    """Specific to this particular project and dataset."""
+    """Specific to this particular project and dataset.
+    Spectral indices were chosen based on multispectral sensor used (micasense RedEdge-MX)
+    """
     df = spyndex.computeIndex(
         index=SPECTRAL_INDICES,
         params={
@@ -32,32 +37,59 @@ def compute_indices(data: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def feature_selector_factory(
+    problem_type: Literal["regression", "classification"], verbose: int = 2, n_jobs: int = 1
+) -> SFS:
+    """Specific to this particular project and dataset."""
+    if problem_type == "regression":
+        algo = Ridge()
+        scoring = "neg_mean_squared_error"
+    elif problem_type == "classification":
+        algo = RidgeClassifier()
+        scoring = "f1_weighted"
+    else:
+        raise ValueError(
+            f"Invalid problem type: {problem_type}, possible values are: 'regression' or 'classification'"
+        )
+    return SFS(
+        estimator=algo,
+        k_features=20,  # can be: "best" - most extensive, [1, n] - check range of features, n - exact number of features # noqa
+        forward=True,  # selection in forward direction
+        floating=True,  # floating algorithm - can go back and remove features once added
+        verbose=verbose,
+        scoring=scoring,
+        cv=5,
+        n_jobs=n_jobs,
+    )
+
+
 class AutoSpectralIndicesClassification(BaseEstimator, TransformerMixin):
-    def __init__(self, feateng_steps: int = 1, verbose: int = 0, merge_with_original: bool = True):
-        self.feateeng_steps = feateng_steps
-        self.verbose = verbose
+    def __init__(self, verbose: int = 0, n_jobs=1, merge_with_original: bool = True, **kwargs):
         self.merge_with_original = merge_with_original
-        self.selector = FeatureSelector(
-            verbose=self.verbose, problem_type="classification", featsel_runs=5
+        self.selector = feature_selector_factory(
+            problem_type="classification", verbose=verbose, n_jobs=n_jobs
         )
 
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
         df_indices = compute_indices(data)
         self.selector.fit(df_indices, target)
         return self
+        """ -- Check plot: performance vs number of features --
+        import matplotlib.pyplot as plt
+        from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
+        plot_sfs(self.selector.get_metric_dict(), kind='std_err', figsize=(30, 20))
+        plt.savefig('selection.png')
+        plt.close()
+        """
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         df_indices = compute_indices(data)
-        df_indices = self.selector.transform(df_indices)
-        df_indices.index = data.index
+        features_names = list(self.selector.k_feature_names_)
+        df_indices = df_indices[features_names]
         if self.merge_with_original:
             return pd.concat([data, df_indices], axis=1)
         return df_indices
 
     def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
-        df_indices = compute_indices(data)
-        df_indices = self.selector.fit_transform(df_indices, target)
-        df_indices.index = data.index
-        if self.merge_with_original:
-            return pd.concat([data, df_indices], axis=1)
-        return df_indices
+        self.fit(data, target)
+        return self.transform(data)

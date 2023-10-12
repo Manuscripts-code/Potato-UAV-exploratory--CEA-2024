@@ -22,6 +22,7 @@ zenml[server]
 xgboost==2.0.0
 autofeat==2.1.2
 shap==0.42.1
+mlxtend==0.23.0
 
 # MLflow integration (same as running: 'zenml integration install mlflow')
 mlflow==2.5.0
