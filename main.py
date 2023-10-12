@@ -5,6 +5,7 @@ from rich import print
 from zenml.integrations.mlflow.mlflow_utils import get_tracking_uri
 
 from configs import configs
+from notebooks.results import produce_results
 from pipelines.test import deployment_inference_pipeline
 from pipelines.train import train_and_register_model_pipeline
 from utils.utils import set_random_seed
@@ -22,11 +23,19 @@ from utils.utils import set_random_seed
 )
 @click.option(
     "--toml-config-file",
+    "-t",
     default=configs.TOML_DEFAULT_FILE_NAME,
     type=str,
-    help="Select among possible toml configs located in 'configs/specific/*.toml'",
+    help="Select among possible toml configs located in 'configs/specific/**/*.toml'.",
 )
-def main(config: str, toml_config_file: str):
+@click.option(
+    "--results",
+    "-r",
+    is_flag=True,
+    default=False,
+    help="If set, the results will be produced (metrics calculated and artifacts saved).",
+)
+def main(config: str, toml_config_file: str, results: bool):
     set_random_seed(configs.RANDOM_SEED)
     # Set the TOML config file as an environment variable (parsed in the pipelines)
     os.environ[configs.TOML_ENV_NAME] = toml_config_file
@@ -39,6 +48,9 @@ def main(config: str, toml_config_file: str):
 
     if do_deploy_and_test:
         deployment_inference_pipeline()
+
+    if results:
+        produce_results()
 
     print(
         "\nYou can run:\n "

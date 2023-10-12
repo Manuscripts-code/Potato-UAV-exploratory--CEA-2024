@@ -239,7 +239,7 @@ class Report:
         return self._df_reg
 
 
-if __name__ == "__main__":
+def produce_results():
     db = SQLiteDatabase()
 
     records = db.get_records()
@@ -254,3 +254,7 @@ if __name__ == "__main__":
     report.add_records(records_latest)
     print(report.df_classification)
     print(report.df_regression)
+
+
+if __name__ == "__main__":
+    produce_results()
