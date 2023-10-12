@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Union
 
 import numpy as np
 import pandas as pd
@@ -67,7 +67,13 @@ def feature_selector_factory(
 
 
 class AutoSpectralIndices(BaseEstimator, TransformerMixin):
-    def __init__(self, problem_type, verbose: int = 0, n_jobs=1, merge_with_original: bool = True):
+    def __init__(
+        self,
+        problem_type=Literal["regression", "classification"],
+        verbose: int = 0,
+        n_jobs=1,
+        merge_with_original: bool = True,
+    ):
         self.merge_with_original = merge_with_original
         self.selector = feature_selector_factory(
             problem_type=problem_type, verbose=verbose, n_jobs=n_jobs
@@ -115,4 +121,60 @@ class AutoSpectralIndicesRegression(AutoSpectralIndices):
             verbose=verbose,
             n_jobs=n_jobs,
             merge_with_original=merge_with_original,
+        )
+
+
+class AutoSpectralIndicesPlusGenerated(BaseEstimator, TransformerMixin):
+    def __init__(
+        self,
+        selector_spectral_indices: Union[
+            "AutoSpectralIndicesPlusGeneratedClassification",
+            "AutoSpectralIndicesPlusGeneratedRegression",
+        ],
+        selector_generated: Union["AutoFeatClassifier", "AutoFeatRegressor"],
+    ):
+        self.selector_spectral_indices = selector_spectral_indices
+        self.selector_generated = selector_generated
+
+    def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
+        self.selector_spectral_indices.fit(data, target)
+        self.selector_generated.fit(data, target)
+        return self
+
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        df_spectral_indices = self.selector_spectral_indices.transform(data)
+        df_generated = self.selector_generated.transform(data)
+        df_generated.index = df_spectral_indices.index
+        return pd.concat([df_generated, df_spectral_indices], axis=1)
+
+    def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
+        self.fit(data, target)
+        return self.transform(data)
+
+
+class AutoSpectralIndicesPlusGeneratedClassification(AutoSpectralIndicesPlusGenerated):
+    def __init__(self, verbose: int = 0, n_jobs=1, feateng_steps: int = 1, **kwargs):
+        selector_spectral_indices = AutoSpectralIndicesClassification(
+            verbose=verbose, n_jobs=n_jobs, merge_with_original=False
+        )
+        selector_generated = AutoFeatClassifier(
+            verbose=verbose, feateng_steps=feateng_steps, n_jobs=n_jobs
+        )
+        super().__init__(
+            selector_spectral_indices=selector_spectral_indices,
+            selector_generated=selector_generated,
+        )
+
+
+class AutoSpectralIndicesPlusGeneratedRegression(AutoSpectralIndicesPlusGenerated):
+    def __init__(self, verbose: int = 0, n_jobs=1, feateng_steps: int = 1, **kwargs):
+        selector_spectral_indices = AutoSpectralIndicesRegression(
+            verbose=verbose, n_jobs=n_jobs, merge_with_original=False
+        )
+        selector_generated = AutoFeatRegressor(
+            verbose=verbose, feateng_steps=feateng_steps, n_jobs=n_jobs
+        )
+        super().__init__(
+            selector_spectral_indices=selector_spectral_indices,
+            selector_generated=selector_generated,
         )
