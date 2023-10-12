@@ -6,7 +6,9 @@ import spyndex
 from autofeat import AutoFeatClassifier, AutoFeatRegressor
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.linear_model import Ridge, RidgeClassifier, LogisticRegression, LinearRegression
+from sklearn.linear_model import Ridge, RidgeClassifier
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.preprocessing import RobustScaler
 
 from configs import configs
 from configs.constants import SPECTRAL_INDICES
@@ -39,7 +41,7 @@ def compute_indices(data: pd.DataFrame) -> pd.DataFrame:
 
 def feature_selector_factory(
     problem_type: Literal["regression", "classification"], verbose: int = 2, n_jobs: int = 1
-) -> SFS:
+) -> Pipeline:
     """Specific to this particular project and dataset."""
     if problem_type == "regression":
         algo = Ridge()
@@ -51,16 +53,17 @@ def feature_selector_factory(
         raise ValueError(
             f"Invalid problem type: {problem_type}, possible values are: 'regression' or 'classification'"
         )
-    return SFS(
+    sfs = SFS(
         estimator=algo,
         k_features=20,  # can be: "best" - most extensive, [1, n] - check range of features, n - exact number of features # noqa
         forward=True,  # selection in forward direction
         floating=True,  # floating algorithm - can go back and remove features once added
         verbose=verbose,
         scoring=scoring,
-        cv=5,
+        cv=3,
         n_jobs=n_jobs,
     )
+    return make_pipeline(RobustScaler(), sfs)
 
 
 class AutoSpectralIndicesClassification(BaseEstimator, TransformerMixin):
@@ -84,8 +87,8 @@ class AutoSpectralIndicesClassification(BaseEstimator, TransformerMixin):
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         df_indices = compute_indices(data)
-        features_names = list(self.selector.k_feature_names_)
-        df_indices = df_indices[features_names]
+        columns_select_idx = list(self.selector[1].k_feature_idx_)
+        df_indices = df_indices.iloc[:, columns_select_idx]
         if self.merge_with_original:
             return pd.concat([data, df_indices], axis=1)
         return df_indices
