@@ -62,7 +62,9 @@ class FormatterConfig(BaseModel):
     formatter: str
     measurements_paths: TYPE_DICT_TUPL
     regression_label: str = None
+    classification_label: str = None
     classification_labels: list[str] = None
+    date_as_feature: bool = False
 
 
 class ModelConfig(BaseModel):

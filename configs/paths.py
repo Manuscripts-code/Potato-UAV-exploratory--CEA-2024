@@ -163,4 +163,12 @@ PATHS_MEASUREMENTS = {
         "Procent",
         str(configs.MEASUREMENTS_DIR / "Alternaria_ocenjevanje1_Ecobreed_krompir_2022.xlsx"),
     ),
+    "AlternariaClass": (
+        "Razred",
+        str(configs.MEASUREMENTS_DIR / "Alternaria_ocenjevanje1_Ecobreed_krompir_2022.xlsx"),
+    ),
+    "VarietiesGrouped": (
+        "Razred",
+        str(configs.MEASUREMENTS_DIR / "Varieties_grouped_Ecobreed_krompir_2022.xlsx"),
+    ),
 }

@@ -12,7 +12,8 @@ from models import evaluators, methods
 
 FORMATTERS = {
     "ClassificationFormatter": formatters.ClassificationFormatter,
-    "RegressionFormatter": formatters.RegressionFormatter,
+    "RegressionFromExcelFormatter": formatters.RegressionFromExcelFormatter,
+    "ClassificationFromExcelFormatter": formatters.ClassificationFromExcelFormatter,
 }
 
 SPLITTERS = {
