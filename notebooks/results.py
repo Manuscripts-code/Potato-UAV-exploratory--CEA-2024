@@ -137,7 +137,11 @@ class Report:
         self._copy_shap_artifacts(Path(model_mlflow_uri) / configs.MLFLOW_EXPLAINER / data_name, save_dir)  # type: ignore # noqa
 
         if isinstance(target, ClassificationTarget):
-            row_formatter = lambda row: "__".join(row)
+            if isinstance(target.label[0], list):
+                row_formatter = lambda row: "__".join(row)
+            else:
+                row_formatter = lambda row: row
+
             target_label = target.label.apply(row_formatter)
             encoding = target.encoding.apply(row_formatter).to_dict()
             target_names = [encoding[key] for key in sorted(encoding.keys())]
