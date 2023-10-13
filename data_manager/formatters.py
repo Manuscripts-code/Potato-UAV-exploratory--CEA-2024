@@ -45,6 +45,14 @@ class Formatter(ABC):
         ].to_list()
         return data[indices].reset_index()
 
+    def _modify_data(self, data: StructuredData) -> StructuredData:
+        # for now modify only if date used as a feature
+        if self.formatter_cfg.date_as_feature:
+            # ! the increasing dates have higher values, consequently sorting in ascending order
+            encoded, encoding = pd.factorize(data.meta[configs.DATE_ENG].sort_values())
+            data.data[configs.DATE_FEATURE_ENCODING] = encoded
+        return data
+
     def _sanity_check(self, df1: pd.DataFrame, df2: pd.DataFrame, df1_name: str, df2_name: str):
         if len(df1) != len(df2):
             logging.error(
@@ -58,6 +66,8 @@ class ClassificationFormatter(Formatter):
     def format(self, data: StructuredData) -> StructuredData:
         # keep only varieties defined in the toml config
         data = self._filter_data(data)
+        # add other features to data.data
+        data = self._modify_data(data)
 
         # create one column labels from multiple columns
         label = data.meta[self.formatter_cfg.classification_labels].apply(tuple, axis=1)
@@ -85,6 +95,8 @@ class RegressionFromExcelFormatter(Formatter):
 
         # keep only varieties defined in the toml config
         data = self._filter_data(data)
+        # add other features to data.data
+        data = self._modify_data(data)
         # match rows from measurements with rows from metadata
         merged_df = pd.merge(
             data.meta, measurements, on=self.columns_eng, how="inner", validate="one_to_one"
@@ -108,7 +120,8 @@ class ClassificationFromExcelFormatter(Formatter):
 
         # keep only varieties defined in the toml config
         data = self._filter_data(data)
-
+        # add other features to data.data
+        data = self._modify_data(data)
         # match rows from measurements with rows from metadata
         merged_df = pd.merge(
             data.meta, measurements, on=self.columns_eng, how="inner", validate="one_to_one"
