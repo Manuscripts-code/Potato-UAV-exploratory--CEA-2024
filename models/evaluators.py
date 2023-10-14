@@ -105,9 +105,12 @@ class LoggerMixin:
             explainer = shap.TreeExplainer(reg)
             joblib.dump(explainer, explainer_path / "explainer.joblib")
 
+            class_names = None
+            if hasattr(tobj.best_model, "classes_"):
+                class_names = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
+
             # save shap artifacts
             shap_values = explainer.shap_values(data_transformed)
-            class_names = ["".join(tobj.encoding[idx]) for idx in tobj.best_model.classes_]
             self._save_shap_figure(shap_values, data_transformed, explainer_path, "bar", class_names)
             self._save_shap_figure(shap_values, data_transformed, explainer_path, "dot", class_names)
             self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin", class_names)
