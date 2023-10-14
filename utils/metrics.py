@@ -22,6 +22,15 @@ class ClassificationMetrics(NamedTuple):
     f1: float
     confusion_mtx: np.ndarray
 
+    def __str__(self):
+        return (
+            f"Accuracy: {self.accuracy:.2f}\n"
+            f"Precision: {self.precision:.2f}\n"
+            f"Recall: {self.recall:.2f}\n"
+            f"F1: {self.f1:.2f}\n"
+            f"Confusion matrix:\n{self.confusion_mtx}"
+        )
+
 
 class RegressionMetrics(NamedTuple):
     mae: float
@@ -30,6 +39,16 @@ class RegressionMetrics(NamedTuple):
     r2: float
     mape: float
     maxe: float
+
+    def __str__(self) -> str:
+        return (
+            f"Mean absolute error: {self.mae:.2f}\n"
+            f"Mean squared error: {self.mse:.2f}\n"
+            f"Root mean squared error: {self.rmse:.2f}\n"
+            f"R2 score: {self.r2:.2f}\n"
+            f"Mean absolute percentage error: {self.mape:.2f}\n"
+            f"Max error: {self.maxe:.2f}"
+        )
 
 
 def calculate_classification_metrics(y_true, y_pred):

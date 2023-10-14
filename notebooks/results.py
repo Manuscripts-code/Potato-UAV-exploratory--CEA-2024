@@ -2,6 +2,7 @@ import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import NamedTuple
 
 import pandas as pd
 from rich import print
@@ -86,7 +87,7 @@ class Report:
                 data_name = data.name
                 data_content = data.content
                 pred_content = predictions.content
-                self.add_record(
+                metrics = self.add_record_metrics(
                     model_name=model_name,
                     model_version=model_version,
                     model_is_latest=model_is_latest,
@@ -103,6 +104,7 @@ class Report:
                     data_name=data_name,
                     data_content=data_content,
                     pred_content=pred_content,
+                    metrics=metrics,
                 )
 
         self.save_records_summary()
@@ -119,6 +121,7 @@ class Report:
         data_name: str,
         data_content: StructuredData,
         pred_content: Prediction,
+        metrics: NamedTuple,
     ):
         data = data_content.data
         meta = data_content.meta
@@ -133,6 +136,7 @@ class Report:
         write_txt(meta.groupby([configs.TREATMENT_ENG, configs.DATE_ENG, configs.BLOCK_ENG, configs.VARIETY_ENG]).size().to_string(), save_dir / "describe_meta.txt")  # type: ignore # noqa
         write_txt(data.to_string(), save_dir / "data_data.txt")
         write_txt(meta.to_string(), save_dir / "data_meta.txt")
+        write_txt(str(metrics), save_dir / "metrics.txt")
         save_meta_visualization(meta, save_path=save_dir / "visualization_meta.pdf")
         self._copy_shap_artifacts(Path(model_mlflow_uri) / configs.MLFLOW_EXPLAINER / data_name, save_dir)  # type: ignore # noqa
 
@@ -172,7 +176,7 @@ class Report:
         explainer_artifacts_uri = Path("/", *explainer_artifacts_uri.parts[1:])
         shutil.copytree(explainer_artifacts_uri, save_dir, dirs_exist_ok=True)
 
-    def add_record(
+    def add_record_metrics(
         self,
         model_name: str,
         model_version: str,
@@ -181,7 +185,7 @@ class Report:
         data_name: str,
         data_content: StructuredData,
         pred_content: Prediction,
-    ):
+    ) -> NamedTuple:
         target = data_content.target
 
         y_true = target.value.to_numpy()
@@ -203,6 +207,7 @@ class Report:
             self._add_regression_record(model_columns, metrics)
         else:
             raise ValueError(f"Unknown target type: {type(target)}")
+        return metrics
 
     def _add_classification_record(
         self,
