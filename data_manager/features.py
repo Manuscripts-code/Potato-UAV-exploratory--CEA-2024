@@ -1,17 +1,11 @@
 from typing import Literal, Union
 
-import numpy as np
 import pandas as pd
-import spyndex
 from autofeat import AutoFeatClassifier, AutoFeatRegressor
-from mlxtend.feature_selection import SequentialFeatureSelector as SFS
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.linear_model import Ridge, RidgeClassifier
-from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.preprocessing import RobustScaler
 
 from configs import configs
-from configs.constants import SPECTRAL_INDICES
+from utils.tools import compute_indices, feature_selector_factory
 from utils.utils import set_random_seed
 
 
@@ -52,12 +46,12 @@ class AutoSpectralIndices(BaseEstimator, TransformerMixin):
         merge_with_original: bool = True,
     ):
         self.merge_with_original = merge_with_original
-        self.selector = self._feature_selector_factory(
+        self.selector = feature_selector_factory(
             problem_type=problem_type, verbose=verbose, n_jobs=n_jobs
         )
 
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
-        df_indices = self._compute_indices(data)
+        df_indices = compute_indices(data)
         self.selector.fit(df_indices, target)
         return self
         """ -- Check plot: performance vs number of features --
@@ -69,7 +63,7 @@ class AutoSpectralIndices(BaseEstimator, TransformerMixin):
         """
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        df_indices = self._compute_indices(data)
+        df_indices = compute_indices(data)
         columns_select_idx = list(self.selector[1].k_feature_idx_)
         df_indices = df_indices.iloc[:, columns_select_idx]
         if self.merge_with_original:
@@ -79,56 +73,6 @@ class AutoSpectralIndices(BaseEstimator, TransformerMixin):
     def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
         self.fit(data, target)
         return self.transform(data)
-
-    def _compute_indices(self, data: pd.DataFrame) -> pd.DataFrame:
-        """Specific to this particular project and dataset.
-        Spectral indices were chosen based on multispectral sensor used (micasense RedEdge-MX)
-        """
-        df = spyndex.computeIndex(
-            index=SPECTRAL_INDICES,
-            params={
-                configs.BAND_BLUE_S: data[configs.BAND_BLUE],
-                configs.BAND_GREEN_S1: data[configs.BAND_GREEN],
-                configs.BAND_GREEN_S2: data[configs.BAND_GREEN],
-                configs.BAND_RED_S: data[configs.BAND_RED],
-                configs.BAND_RED_EDGE_S1: data[configs.BAND_RED_EDGE],
-                configs.BAND_RED_EDGE_S2: data[configs.BAND_RED_EDGE],
-                configs.BAND_RED_EDGE_S3: data[configs.BAND_RED_EDGE],
-                configs.BAND_NIR_S1: data[configs.BAND_NIR],
-                configs.BAND_NIR_S2: data[configs.BAND_NIR],
-            },
-        )
-        # Drop columns with inf or NaN values
-        df = df.drop(df.columns[df.isin([np.inf, -np.inf, np.nan]).any()], axis=1)
-        # Drop columns with constant values
-        df = df.drop(df.columns[df.nunique() == 1], axis=1)
-        return df
-
-    def _feature_selector_factory(
-        self, problem_type: Literal["regression", "classification"], verbose: int = 2, n_jobs: int = 1
-    ) -> Pipeline:
-        """Specific to this particular project and dataset."""
-        if problem_type == "regression":
-            algo = Ridge()
-            scoring = "neg_mean_squared_error"
-        elif problem_type == "classification":
-            algo = RidgeClassifier()
-            scoring = "f1_weighted"
-        else:
-            raise ValueError(
-                f"Invalid problem type: {problem_type}, possible values are: 'regression' or 'classification'"
-            )
-        sfs = SFS(
-            estimator=algo,
-            k_features=20,  # can be: "best" - most extensive, [1, n] - check range of features, n - exact number of features # noqa
-            forward=True,  # selection in forward direction
-            floating=True,  # floating algorithm - can go back and remove features once added
-            verbose=verbose,
-            scoring=scoring,
-            cv=3,
-            n_jobs=n_jobs,
-        )
-        return make_pipeline(RobustScaler(), sfs)
 
 
 class AutoSpectralIndicesClassification(AutoSpectralIndices):
