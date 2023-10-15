@@ -1,4 +1,3 @@
-from autofeat import AutoFeatClassifier, AutoFeatRegressor
 from sklearn import model_selection
 from sklearn.decomposition import PCA
 from sklearn.dummy import DummyClassifier, DummyRegressor
@@ -22,8 +21,8 @@ SPLITTERS = {
 }
 
 FEATURE_ENGINEERS = {
-    "AutoFeatClassifier": AutoFeatClassifier,
-    "AutoFeatRegressor": AutoFeatRegressor,
+    "AutoFeatClassification": features.AutoFeatClassification,
+    "AutoFeatRegression": features.AutoFeatRegression,
     "AutoSpectralIndicesClassification": features.AutoSpectralIndicesClassification,
     "AutoSpectralIndicesRegression": features.AutoSpectralIndicesRegression,
     "AutoSpectralIndicesPlusGeneratedClassification": features.AutoSpectralIndicesPlusGeneratedClassification,
