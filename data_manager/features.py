@@ -18,9 +18,17 @@ class AutoFeatClassification(AutoFeatClassifier):
         set_random_seed(configs.RANDOM_SEED)
         super().fit(data, target)
 
+    def transform(self, data: pd.DataFrame):
+        set_random_seed(configs.RANDOM_SEED)
+        data_transformed = super().transform(data)
+        data_transformed.index = data.index
+        return data_transformed
+
     def fit_transform(self, data: pd.DataFrame, target: pd.Series):
         set_random_seed(configs.RANDOM_SEED)
-        return super().fit_transform(data, target)
+        data_transformed = super().fit_transform(data, target)
+        data_transformed.index = data.index
+        return data_transformed
 
 
 class AutoFeatRegression(AutoFeatRegressor):
@@ -32,9 +40,17 @@ class AutoFeatRegression(AutoFeatRegressor):
         set_random_seed(configs.RANDOM_SEED)
         super().fit(data, target)
 
+    def transform(self, data: pd.DataFrame):
+        set_random_seed(configs.RANDOM_SEED)
+        data_transformed = super().transform(data)
+        data_transformed.index = data.index
+        return data_transformed
+
     def fit_transform(self, data: pd.DataFrame, target: pd.Series):
         set_random_seed(configs.RANDOM_SEED)
-        return super().fit_transform(data, target)
+        data_transformed = super().fit_transform(data, target)
+        data_transformed.index = data.index
+        return data_transformed
 
 
 class AutoSpectralIndices(BaseEstimator, TransformerMixin):
@@ -108,19 +124,19 @@ class AutoSpectralIndicesPlusGenerated(BaseEstimator, TransformerMixin):
         self.selector_generated = selector_generated
 
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
-        self.selector_spectral_indices.fit(data, target)
         self.selector_generated.fit(data, target)
+        self.selector_spectral_indices.fit(data, target)
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
-        df_spectral_indices = self.selector_spectral_indices.transform(data)
         df_generated = self.selector_generated.transform(data)
-        df_generated.index = df_spectral_indices.index
+        df_spectral_indices = self.selector_spectral_indices.transform(data)
         return pd.concat([df_generated, df_spectral_indices], axis=1)
 
     def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
-        self.fit(data, target)
-        return self.transform(data)
+        df_generated = self.selector_generated.fit_transform(data, target)
+        df_spectral_indices = self.selector_spectral_indices.fit_transform(data, target)
+        return pd.concat([df_generated, df_spectral_indices], axis=1)
 
 
 class AutoSpectralIndicesPlusGeneratedClassification(AutoSpectralIndicesPlusGenerated):
