@@ -26,11 +26,12 @@ SAVE_DIR.mkdir(parents=True, exist_ok=True)
 CACHING = os.getenv("CACHING", "false") == "true"
 SAVE_COORDS = os.getenv("SAVE_COORDS", "false") == "true"
 TOML_ENV_NAME = "DATA_TOML_NAME"
-TOML_DEFAULT_FILE_NAME = "test_classification.toml"
+TOML_DEFAULT_FILE_NAME = "clf/_base.toml"
 REGISTER_MODEL = os.getenv("REGISTER_MODEL", "true") == "true"
 USE_REDUCED_DATASET = os.getenv("USE_REDUCED_DATASET", "false") == "true"
 
 # TOML CONFIG ROOT KEYS
+BASE_CFG_NAME = "_base.toml"
 GENERAL_CFG_NAME = "general"
 MULTISPECTRAL_CFG_NAME = "multispectral"
 SAMPLER_CFG_NAME = "sampler"

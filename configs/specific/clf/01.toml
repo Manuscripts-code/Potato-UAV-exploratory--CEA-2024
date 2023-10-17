@@ -1,0 +1,11 @@
+[general]
+treatments = ["eko"]
+
+[features_generator]
+features_engineer = ""
+
+[optimizer]
+n_trials = 2
+
+[registry]
+model_name = "01"

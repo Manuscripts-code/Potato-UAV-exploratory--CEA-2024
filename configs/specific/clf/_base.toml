@@ -1,9 +1,9 @@
-# this is testing file
+# this is base config for classification
 
 [general]
 raster_num_closest_points = 10
 dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
-treatments = ["eko"]
+treatments = ["eko", "konv"]
 varieties = [
 	"Carolus",
 	"Alouette",
@@ -28,14 +28,16 @@ random_state = 1
 stratify = true
 
 [features_generator]
-features_engineer = "AutoSpectralIndicesClassification"
-feateng_steps = 2
+features_engineer = ""
+feateng_steps = 3
 verbose = 2
-n_jobs = -1
+n_jobs = 10
 
 [formatter]
 formatter = "ClassificationFormatter"
 classification_labels = ["varieties"]
+classification_label = ""
+date_as_feature = false
 
 [model]
 pipeline = ["XGBClassifier"]
@@ -68,8 +70,8 @@ n_repeats = 3
 random_state = 1
 
 [registry]
-model_name = "Feat_XGBClassifier"
-description = "Differentiation between eko and konv treatments"
+model_name = "TestModelClf"
+description = ""
 metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]

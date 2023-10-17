@@ -1,5 +1,7 @@
+import logging
 import os
 from functools import partial
+from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
 from rich import print
@@ -124,20 +126,7 @@ class ConfigParser:
             configs.TOML_ENV_NAME,
             configs.TOML_DEFAULT_FILE_NAME,
         )
-        self.toml_cfg = read_toml(self.toml_cfg_path)
-
-    def _parse_config(self, config_name: str, config_class: type[BaseModel]) -> BaseModel:
-        try:
-            specific_cfg = self.toml_cfg[config_name]
-        except KeyError as err:
-            print(f"Warning: Config name not found in toml file: {err}")
-            return config_class()
-        try:
-            config = config_class(**specific_cfg)
-        except ValidationError as err:
-            print(f"Error: Toml configuration problem: {str(err.model)} \n{err}")
-            raise
-        return config
+        self.toml_cfg = self._prepare_toml(self.toml_cfg_path)
 
     def general(self) -> GeneralConfig:
         return self._parse_config(configs.GENERAL_CFG_NAME, GeneralConfig)
@@ -174,3 +163,34 @@ class ConfigParser:
 
     def registry(self) -> RegistryConfig:
         return self._parse_config(configs.REGISTRY_CFG_NAME, RegistryConfig)
+
+    def _parse_config(self, config_name: str, config_class: type[BaseModel]) -> BaseModel:
+        try:
+            specific_cfg = self.toml_cfg[config_name]
+        except KeyError as err:
+            print(f"Warning: Config name not found in toml file: {err}")
+            return config_class()
+        try:
+            config = config_class(**specific_cfg)
+        except ValidationError as err:
+            print(f"Error: Toml configuration problem: {str(err.model)} \n{err}")
+            raise
+        return config
+
+    def _prepare_toml(self, toml_cfg_path: Path) -> dict:
+        toml_cfg = read_toml(toml_cfg_path)
+        toml_base_cfg = read_toml(toml_cfg_path.parent / configs.BASE_CFG_NAME)
+
+        # rewrite base config with specific config
+        for key, value in toml_base_cfg.items():
+            if key not in toml_cfg:
+                continue
+            for key2, value2 in value.items():
+                if key2 not in toml_cfg[key]:
+                    continue
+                toml_base_cfg[key][key2] = toml_cfg[key][key2]
+                logging.info(
+                    f"Rewriting base toml: {key} / {key2} = '{value2}'  -->  '{toml_cfg[key][key2]}'"
+                )
+
+        return toml_base_cfg
