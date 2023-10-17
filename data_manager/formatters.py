@@ -61,6 +61,16 @@ class Formatter(ABC):
             )
             raise ValueError(f"Number of rows in {df1_name} and {df2_name} do not match.")
 
+    def _merge_measurements_with_meta(
+        self, meta: pd.DataFrame, measurements: pd.DataFrame, target_column_label: str
+    ) -> pd.DataFrame:
+        measurements = measurements[self.columns_eng + [target_column_label]]
+
+        if self.formatter_cfg.average_duplicates:
+            measurements = measurements.groupby(self.columns_eng).mean().reset_index()
+
+        return pd.merge(meta, measurements, on=self.columns_eng, how="inner", validate="one_to_one")
+
 
 class ClassificationFormatter(Formatter):
     def format(self, data: StructuredData) -> StructuredData:
@@ -98,9 +108,7 @@ class RegressionFromExcelFormatter(Formatter):
         # add other features to data.data
         data = self._modify_data(data)
         # match rows from measurements with rows from metadata
-        merged_df = pd.merge(
-            data.meta, measurements, on=self.columns_eng, how="inner", validate="one_to_one"
-        )
+        merged_df = self._merge_measurements_with_meta(data.meta, measurements, target_column_label)
         self._sanity_check(data.meta, merged_df, "Metadata", "Measurements")
         data.target = RegressionTarget(name=target_column_label, value=merged_df[target_column_label])
         return data
@@ -123,9 +131,7 @@ class ClassificationFromExcelFormatter(Formatter):
         # add other features to data.data
         data = self._modify_data(data)
         # match rows from measurements with rows from metadata
-        merged_df = pd.merge(
-            data.meta, measurements, on=self.columns_eng, how="inner", validate="one_to_one"
-        )
+        merged_df = self._merge_measurements_with_meta(data.meta, measurements, target_column_label)
         self._sanity_check(data.meta, merged_df, "Metadata", "Measurements")
         label = merged_df[target_column_label]
         # encode to numbers

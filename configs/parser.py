@@ -65,6 +65,7 @@ class FormatterConfig(BaseModel):
     classification_label: str = None
     classification_labels: list[str] = None
     date_as_feature: bool = False
+    average_duplicates: bool = False
 
 
 class ModelConfig(BaseModel):
