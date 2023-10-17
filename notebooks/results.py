@@ -254,15 +254,15 @@ def produce_results():
     records = db.get_records()
     records_latest = db.get_records(is_latest=True)
 
-    # report = Report()
-    # report.add_records(records)
-    # print(report.df_classification)
-    # print(report.df_regression)
-
     report = Report()
-    report.add_records(records_latest)
+    report.add_records(records)
     print(report.df_classification)
     print(report.df_regression)
+
+    # report = Report()
+    # report.add_records(records_latest)
+    # print(report.df_classification)
+    # print(report.df_regression)
 
 
 if __name__ == "__main__":

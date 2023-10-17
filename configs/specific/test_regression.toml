@@ -18,9 +18,17 @@ shuffle = true
 random_state = 1
 stratify = false
 
+# [features_generator]
+# features_engineer = "AutoSpectralIndicesPlusGeneratedRegression"
+# feateng_steps = 3
+# verbose = 2
+# n_jobs = 10
+
 [formatter]
-formatter = "RegressionFormatter"
+formatter = "RegressionFromExcelFormatter"
 regression_label = "SPAD"
+# date_as_feature = true
+# average_duplicates = true
 
 [model]
 pipeline = ["RandomForestRegressor"]

@@ -18,9 +18,17 @@ shuffle = true
 random_state = 1
 stratify = true
 
+[features_generator]
+features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
+feateng_steps = 3
+verbose = 2
+n_jobs = 10
+
 [formatter]
 formatter = "ClassificationFormatter"
 classification_labels = ["varieties"]
+# classification_label = "Varieties_grouped"
+# date_as_feature = true
 
 [model]
 pipeline = ["XGBClassifier"]
@@ -40,7 +48,7 @@ n_repeats = 3
 random_state = 1
 
 [registry]
-model_name = "TestModel"
+model_name = "TestModelClf"
 description = "Differentiation between eko and konv treatments"
 metadata = ["test_size=0.3", "n_splits=5", "n_repeats=3", "random_state=1"]
 

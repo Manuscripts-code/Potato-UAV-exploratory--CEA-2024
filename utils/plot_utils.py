@@ -117,16 +117,16 @@ def save_data_visualization(
 
     # 2d manifold
     # method used can be "tsne", "lle", "isomap", "mds" etc.
-    _method = "isomap"
-    _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
-    plt.subplots(figsize=(8, 7), dpi=300)
-    visualizer = yb.Manifold(
-        manifold=_method, classes=classes, alpha=0.7, colormap="viridis", n_neighbors=3
-    )
-    visualizer.fit_transform(data, y_data_encoded)
-    visualizer.show()
-    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
+    # _method = "isomap"
+    # _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
+    # plt.subplots(figsize=(8, 7), dpi=300)
+    # visualizer = yb.Manifold(
+    #     manifold=_method, classes=classes, alpha=0.7, colormap="viridis", n_neighbors=3
+    # )
+    # visualizer.fit_transform(data, y_data_encoded)
+    # visualizer.show()
+    # plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    # plt.close("all")
 
 
 def save_meta_visualization(
