@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import yellowbrick.features as yb
 from matplotlib.lines import Line2D
 from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay
-from yellowbrick.features import RadViz
 
 from configs import configs
 
@@ -93,12 +93,39 @@ def save_data_visualization(
     save_path: str | Path = "visualization_data.pdf",
 ):
     mpl.rcParams.update(mpl.rcParamsDefault)
+
+    # RadViz
+    _save_path = save_path.with_name(save_path.stem + "_radviz.pdf")
     plt.subplots(figsize=(8, 7), dpi=300)
-    visualizer = RadViz(classes=classes, features=data.columns.tolist(), alpha=0.7, colormap="viridis")
+    visualizer = yb.RadViz(
+        classes=classes, features=data.columns.tolist(), alpha=0.7, colormap="viridis"
+    )
     visualizer.fit(data, y_data_encoded)
     visualizer.transform(data)
     visualizer.show()
-    plt.savefig(save_path, format="pdf", bbox_inches="tight")
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+    # 2d PCA
+    _save_path = save_path.with_name(save_path.stem + "_pca.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.PCA(scale=True, classes=classes, alpha=0.7, colormap="viridis")
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+    # 2d manifold
+    # method used can be "tsne", "lle", "isomap", "mds" etc.
+    _method = "isomap"
+    _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.Manifold(
+        manifold=_method, classes=classes, alpha=0.7, colormap="viridis", n_neighbors=3
+    )
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
     plt.close("all")
 
 
