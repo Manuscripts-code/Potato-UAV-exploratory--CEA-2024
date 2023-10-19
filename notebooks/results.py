@@ -136,7 +136,7 @@ class Report:
         write_txt(data.to_string(), save_dir / "data_data.txt")
         write_txt(meta.to_string(), save_dir / "data_meta.txt")
         write_txt(str(metrics), save_dir / "metrics.txt")
-        save_meta_visualization(meta, save_path=save_dir / "visualization_meta.pdf")
+        save_meta_visualization(meta, save_dir=save_dir)
         self._copy_shap_artifacts(Path(model_mlflow_uri) / configs.MLFLOW_EXPLAINER / data_name, save_dir)  # type: ignore # noqa
 
         if isinstance(target, ClassificationTarget):

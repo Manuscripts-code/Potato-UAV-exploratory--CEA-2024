@@ -16,9 +16,14 @@ from configs import configs
 
 
 @contextmanager
-def _save_plot_figure(save_path: str | Path = "plot.pdf", *args, **kwargs):
+def _save_plot_figure(
+    save_path: str | Path = "plot.pdf", use_science_style: bool = False, *args, **kwargs
+):
     mpl.rcParams.update(mpl.rcParamsDefault)
-    plt.style.use(["science", "ieee", "no-latex"])
+    if use_science_style:
+        plt.style.use(["science", "ieee", "no-latex"])
+    else:
+        plt.style.use("default")
     fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
     yield fig, ax
     plt.savefig(save_path, format="pdf", bbox_inches="tight", *args, **kwargs)
@@ -81,13 +86,11 @@ def save_confusion_matrix_display(
     target_names: list[str],
     save_path: str | Path = "confusion_matrix.pdf",
 ):
-    mpl.rcParams.update(mpl.rcParamsDefault)
-    cm_display = ConfusionMatrixDisplay.from_predictions(
-        y_true, y_pred, display_labels=target_names, normalize="true"
-    )
-    cm_display.plot()
-    plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
+    with _save_plot_figure(save_path):
+        cm_display = ConfusionMatrixDisplay.from_predictions(
+            y_true, y_pred, display_labels=target_names, normalize="true"
+        )
+        cm_display.plot()
 
 
 def save_prediction_errors_display(
@@ -96,11 +99,9 @@ def save_prediction_errors_display(
     save_path: str | Path = "prediction_errors.pdf",
     kind: str = "residual_vs_predicted",
 ):
-    mpl.rcParams.update(mpl.rcParamsDefault)
-    pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
-    pe_display.plot(kind=kind)
-    plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
+    with _save_plot_figure(save_path):
+        pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
+        pe_display.plot(kind=kind)
 
 
 def show_parallel_coordinates(
@@ -211,35 +212,29 @@ def save_data_visualization(
 
 def save_meta_visualization(
     meta: pd.DataFrame,
-    save_path: str | Path = "visualization_meta.pdf",
+    save_dir: Path = Path("visualization"),
 ):
-    mpl.rcParams.update(mpl.rcParamsDefault)
     for treatment in pd.unique(meta[configs.TREATMENT_ENG]):
-        plt.subplots(figsize=(8, 7), dpi=300)
-        ax = sns.countplot(
-            data=meta,
-            x=configs.DATE_ENG,
-            hue=configs.VARIETY_ENG,
-            alpha=0.8,
-        )
-        ax.set_ylabel("Count", fontsize=16)
-        ax.set_xlabel(configs.DATE_ENG, fontsize=16)
-        ax.tick_params(axis="both", which="major", labelsize=14)
-        ax.tick_params(axis="both", which="minor", labelsize=14)
-        ax.tick_params(axis="x", labelrotation=0)
-        ax.grid(False)
-        ax.spines["bottom"].set_linewidth(2)
-        ax.spines["left"].set_linewidth(2)
-        ax.spines[["right", "top"]].set_visible(False)
-        ax.legend(loc="lower right", fontsize=12, framealpha=1)
-        for container in ax.containers:
-            ax.bar_label(container, fontsize=12, padding=3)
-        plt.savefig(
-            save_path.with_name("".join([save_path.stem, f"_{treatment}", save_path.suffix])),
-            format="pdf",
-            bbox_inches="tight",
-        )
-        plt.close("all")
+        save_path = save_dir / f"visualization_meta_{treatment}.pdf"
+        with _save_plot_figure(save_path):
+            ax = sns.countplot(
+                data=meta,
+                x=configs.DATE_ENG,
+                hue=configs.VARIETY_ENG,
+                alpha=0.8,
+            )
+            ax.set_ylabel("Count", fontsize=16)
+            ax.set_xlabel(configs.DATE_ENG, fontsize=16)
+            ax.tick_params(axis="both", which="major", labelsize=14)
+            ax.tick_params(axis="both", which="minor", labelsize=14)
+            ax.tick_params(axis="x", labelrotation=0)
+            ax.grid(False)
+            ax.spines["bottom"].set_linewidth(2)
+            ax.spines["left"].set_linewidth(2)
+            ax.spines[["right", "top"]].set_visible(False)
+            ax.legend(loc="lower right", fontsize=12, framealpha=1)
+            for container in ax.containers:
+                ax.bar_label(container, fontsize=12, padding=3)
 
 
 def save_target_visualization(
@@ -248,33 +243,29 @@ def save_target_visualization(
     target_type: str = "classification",
     save_path: str | Path = "visualization_target.pdf",
 ):
-    mpl.rcParams.update(mpl.rcParamsDefault)
     _TARGET_VAL = "Target values"
     _TARGET_LAB = "Target"
     data = pd.DataFrame.from_dict({_TARGET_VAL: target_values, _TARGET_LAB: target_labels})
 
-    plt.subplots(figsize=(8, 7), dpi=300)
-    if target_type == "classification":
-        ax = sns.countplot(
-            data=data,
-            x=_TARGET_LAB,
-            alpha=0.8,
-        )
-    elif target_type == "regression":
-        ax = sns.histplot(data=data, x=_TARGET_VAL, hue=_TARGET_LAB, alpha=0.8)
-        # ax.legend()
-    else:
-        raise ValueError(f"Unknown target type: {target_type}")
+    with _save_plot_figure(save_path):
+        if target_type == "classification":
+            ax = sns.countplot(
+                data=data,
+                x=_TARGET_LAB,
+                alpha=0.8,
+            )
+        elif target_type == "regression":
+            ax = sns.histplot(data=data, x=_TARGET_VAL, hue=_TARGET_LAB, alpha=0.8)
+            # ax.legend()
+        else:
+            raise ValueError(f"Unknown target type: {target_type}")
 
-    ax.set_xlabel(_TARGET_LAB, fontsize=16)
-    ax.set_ylabel("Count", fontsize=16)
-    ax.tick_params(axis="both", which="major", labelsize=14)
-    ax.tick_params(axis="both", which="minor", labelsize=14)
-    ax.tick_params(axis="x", labelrotation=0)
-    ax.grid(False)
-    ax.spines["bottom"].set_linewidth(2)
-    ax.spines["left"].set_linewidth(2)
-    ax.spines[["right", "top"]].set_visible(False)
-
-    plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
+        ax.set_xlabel(_TARGET_LAB, fontsize=16)
+        ax.set_ylabel("Count", fontsize=16)
+        ax.tick_params(axis="both", which="major", labelsize=14)
+        ax.tick_params(axis="both", which="minor", labelsize=14)
+        ax.tick_params(axis="x", labelrotation=0)
+        ax.grid(False)
+        ax.spines["bottom"].set_linewidth(2)
+        ax.spines["left"].set_linewidth(2)
+        ax.spines[["right", "top"]].set_visible(False)
