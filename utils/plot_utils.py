@@ -91,6 +91,101 @@ def save_prediction_errors_display(
     plt.close("all")
 
 
+def show_parallel_coordinates(
+    data: pd.DataFrame,
+    y_data_encoded: np.ndarray,
+    classes: list = None,
+    save_path: str | Path = "visualization_data.pdf",
+    colormap: str = "viridis",
+):
+    _save_path = save_path.with_name(save_path.stem + "_parallel_coordinates.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.ParallelCoordinates(
+        classes=classes, features=data.columns.tolist(), shuffle=True, alpha=0.7, colormap=colormap
+    )
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+
+def show_radial_visualization(
+    data: pd.DataFrame,
+    y_data_encoded: np.ndarray,
+    classes: list = None,
+    save_path: str | Path = "visualization_data.pdf",
+    colormap: str = "viridis",
+):
+    _save_path = save_path.with_name(save_path.stem + "_radviz.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.RadViz(classes=classes, features=data.columns.tolist(), alpha=0.7, colormap=colormap)
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+
+def show_2d_pca(
+    data: pd.DataFrame,
+    y_data_encoded: np.ndarray,
+    classes: list = None,
+    save_path: str | Path = "visualization_data.pdf",
+    colormap: str = "viridis",
+):
+    _save_path = save_path.with_name(save_path.stem + "_pca.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.PCA(scale=True, classes=classes, alpha=0.7, colormap=colormap)
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+
+def show_manifold(
+    data: pd.DataFrame,
+    y_data_encoded: np.ndarray,
+    classes: list = None,
+    save_path: str | Path = "visualization_data.pdf",
+    colormap: str = "viridis",
+):
+    # method used can be "tsne", "lle", "isomap", "mds" etc.
+    _method = "isomap"
+    _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.Manifold(
+        manifold=_method, classes=classes, alpha=0.7, colormap=colormap, n_neighbors=3
+    )
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+
+def show_umap(
+    data: pd.DataFrame,
+    y_data_encoded: np.ndarray,
+    classes: list = None,
+    save_path: str | Path = "visualization_data.pdf",
+    colormap: str = "viridis",
+):
+    _save_path = save_path.with_name(save_path.stem + "_umap.pdf")
+    reducer = umap.UMAP(configs.RANDOM_SEED)
+    # unsuperivsed
+    embedding = reducer.fit_transform(data)
+    # supervised
+    # embedding = reducer.fit_transform(data, y_data_encoded)
+
+    fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
+    plt.scatter(*embedding.T, s=50, c=y_data_encoded, cmap=colormap, alpha=0.7)
+    plt.setp(ax, xticks=[], yticks=[])
+    cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
+    cbar.set_ticks(np.arange(len(classes)))
+    cbar.set_ticklabels(classes)
+
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+
 def save_data_visualization(
     data: pd.DataFrame,
     y_data_encoded: np.ndarray,
@@ -104,67 +199,12 @@ def save_data_visualization(
     data = data.copy()
     data = (data - data.mean()) / data.std()
 
-    # Parallel coordinates
-    _save_path = save_path.with_name(save_path.stem + "_parallel_coordinates.pdf")
-    plt.subplots(figsize=(8, 7), dpi=300)
-    visualizer = yb.ParallelCoordinates(
-        classes=classes, features=data.columns.tolist(), shuffle=True, alpha=0.7, colormap="viridis"
-    )
-    visualizer.fit_transform(data, y_data_encoded)
-    visualizer.show()
-    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
-
-    # RadViz
-    _save_path = save_path.with_name(save_path.stem + "_radviz.pdf")
-    plt.subplots(figsize=(8, 7), dpi=300)
-    visualizer = yb.RadViz(
-        classes=classes, features=data.columns.tolist(), alpha=0.7, colormap="viridis"
-    )
-    visualizer.fit_transform(data, y_data_encoded)
-    visualizer.show()
-    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
-
-    # 2d PCA
-    _save_path = save_path.with_name(save_path.stem + "_pca.pdf")
-    plt.subplots(figsize=(8, 7), dpi=300)
-    visualizer = yb.PCA(scale=True, classes=classes, alpha=0.7, colormap="viridis")
-    visualizer.fit_transform(data, y_data_encoded)
-    visualizer.show()
-    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
-
-    # 2d manifold
-    # method used can be "tsne", "lle", "isomap", "mds" etc.
-    _method = "isomap"
-    _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
-    plt.subplots(figsize=(8, 7), dpi=300)
-    visualizer = yb.Manifold(
-        manifold=_method, classes=classes, alpha=0.7, colormap="viridis", n_neighbors=3
-    )
-    visualizer.fit_transform(data, y_data_encoded)
-    visualizer.show()
-    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
-
-    # umap
-    _save_path = save_path.with_name(save_path.stem + "_umap.pdf")
-    reducer = umap.UMAP(configs.RANDOM_SEED)
-    # unsuperivsed
-    embedding = reducer.fit_transform(data)
-    # supervised
-    # embedding = reducer.fit_transform(data, y_data_encoded)
-
-    fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
-    plt.scatter(*embedding.T, s=50, c=y_data_encoded, cmap="Spectral", alpha=0.7)
-    plt.setp(ax, xticks=[], yticks=[])
-    cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
-    cbar.set_ticks(np.arange(len(classes)))
-    cbar.set_ticklabels(classes)
-
-    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
+    colormap = "viridis"
+    show_parallel_coordinates(data, y_data_encoded, classes, save_path, colormap)
+    show_radial_visualization(data, y_data_encoded, classes, save_path, colormap)
+    show_2d_pca(data, y_data_encoded, classes, save_path, colormap)
+    show_manifold(data, y_data_encoded, classes, save_path, colormap)
+    show_umap(data, y_data_encoded, classes, save_path, colormap)
 
 
 def save_meta_visualization(
