@@ -24,7 +24,6 @@ from utils.metrics import (
 from utils.plot_utils import (
     save_confusion_matrix_display,
     save_data_visualization,
-    save_features_plot,
     save_meta_visualization,
     save_prediction_errors_display,
     save_target_visualization,
@@ -150,7 +149,6 @@ class Report:
             encoding = target.encoding.apply(row_formatter).to_dict()
             target_names = [encoding[key] for key in sorted(encoding.keys())]
 
-            save_features_plot(data, data.columns.tolist(), target_label.to_numpy(), save_path=save_dir / "features_plot.pdf")  # type: ignore # noqa
             save_confusion_matrix_display(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
             write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
             write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa

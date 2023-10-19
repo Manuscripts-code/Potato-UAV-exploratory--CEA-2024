@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import umap
 import yellowbrick.features as yb
 from matplotlib.lines import Line2D
 from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay
@@ -22,6 +23,10 @@ def save_features_plot(
     y_label: str = "",
 ):
     assert len(features) == len(labels), "Features and labels must have the same length!"
+    """
+    Currently not used, but can be used to plot the features of the data.
+    For this reason plotting from other libraries is used.
+    """
 
     mpl.rcParams.update(mpl.rcParamsDefault)
     fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
@@ -93,6 +98,22 @@ def save_data_visualization(
     save_path: str | Path = "visualization_data.pdf",
 ):
     mpl.rcParams.update(mpl.rcParamsDefault)
+    if classes is None:
+        classes = np.unique(y_data_encoded)
+
+    data = data.copy()
+    data = (data - data.mean()) / data.std()
+
+    # Parallel coordinates
+    _save_path = save_path.with_name(save_path.stem + "_parallel_coordinates.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.ParallelCoordinates(
+        classes=classes, features=data.columns.tolist(), shuffle=True, alpha=0.7, colormap="viridis"
+    )
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
 
     # RadViz
     _save_path = save_path.with_name(save_path.stem + "_radviz.pdf")
@@ -100,8 +121,7 @@ def save_data_visualization(
     visualizer = yb.RadViz(
         classes=classes, features=data.columns.tolist(), alpha=0.7, colormap="viridis"
     )
-    visualizer.fit(data, y_data_encoded)
-    visualizer.transform(data)
+    visualizer.fit_transform(data, y_data_encoded)
     visualizer.show()
     plt.savefig(_save_path, format="pdf", bbox_inches="tight")
     plt.close("all")
@@ -117,16 +137,34 @@ def save_data_visualization(
 
     # 2d manifold
     # method used can be "tsne", "lle", "isomap", "mds" etc.
-    # _method = "isomap"
-    # _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
-    # plt.subplots(figsize=(8, 7), dpi=300)
-    # visualizer = yb.Manifold(
-    #     manifold=_method, classes=classes, alpha=0.7, colormap="viridis", n_neighbors=3
-    # )
-    # visualizer.fit_transform(data, y_data_encoded)
-    # visualizer.show()
-    # plt.savefig(_save_path, format="pdf", bbox_inches="tight")
-    # plt.close("all")
+    _method = "isomap"
+    _save_path = save_path.with_name(save_path.stem + "_manifold.pdf")
+    plt.subplots(figsize=(8, 7), dpi=300)
+    visualizer = yb.Manifold(
+        manifold=_method, classes=classes, alpha=0.7, colormap="viridis", n_neighbors=3
+    )
+    visualizer.fit_transform(data, y_data_encoded)
+    visualizer.show()
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
+
+    # umap
+    _save_path = save_path.with_name(save_path.stem + "_umap.pdf")
+    reducer = umap.UMAP(configs.RANDOM_SEED)
+    # unsuperivsed
+    embedding = reducer.fit_transform(data)
+    # supervised
+    # embedding = reducer.fit_transform(data, y_data_encoded)
+
+    fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
+    plt.scatter(*embedding.T, s=50, c=y_data_encoded, cmap="Spectral", alpha=0.7)
+    plt.setp(ax, xticks=[], yticks=[])
+    cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
+    cbar.set_ticks(np.arange(len(classes)))
+    cbar.set_ticklabels(classes)
+
+    plt.savefig(_save_path, format="pdf", bbox_inches="tight")
+    plt.close("all")
 
 
 def save_meta_visualization(
