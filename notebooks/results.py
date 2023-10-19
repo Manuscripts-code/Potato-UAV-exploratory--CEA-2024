@@ -152,7 +152,7 @@ class Report:
             save_confusion_matrix_display(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
             write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
             write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
-            save_data_visualization(data, y_data_encoded=y_true, classes=target_names, save_path=save_dir / "visualization_data.pdf")  # type: ignore # noqa
+            save_data_visualization(data, y_data_encoded=y_true, classes=target_names, save_dir=save_dir)  # type: ignore # noqa
             save_target_visualization(target_values=y_true, target_labels=target_label.to_numpy(), save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
 
         elif isinstance(target, RegressionTarget):
@@ -163,7 +163,7 @@ class Report:
             save_prediction_errors_display(y_true, y_pred, kind="residual_vs_predicted", save_path=save_dir / "prediction_errors_rvp.pdf")  # type: ignore # noqa
             save_prediction_errors_display(y_true, y_pred, kind="actual_vs_predicted", save_path=save_dir / "prediction_errors_avp.pdf")  # type: ignore # noqa
             write_txt(target.value.to_string(), save_dir / "data_target.txt")
-            save_data_visualization(data, y_data_encoded=target_label_encoded, classes=target_label_classes, save_path=save_dir / "visualization_data.pdf")  # type: ignore # noqa
+            save_data_visualization(data, y_data_encoded=target_label_encoded, classes=target_label_classes, save_dir=save_dir)  # type: ignore # noqa
             save_target_visualization(target_values=y_true, target_labels=target_label.to_numpy(), target_type="regression", save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
 
         else:
@@ -252,15 +252,15 @@ def produce_results():
     records = db.get_records()
     records_latest = db.get_records(is_latest=True)
 
-    report = Report()
-    report.add_records(records)
-    print(report.df_classification)
-    print(report.df_regression)
-
     # report = Report()
-    # report.add_records(records_latest)
+    # report.add_records(records)
     # print(report.df_classification)
     # print(report.df_regression)
+
+    report = Report()
+    report.add_records(records_latest)
+    print(report.df_classification)
+    print(report.df_regression)
 
 
 if __name__ == "__main__":
