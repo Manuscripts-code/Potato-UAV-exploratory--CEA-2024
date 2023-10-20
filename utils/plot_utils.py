@@ -17,17 +17,22 @@ from configs import configs
 
 @contextmanager
 def _save_plot_figure(
-    save_path: str | Path = "plot.pdf", use_science_style: bool = False, *args, **kwargs
+    save_path: str | Path = "plot.pdf",
+    use_science_style: bool = False,
+    figsize: tuple[int, int] = (8, 7),
+    dpi: int = 300,
 ):
     mpl.rcParams.update(mpl.rcParamsDefault)
     if use_science_style:
         plt.style.use(["science", "ieee", "no-latex"])
     else:
         plt.style.use("default")
-    fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     yield fig, ax
     if save_path:
-        plt.savefig(save_path, format="pdf", bbox_inches="tight", *args, **kwargs)
+        plt.savefig(save_path, format="pdf", bbox_inches="tight")
+    else:
+        plt.show()
     plt.close("all")
 
 
@@ -171,17 +176,19 @@ def show_umap(
     classes: list = None,
     save_path: str | Path = "visualization_umap.pdf",
     colormap: str = "viridis",
+    figsize: tuple[int, int] = (8, 7),
     supervised: bool = False,
+    random_state: int = configs.RANDOM_SEED,
     **umap_kwargs,
 ):
-    with _save_plot_figure(save_path) as (fig, ax):
-        reducer = umap.UMAP(random_state=configs.RANDOM_SEED, **umap_kwargs)
+    with _save_plot_figure(save_path=save_path, figsize=figsize) as (fig, ax):
+        reducer = umap.UMAP(random_state=random_state, **umap_kwargs)
         if supervised:
             embedding = reducer.fit_transform(data, y_data_encoded)
         else:
             embedding = reducer.fit_transform(data)
 
-        plt.scatter(*embedding.T, s=50, c=y_data_encoded, cmap=colormap, alpha=0.7)
+        plt.scatter(*embedding.T, s=25, c=y_data_encoded, cmap=colormap, alpha=0.7)
         plt.setp(ax, xticks=[], yticks=[])
         cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
         cbar.set_ticks(np.arange(len(classes)))
