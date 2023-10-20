@@ -10,13 +10,13 @@ from utils.utils import init_object
 @step(enable_cache=False)
 def data_features(
     data_train: StructuredData,
-    data_val: StructuredData,
-    data_test: StructuredData,
-    features_cfg: FeaturesConfig,
+    data_val: StructuredData | None = None,
+    data_test: StructuredData | None = None,
+    features_cfg: FeaturesConfig = FeaturesConfig(),
 ) -> tuple[
     Annotated[StructuredData, "data_train"],
-    Annotated[StructuredData, "data_val"],
-    Annotated[StructuredData, "data_test"],
+    Annotated[StructuredData | None, "data_val"],
+    Annotated[StructuredData | None, "data_test"],
 ]:
     if not features_cfg.features_engineer:
         return data_train, data_val, data_test
@@ -25,5 +25,8 @@ def data_features(
         options.FEATURE_ENGINEERS, features_cfg.features_engineer, **features_cfg.params()
     )
     data_train.data = features_engineer.fit_transform(data_train.data, data_train.target.value)
-    data_test.data = features_engineer.transform(data_test.data)
+    if data_val is not None:
+        data_val.data = features_engineer.transform(data_val.data)
+    if data_test is not None:
+        data_test.data = features_engineer.transform(data_test.data)
     return data_train, data_val, data_test

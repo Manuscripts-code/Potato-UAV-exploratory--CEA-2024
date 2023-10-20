@@ -26,7 +26,8 @@ def _save_plot_figure(
         plt.style.use("default")
     fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
     yield fig, ax
-    plt.savefig(save_path, format="pdf", bbox_inches="tight", *args, **kwargs)
+    if save_path:
+        plt.savefig(save_path, format="pdf", bbox_inches="tight", *args, **kwargs)
     plt.close("all")
 
 
@@ -170,13 +171,15 @@ def show_umap(
     classes: list = None,
     save_path: str | Path = "visualization_umap.pdf",
     colormap: str = "viridis",
+    supervised: bool = False,
+    **umap_kwargs,
 ):
     with _save_plot_figure(save_path) as (fig, ax):
-        reducer = umap.UMAP(configs.RANDOM_SEED)
-        # unsuperivsed
-        embedding = reducer.fit_transform(data)
-        # supervised
-        # embedding = reducer.fit_transform(data, y_data_encoded)
+        reducer = umap.UMAP(random_state=configs.RANDOM_SEED, **umap_kwargs)
+        if supervised:
+            embedding = reducer.fit_transform(data, y_data_encoded)
+        else:
+            embedding = reducer.fit_transform(data)
 
         plt.scatter(*embedding.T, s=50, c=y_data_encoded, cmap=colormap, alpha=0.7)
         plt.setp(ax, xticks=[], yticks=[])
