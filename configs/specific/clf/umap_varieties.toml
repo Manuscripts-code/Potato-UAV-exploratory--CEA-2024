@@ -1,6 +1,2 @@
-[general]
-dates = ["2022_07_20"]
-treatments = ["eko"]
-
 [features_generator]
 features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
