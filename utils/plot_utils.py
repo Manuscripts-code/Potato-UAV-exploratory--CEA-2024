@@ -27,13 +27,15 @@ def _save_plot_figure(
         plt.style.use(["science", "ieee", "no-latex"])
     else:
         plt.style.use("default")
-    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-    yield fig, ax
-    if save_path:
-        plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    else:
-        plt.show()
-    plt.close("all")
+    try:
+        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+        yield fig, ax
+        if save_path:
+            plt.savefig(save_path, format="pdf", bbox_inches="tight")
+        else:
+            plt.show()
+    finally:
+        plt.close("all")
 
 
 def save_features_plot(

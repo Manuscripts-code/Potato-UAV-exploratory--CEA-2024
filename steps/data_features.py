@@ -25,8 +25,8 @@ def data_features(
         options.FEATURE_ENGINEERS, features_cfg.features_engineer, **features_cfg.params()
     )
     data_train.data = features_engineer.fit_transform(data_train.data, data_train.target.value)
-    if data_val is not None:
+    if data_val is not None and not data_val.data.empty:
         data_val.data = features_engineer.transform(data_val.data)
-    if data_test is not None:
+    if data_test is not None and not data_test.data.empty:
         data_test.data = features_engineer.transform(data_test.data)
     return data_train, data_val, data_test
