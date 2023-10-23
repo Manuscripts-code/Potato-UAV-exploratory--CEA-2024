@@ -219,7 +219,14 @@ def save_data_visualization(
     _save_path = save_dir / "visualization_manifold.pdf"
     show_manifold(data, y_data_encoded, classes, _save_path, colormap)
     _save_path = save_dir / "visualization_umap.pdf"
-    show_umap(data, y_data_encoded, classes, _save_path, colormap)
+    show_umap(
+        data,
+        y_data_encoded,
+        classes,
+        _save_path,
+        colormap,
+        **dict(n_neighbors=15, min_dist=1),
+    )
 
 
 def save_meta_visualization(
