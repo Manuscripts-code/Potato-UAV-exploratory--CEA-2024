@@ -52,16 +52,16 @@ scoring_mode = "maximize"
 
 [optimizer.tuned_parameters.optimize_int]
 XGBClassifier__n_estimators = [100, 1000]
-XGBClassifier__max_depth = [3, 10]
+XGBClassifier__max_depth = [3, 6]
 
 [optimizer.tuned_parameters.optimize_float]
-XGBClassifier__learning_rate = [0.001, 0.1]
+XGBClassifier__learning_rate = [0.01, 0.2]
 XGBClassifier__min_child_weight = [1.0, 10.0]
-XGBClassifier__gamma = [0.001, 1.0]
-XGBClassifier__subsample = [0.5, 1.0]
-XGBClassifier__colsample_bytree = [0.5, 1.0]
-XGBClassifier__reg_alpha = [0.001, 1.0]
-XGBClassifier__reg_lambda = [0.001, 1.0]
+# XGBClassifier__gamma = [0.001, 1.0]
+XGBClassifier__subsample = [0.5, 0.8]
+XGBClassifier__colsample_bytree = [0.5, 0.8]
+# XGBClassifier__reg_alpha = [0.1, 1.0]
+XGBClassifier__reg_lambda = [1.0, 10.0]
 
 [optimizer.validator]
 validator = "RepeatedStratifiedKFold"
