@@ -35,6 +35,9 @@ class SQLiteDatabase:
                 data.content = StructuredData.from_bytes(data.content)
             for prediction in record.predictions:
                 prediction.content = Prediction.from_bytes(prediction.content)
+            for metric in record.metrics:
+                # needs to be done because SQLModel throws an exception if the table is not created
+                pass
         return records
 
     @_with_session()

@@ -2,6 +2,7 @@ import logging
 
 import mlflow
 from mlflow import MlflowClient
+from optuna.trial import FrozenTrial
 from zenml import step
 from zenml.client import Client
 from zenml.utils import dashboard_utils
@@ -12,7 +13,7 @@ from database.service import DBService, RecordAttributes
 
 
 @step(enable_cache=False, experiment_tracker=Client().active_stack.experiment_tracker.name)
-def db_saver_register(registr_cfg: RegistryConfig) -> None:
+def db_saver_register(best_trial: FrozenTrial, registr_cfg: RegistryConfig) -> None:
     logging.info("Saving data to database...")
 
     runs = Client().list_pipeline_runs(
@@ -23,6 +24,7 @@ def db_saver_register(registr_cfg: RegistryConfig) -> None:
     record_attrs = RecordAttributes(
         mlflow_uri=mlflow.active_run().info.artifact_uri,
         dashboard_url=dashboard_utils.get_run_url(runs[0]),
+        best_trial=best_trial,
     )
 
     mlflow_client = MlflowClient()

@@ -54,7 +54,13 @@ class Optimizer:
             study_name=f"trial--{datetime.now().strftime(configs.DATETIME_FORMAT)}",
             # load_if_exists=True,
         )
-        study.optimize(self._trainable, n_trials=self.n_trials, timeout=self.timeout, n_jobs=self.n_jobs)
+        study.optimize(
+            self._trainable,
+            n_trials=self.n_trials,
+            timeout=self.timeout,
+            n_jobs=self.n_jobs,
+            show_progress_bar=True,
+        )
         return study
 
     def _trainable(self, trial):

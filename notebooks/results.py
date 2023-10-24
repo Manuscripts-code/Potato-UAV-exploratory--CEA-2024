@@ -14,7 +14,7 @@ sys.path.insert(0, "..")
 from configs import configs
 from data_structures.schemas import ClassificationTarget, Prediction, RegressionTarget, StructuredData
 from database.db import SQLiteDatabase
-from database.schemas import RecordSchema
+from database.schemas import MetricSchema, RecordSchema
 from utils.metrics import (
     ClassificationMetrics,
     RegressionMetrics,
@@ -38,6 +38,7 @@ class Column:
     model_is_latest = ("model", "is_latest")
     model_created_at = ("model", "created_at")
     model_data_name = ("model", "data_name")
+    model_cv_metric = ("model", configs.DB_CV_METRIC_NAME)
 
     def to_list(self):
         # get all attributes values of the class and remove this method
@@ -81,6 +82,7 @@ class Report:
             model_mlflow_uri = record.mlflow_uri
             model_is_latest = record.is_latest
             model_created_at = record.created_at
+            model_metrics = record.metrics
 
             for data, predictions in zip(record.data, record.predictions):
                 data_name = data.name
@@ -94,6 +96,7 @@ class Report:
                     data_name=data_name,
                     data_content=data_content,
                     pred_content=pred_content,
+                    model_metrics=model_metrics,
                 )
 
                 self.save_record_artifacts(
@@ -183,18 +186,21 @@ class Report:
         data_name: str,
         data_content: StructuredData,
         pred_content: Prediction,
+        model_metrics: list[MetricSchema],
     ) -> NamedTuple:
         target = data_content.target
 
         y_true = target.value.to_numpy()
         y_pred = pred_content.predictions
 
+        assert len(model_metrics) == 1, "Only one model metric is supported"
         model_columns = {
             Column.model_name: model_name,
             Column.model_version: model_version,
             Column.model_is_latest: model_is_latest,
             Column.model_created_at: model_created_at,
             Column.model_data_name: data_name,
+            Column.model_cv_metric: model_metrics[0].value,
         }
 
         if isinstance(target, ClassificationTarget):

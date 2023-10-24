@@ -6,7 +6,7 @@ from typing_extensions import Annotated
 from zenml import step
 from zenml.client import Client
 
-from configs import configs, options
+from configs import options
 from configs.parser import OptimizerConfig
 from data_structures.schemas import StructuredData
 from models.optimizers import Optimizer

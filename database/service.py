@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from functools import wraps
 
 import numpy as np
+from optuna.trial import FrozenTrial
 
 from configs import configs
 from data_structures.schemas import Prediction, StructuredData
@@ -18,6 +19,7 @@ class RecordAttributes:
     data_test: StructuredData = None
     predictions_train: Prediction = None
     predictions_test: Prediction = None
+    best_trial: FrozenTrial = None
 
 
 class DBService:
@@ -59,11 +61,19 @@ class DBService:
     def _create_record_table(
         self, model_name: str, model_version: str, record_attrs: RecordAttributes
     ) -> schemas.RecordSchema:
+        metrics_table = schemas.MetricSchema(
+            name=configs.DB_CV_METRIC_NAME,
+            value=record_attrs.best_trial.value,
+            ci_low=0.0,
+            ci_high=0.0,
+        )
+
         record_table = schemas.RecordSchema(
             model_name=model_name,
             model_version=model_version,
             mlflow_uri=record_attrs.mlflow_uri,
             dashboard_url=record_attrs.dashboard_url,
+            metrics=[metrics_table],
         )
         return record_table
 

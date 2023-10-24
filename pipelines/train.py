@@ -37,7 +37,7 @@ def train_and_register_model_pipeline() -> None:
     if configs.REGISTER_MODEL:
         register_step = model_register(best_model, cfg_parser.registry())
         db_saver_register.after(register_step)
-        db_saver_register(cfg_parser.registry())
+        db_saver_register(best_trial, cfg_parser.registry())
 
 
 if __name__ == "__main__":
