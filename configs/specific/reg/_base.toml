@@ -1,0 +1,76 @@
+# this is base config for regression
+
+[general]
+raster_num_closest_points = 10
+dates = ["2022_06_15", "2022_07_11", "2022_07_20"]
+treatments = ["eko", "konv"]
+varieties = [
+	"Carolus",
+	"Alouette",
+	"Twister",
+	"Otolia",
+	"KIS_Tamar",
+	"KIS_Blegos",
+	"KIS_Kokra",
+	"Levante",
+]
+
+[multispectral]
+channels = ["blue", "green", "red", "red_edge", "nir"]
+location_type = "measured"
+
+[sampler]
+splitter = "StratifyAllSplitter"
+split_size_val = 0.0
+split_size_test = 0.25
+shuffle = true
+random_state = 1
+stratify = true
+
+[features_generator]
+features_engineer = ""
+feateng_steps = 3
+verbose = 2
+n_jobs = 10
+
+[formatter]
+formatter = "RegressionFromExcelFormatter"
+regression_label = ""
+date_as_feature = false
+average_duplicates = false
+
+[model]
+pipeline = ["XGBRegressor"]
+
+[optimizer]
+n_trials = 200
+n_jobs = 10
+scoring_metric = "neg_root_mean_squared_error"
+scoring_mode = "maximize"
+
+[optimizer.tuned_parameters]
+
+[optimizer.tuned_parameters.optimize_int]
+XGBRegressor__n_estimators = [100, 1000]
+XGBRegressor__max_depth = [3, 6]
+
+[optimizer.tuned_parameters.optimize_float]
+XGBRegressor__learning_rate = [0.01, 0.2]
+XGBRegressor__min_child_weight = [1.0, 10.0]
+XGBRegressor__subsample = [0.5, 0.8]
+XGBRegressor__colsample_bytree = [0.5, 0.8]
+XGBRegressor__reg_lambda = [1.0, 10.0]
+
+[optimizer.validator]
+validator = "RepeatedKFold"
+n_splits = 5
+n_repeats = 3
+random_state = 1
+
+[registry]
+model_name = "TestModelReg"
+description = "Classification"
+metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
+
+[evaluator]
+logger = "ArtifactLoggerRegression"
