@@ -46,11 +46,23 @@ class Formatter(ABC):
         return data[indices].reset_index()
 
     def _modify_data(self, data: StructuredData) -> StructuredData:
-        # for now modify only if date used as a feature
         if self.formatter_cfg.date_as_feature:
             # ! the increasing dates have higher values, consequently sorting in ascending order
             encoded, encoding = pd.factorize(data.meta[configs.DATE_ENG].sort_values())
             data.data[configs.DATE_FEATURE_ENCODING] = encoded
+
+        if self.formatter_cfg.stratify_by_meta:
+            # apply stratify by date, treatment, block and variety
+            stratify = data.meta[
+                [configs.DATE_ENG, configs.TREATMENT_ENG, configs.BLOCK_ENG, configs.VARIETY_ENG]
+            ].apply(tuple, axis=1)
+            encoded, encoding = pd.factorize(stratify)
+            encoded = pd.Series(encoded)
+            # Calculate the size of each group and sample the same number of values from each group
+            group_sizes = encoded.groupby(encoded).size()
+            stratified = encoded.groupby(encoded).apply(lambda x: x.sample(n=group_sizes.min()))
+            data = data[stratified.reset_index()["level_1"]].reset_index()
+
         return data
 
     def _sanity_check(self, df1: pd.DataFrame, df2: pd.DataFrame, df1_name: str, df2_name: str):

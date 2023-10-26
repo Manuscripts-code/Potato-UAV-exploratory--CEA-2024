@@ -38,6 +38,7 @@ formatter = "ClassificationFormatter"
 classification_labels = ["varieties"]
 classification_label = ""
 date_as_feature = false
+stratify_by_meta = false
 
 [model]
 pipeline = ["XGBClassifier"]

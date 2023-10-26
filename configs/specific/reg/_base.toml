@@ -38,6 +38,7 @@ formatter = "RegressionFromExcelFormatter"
 regression_label = ""
 date_as_feature = false
 average_duplicates = false
+stratify_by_meta = false
 
 [model]
 pipeline = ["XGBRegressor"]
