@@ -1,3 +1,5 @@
+import logging
+
 from typing_extensions import Annotated
 from zenml.client import Client
 from zenml.integrations.mlflow.services import MLFlowDeploymentService
@@ -22,4 +24,5 @@ def service_deployer(
             # registered_model_stage="None" # "Staging", "Production", "Archived"
         )
     )()
+    logging.info(f"Model: {registry_cfg.model_name}, version: {len(model_versions)} will be deployed.")
     return model_service

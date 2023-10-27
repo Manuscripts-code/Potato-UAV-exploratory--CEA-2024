@@ -10,6 +10,7 @@ from steps import (
     data_loader,
     data_sampler,
     db_saver_register,
+    model_combiner,
     model_creator,
     model_evaluator,
     model_optimizer,
@@ -35,10 +36,30 @@ def train_and_register_model_pipeline() -> None:
     model_evaluator(best_model, best_trial, data_train, data_val, data_test, cfg_parser.evaluator())
 
     if configs.REGISTER_MODEL:
-        register_step = model_register(best_model, cfg_parser.registry())
+        best_model_combined = model_combiner(best_model, data_train, data_val, data_test)
+        register_step = model_register(best_model_combined, cfg_parser.registry())
         db_saver_register.after(register_step)
         db_saver_register(best_trial, cfg_parser.registry())
 
 
 if __name__ == "__main__":
     train_and_register_model_pipeline()
+
+    # data_train_feat, data_val_feat, data_test_feat, features_engineer = data_features(
+    #     data_train, data_val, data_test, cfg_parser.features()
+    # )
+    # data_facets(data_train_feat, data_val_feat, data_test_feat)
+
+    # model = model_creator(cfg_parser.model())
+    # best_model, best_trial = model_optimizer(
+    #     model, data_train_feat, data_val_feat, cfg_parser.optimizer()
+    # )
+    # # model_evaluator(
+    # #     best_model, best_trial, data_train_feat, data_val_feat, data_test_feat, cfg_parser.evaluator()
+    # # )
+
+    # if configs.REGISTER_MODEL:
+    #     best_model_combined = model_combiner(
+    #         features_engineer, best_model, data_train, data_val, data_test
+    #     )
+    #     register_step = model_register(best_model_combined, cfg_parser.registry())

@@ -5,6 +5,7 @@ from .data_loader import data_loader
 from .data_sampler import data_sampler
 from .db_saver_deployer import db_saver_deployer
 from .db_saver_register import db_saver_register
+from .model_combiner import model_combiner
 from .model_creator import model_creator
 from .model_evaluator import model_evaluator
 from .model_optimizer import model_optimizer
@@ -26,4 +27,5 @@ __all__ = [
     "db_saver_deployer",
     "db_saver_register",
     "data_features",
+    "model_combiner",
 ]
