@@ -5,11 +5,12 @@ from configs import configs
 from configs.parser import ConfigParser
 from steps import (
     data_facets,
-    data_features,
     data_formatter,
     data_loader,
     data_sampler,
     db_saver_register,
+    features_engineer_creator,
+    features_generator,
     model_combiner,
     model_creator,
     model_evaluator,
@@ -28,38 +29,22 @@ def train_and_register_model_pipeline() -> None:
     data = data_loader(cfg_parser.general().without_varieties(), cfg_parser.multispectral())
     data = data_formatter(data, cfg_parser.general(), cfg_parser.formatter())
     data_train, data_val, data_test = data_sampler(data, cfg_parser.sampler())
-    data_train, data_val, data_test = data_features(data_train, data_val, data_test, cfg_parser.features())  # type: ignore # noqa
-    data_facets(data_train, data_val, data_test)
+    # data_facets(data_train, data_val, data_test)
+
+    features_engineer = features_engineer_creator(data_train, cfg_parser.features())
+    data_train_feat, data_val_feat, data_test_feat = features_generator(
+        features_engineer, data_train, data_val, data_test
+    )
 
     model = model_creator(cfg_parser.model())
-    best_model, best_trial = model_optimizer(model, data_train, data_val, cfg_parser.optimizer())
-    model_evaluator(best_model, best_trial, data_train, data_val, data_test, cfg_parser.evaluator())
+    best_trial = model_optimizer(model, data_train_feat, data_val_feat, cfg_parser.optimizer())
+    best_model = model_combiner(model, features_engineer, data_train, best_trial)
+    # model_evaluator(best_model, best_trial, data_train, data_val, data_test, cfg_parser.evaluator())
 
-    if configs.REGISTER_MODEL:
-        best_model_combined = model_combiner(best_model, data_train, data_val, data_test)
-        register_step = model_register(best_model_combined, cfg_parser.registry())
-        db_saver_register.after(register_step)
-        db_saver_register(best_trial, cfg_parser.registry())
+    register_step = model_register(best_model, cfg_parser.registry())
+    db_saver_register.after(register_step)
+    db_saver_register(best_trial, cfg_parser.registry())
 
 
 if __name__ == "__main__":
     train_and_register_model_pipeline()
-
-    # data_train_feat, data_val_feat, data_test_feat, features_engineer = data_features(
-    #     data_train, data_val, data_test, cfg_parser.features()
-    # )
-    # data_facets(data_train_feat, data_val_feat, data_test_feat)
-
-    # model = model_creator(cfg_parser.model())
-    # best_model, best_trial = model_optimizer(
-    #     model, data_train_feat, data_val_feat, cfg_parser.optimizer()
-    # )
-    # # model_evaluator(
-    # #     best_model, best_trial, data_train_feat, data_val_feat, data_test_feat, cfg_parser.evaluator()
-    # # )
-
-    # if configs.REGISTER_MODEL:
-    #     best_model_combined = model_combiner(
-    #         features_engineer, best_model, data_train, data_val, data_test
-    #     )
-    #     register_step = model_register(best_model_combined, cfg_parser.registry())

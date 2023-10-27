@@ -43,7 +43,8 @@ class Optimizer:
     def run(self):
         study = self._perform_search()
         self._best_trial = study.best_trial
-        self._refit_model(self._best_trial.params)
+        # ! Model is not refitted here
+        # self._refit_model(self._best_trial.params)
         logging.info(f"Best {self.scoring_metric}: {self._best_trial.value}")
         logging.info(f"Best hyperparameters found were: {self._best_trial.params}")
 
