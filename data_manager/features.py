@@ -1,5 +1,6 @@
 from typing import Literal, Union
 
+import numpy as np
 import pandas as pd
 from autofeat import AutoFeatClassifier, AutoFeatRegressor
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -161,3 +162,32 @@ class AutoSpectralIndicesPlusGeneratedRegression(AutoSpectralIndicesPlusGenerate
             selector_spectral_indices=selector_spectral_indices,
             selector_generated=selector_generated,
         )
+
+
+class DummyFeaturesGenerator(BaseEstimator, TransformerMixin):
+    def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
+        return self
+
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        return data
+
+    def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
+        return data
+
+
+class FeaturesEngineer(BaseEstimator, TransformerMixin):
+    def __init__(self, features_engineer: BaseEstimator):
+        self.features_engineer = features_engineer
+        self.data_columns = None
+
+    def fit(self, data: pd.DataFrame, target: pd.Series) -> "FeaturesEngineer":
+        self.data_columns = data.columns.tolist()
+        self.features_engineer.fit(data, target)
+        return self
+
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        data_transformed = self.features_engineer.transform(data)
+        if isinstance(data_transformed, np.ndarray):
+            data_transformed = pd.DataFrame(data_transformed)
+        data_transformed.index = data.index
+        return data_transformed

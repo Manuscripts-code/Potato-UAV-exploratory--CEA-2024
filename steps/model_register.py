@@ -14,6 +14,5 @@ def model_register(best_model: Pipeline, registry_cfg: RegistryConfig) -> step:
             metadata=ModelRegistryModelMetadata(**registry_cfg.metadata_dict),
         )
     )
-    # ! Best model needs to be fitted on data in numpy format.
     register(best_model)
     return register

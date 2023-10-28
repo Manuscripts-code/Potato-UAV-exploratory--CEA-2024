@@ -107,7 +107,6 @@ class Optimizer:
         mlflow.sklearn.autolog()
         self._best_model = clone(self.model)
         self._best_model.set_params(**best_params)
-        # Note: data needs to be numpy array for zenml server to work..
         self._best_model.fit(
             self.data_train.data.to_numpy(),
             self.data_train.target.value.to_numpy(),
