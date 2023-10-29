@@ -6,6 +6,7 @@ import pandas as pd
 from configs import configs
 from configs.parser import FormatterConfig, GeneralConfig
 from data_structures.schemas import ClassificationTarget, RegressionTarget, StructuredData
+from utils.utils import set_random_seed
 
 
 class Formatter(ABC):
@@ -46,6 +47,7 @@ class Formatter(ABC):
         return data[indices].reset_index()
 
     def _modify_data(self, data: StructuredData) -> StructuredData:
+        set_random_seed(configs.RANDOM_SEED)
         if self.formatter_cfg.date_as_feature:
             # ! the increasing dates have higher values, consequently sorting in ascending order
             encoded, encoding = pd.factorize(data.meta[configs.DATE_ENG].sort_values())

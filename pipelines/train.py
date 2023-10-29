@@ -39,9 +39,13 @@ def train_and_register_model_pipeline() -> None:
     model = model_creator(cfg_parser.model())
     best_trial = model_optimizer(model, data_train_feat, data_val_feat, cfg_parser.optimizer())
     best_model = model_combiner(model, features_engineer, data_train, best_trial)
-    # model_evaluator(best_model, best_trial, data_train, data_val, data_test, cfg_parser.evaluator())
 
     register_step = model_register(best_model, cfg_parser.registry())
+
+    model_evaluator.after(register_step)
+    model_evaluator(
+        best_model, best_trial, data_train_feat, data_val_feat, data_test_feat, cfg_parser.evaluator()
+    )
     db_saver_register.after(register_step)
     db_saver_register(best_trial, cfg_parser.registry())
 

@@ -26,5 +26,6 @@ def model_combiner(
 
     best_model = make_pipeline(features_engineer, *model.named_steps.values())
     best_model.fit(data_train.data, data_train.target.value)
+    logging.info(f"Features generated:\n {best_model.steps[0][1].transform(data_train.data).columns}")
     logging.info(f"Model used for prediction (as a service): {best_model}")
     return best_model
