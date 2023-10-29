@@ -11,6 +11,7 @@ from utils.utils import set_random_seed
 
 class Formatter(ABC):
     def __init__(self, general_cfg: GeneralConfig, formatter_cfg: FormatterConfig):
+        set_random_seed(configs.RANDOM_SEED)
         self.general_cfg = general_cfg
         self.formatter_cfg = formatter_cfg
 
@@ -47,7 +48,6 @@ class Formatter(ABC):
         return data[indices].reset_index()
 
     def _modify_data(self, data: StructuredData) -> StructuredData:
-        set_random_seed(configs.RANDOM_SEED)
         if self.formatter_cfg.date_as_feature:
             # ! the increasing dates have higher values, consequently sorting in ascending order
             encoded, encoding = pd.factorize(data.meta[configs.DATE_ENG].sort_values())
@@ -62,7 +62,9 @@ class Formatter(ABC):
             encoded = pd.Series(encoded)
             # Calculate the size of each group and sample the same number of values from each group
             group_sizes = encoded.groupby(encoded).size()
-            stratified = encoded.groupby(encoded).apply(lambda x: x.sample(n=group_sizes.min()))
+            stratified = encoded.groupby(encoded).apply(
+                lambda x: x.sample(n=group_sizes.min()), random_state=configs.RANDOM_SEED
+            )
             data = data[stratified.reset_index()["level_1"]].reset_index()
 
         return data
