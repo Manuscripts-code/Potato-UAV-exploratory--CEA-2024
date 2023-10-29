@@ -21,7 +21,7 @@ def features_engineer_creator(
         features_engineer_internal = init_object(
             options.FEATURE_ENGINEERS, features_cfg.features_engineer, **features_cfg.params()
         )
+    logging.info(f"Underlying feature engineer used: {features_engineer_internal}")
     features_engineer = FeaturesEngineer(features_engineer_internal)
     features_engineer.fit(data_train.data, data_train.target.value)
-    logging.info(f"Feature engineer used: {features_engineer}")
     return features_engineer
