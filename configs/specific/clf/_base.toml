@@ -73,7 +73,7 @@ random_state = 1
 
 [registry]
 model_name = "TestModelClf"
-description = ""
+description = "Classification"
 metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]
