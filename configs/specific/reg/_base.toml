@@ -62,6 +62,9 @@ XGBRegressor__subsample = [0.5, 0.8]
 XGBRegressor__colsample_bytree = [0.5, 0.8]
 XGBRegressor__reg_lambda = [1.0, 10.0]
 
+[optimizer.tuned_parameters.optimize_category]
+XGBRegressor__random_state = [1]
+
 [optimizer.validator]
 validator = "RepeatedKFold"
 n_splits = 5

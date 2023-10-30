@@ -1,9 +1,7 @@
 from typing import NamedTuple
 
-import numpy as np
 from sklearn.metrics import (
     accuracy_score,
-    confusion_matrix,
     f1_score,
     max_error,
     mean_absolute_error,
@@ -20,16 +18,17 @@ class ClassificationMetrics(NamedTuple):
     precision: float
     recall: float
     f1: float
-    confusion_mtx: np.ndarray
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"Accuracy: {self.accuracy:.2f}\n"
             f"Precision: {self.precision:.2f}\n"
             f"Recall: {self.recall:.2f}\n"
             f"F1: {self.f1:.2f}\n"
-            f"Confusion matrix:\n{self.confusion_mtx}"
         )
+
+    def to_dict(self) -> dict:
+        return self._asdict()
 
 
 class RegressionMetrics(NamedTuple):
@@ -50,19 +49,20 @@ class RegressionMetrics(NamedTuple):
             f"Max error: {self.maxe:.2f}"
         )
 
+    def to_dict(self) -> dict:
+        return self._asdict()
+
 
 def calculate_classification_metrics(y_true, y_pred):
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred, average="weighted")
     recall = recall_score(y_true, y_pred, average="weighted")
     f1 = f1_score(y_true, y_pred, average="weighted")
-    confusion_mtx = confusion_matrix(y_true, y_pred)
     return ClassificationMetrics(
         accuracy=accuracy,
         precision=precision,
         recall=recall,
         f1=f1,
-        confusion_mtx=confusion_mtx,
     )
 
 

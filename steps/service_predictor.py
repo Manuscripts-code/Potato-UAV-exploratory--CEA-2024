@@ -18,4 +18,4 @@ def service_predictor(
 ) -> Annotated[np.ndarray, "predictions"]:
     """Run a inference request against a prediction service."""
     model_service.start(timeout=registry_cfg.timeout)  # should be a NOP if already started
-    return model_service.predict(data.data.to_numpy())
+    return model_service.predict(data.data)

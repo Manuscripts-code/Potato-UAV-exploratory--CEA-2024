@@ -1,5 +1,6 @@
 from typing import Literal, Union
 
+import numpy as np
 import pandas as pd
 from autofeat import AutoFeatClassifier, AutoFeatRegressor
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -61,9 +62,21 @@ class AutoSpectralIndices(BaseEstimator, TransformerMixin):
         n_jobs=1,
         merge_with_original: bool = True,
     ):
+        self.problem_type = problem_type
+        self.verbose = verbose
+        self.n_jobs = n_jobs
         self.merge_with_original = merge_with_original
         self.selector = feature_selector_factory(
             problem_type=problem_type, verbose=verbose, n_jobs=n_jobs
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"problem_type={self.problem_type}, "
+            f"verbose={self.verbose}, "
+            f"n_jobs={self.n_jobs}, "
+            f"merge_with_original={self.merge_with_original})"
         )
 
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
@@ -100,6 +113,14 @@ class AutoSpectralIndicesClassification(AutoSpectralIndices):
             merge_with_original=merge_with_original,
         )
 
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"verbose={self.verbose}, "
+            f"n_jobs={self.n_jobs}, "
+            f"merge_with_original={self.merge_with_original})"
+        )
+
 
 class AutoSpectralIndicesRegression(AutoSpectralIndices):
     def __init__(self, verbose: int = 0, n_jobs=1, merge_with_original: bool = True, **kwargs):
@@ -108,6 +129,14 @@ class AutoSpectralIndicesRegression(AutoSpectralIndices):
             verbose=verbose,
             n_jobs=n_jobs,
             merge_with_original=merge_with_original,
+        )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}("
+            f"verbose={self.verbose}, "
+            f"n_jobs={self.n_jobs}, "
+            f"merge_with_original={self.merge_with_original})"
         )
 
 
@@ -122,6 +151,14 @@ class AutoSpectralIndicesPlusGenerated(BaseEstimator, TransformerMixin):
     ):
         self.selector_spectral_indices = selector_spectral_indices
         self.selector_generated = selector_generated
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(\n"
+            f"    selector_spectral_indices={self.selector_spectral_indices},\n"
+            f"    selector_generated={self.selector_generated}\n"
+            f")"
+        )
 
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
         self.selector_generated.fit(data, target)
@@ -141,6 +178,10 @@ class AutoSpectralIndicesPlusGenerated(BaseEstimator, TransformerMixin):
 
 class AutoSpectralIndicesPlusGeneratedClassification(AutoSpectralIndicesPlusGenerated):
     def __init__(self, verbose: int = 0, n_jobs=1, feateng_steps: int = 1, **kwargs):
+        self.verbose = verbose
+        self.n_jobs = n_jobs
+        self.feateng_steps = feateng_steps
+
         selector_spectral_indices = AutoSpectralIndicesClassification(
             verbose=verbose, n_jobs=n_jobs, merge_with_original=False
         )
@@ -150,9 +191,19 @@ class AutoSpectralIndicesPlusGeneratedClassification(AutoSpectralIndicesPlusGene
             selector_generated=selector_generated,
         )
 
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(verbose={self.verbose}, "
+            f"n_jobs={self.n_jobs}, feateng_steps={self.feateng_steps})"
+        )
+
 
 class AutoSpectralIndicesPlusGeneratedRegression(AutoSpectralIndicesPlusGenerated):
     def __init__(self, verbose: int = 0, n_jobs=1, feateng_steps: int = 1, **kwargs):
+        self.verbose = verbose
+        self.n_jobs = n_jobs
+        self.feateng_steps = feateng_steps
+
         selector_spectral_indices = AutoSpectralIndicesRegression(
             verbose=verbose, n_jobs=n_jobs, merge_with_original=False
         )
@@ -161,3 +212,44 @@ class AutoSpectralIndicesPlusGeneratedRegression(AutoSpectralIndicesPlusGenerate
             selector_spectral_indices=selector_spectral_indices,
             selector_generated=selector_generated,
         )
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(verbose={self.verbose}, "
+            f"n_jobs={self.n_jobs}, feateng_steps={self.feateng_steps})"
+        )
+
+
+class DummyFeaturesGenerator(BaseEstimator, TransformerMixin):
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}()"
+
+    def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
+        return self
+
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        return data
+
+    def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
+        return data
+
+
+class FeaturesEngineer(BaseEstimator, TransformerMixin):
+    def __init__(self, features_engineer: BaseEstimator):
+        self.features_engineer = features_engineer
+        self.data_columns = None
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(features_engineer={self.features_engineer})"
+
+    def fit(self, data: pd.DataFrame, target: pd.Series) -> "FeaturesEngineer":
+        self.data_columns = data.columns.tolist()
+        self.features_engineer.fit(data, target)
+        return self
+
+    def transform(self, data: pd.DataFrame) -> pd.DataFrame:
+        data_transformed = self.features_engineer.transform(data)
+        if isinstance(data_transformed, np.ndarray):
+            data_transformed = pd.DataFrame(data_transformed)
+        data_transformed.index = data.index
+        return data_transformed

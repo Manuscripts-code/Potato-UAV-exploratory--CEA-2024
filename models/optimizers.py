@@ -43,7 +43,8 @@ class Optimizer:
     def run(self):
         study = self._perform_search()
         self._best_trial = study.best_trial
-        self._refit_model(self._best_trial.params)
+        # ! Model is not refitted here
+        # self._refit_model(self._best_trial.params)
         logging.info(f"Best {self.scoring_metric}: {self._best_trial.value}")
         logging.info(f"Best hyperparameters found were: {self._best_trial.params}")
 
@@ -106,7 +107,6 @@ class Optimizer:
         mlflow.sklearn.autolog()
         self._best_model = clone(self.model)
         self._best_model.set_params(**best_params)
-        # Note: data needs to be numpy array for zenml server to work..
         self._best_model.fit(
             self.data_train.data.to_numpy(),
             self.data_train.target.value.to_numpy(),

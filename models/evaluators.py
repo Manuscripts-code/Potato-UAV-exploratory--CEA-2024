@@ -13,16 +13,12 @@ import numpy as np
 import pandas as pd
 import shap
 from optuna.trial import FrozenTrial
-from sklearn.metrics import (
-    ConfusionMatrixDisplay,
-    classification_report,
-    confusion_matrix,
-    precision_recall_fscore_support,
-)
+from sklearn.metrics import ConfusionMatrixDisplay, classification_report, confusion_matrix
 from sklearn.pipeline import Pipeline
 
 from configs import configs
 from data_structures.schemas import ClassificationTarget, StructuredData
+from utils.metrics import calculate_classification_metrics, calculate_regression_metrics
 from utils.utils import ensure_dir, replace_substring, write_json, write_txt
 
 
@@ -57,7 +53,7 @@ class Evaluator:
         best_trial: FrozenTrial,
         logger: ArtifactLogger,
     ):
-        self.best_model = best_model
+        self.best_model = deepcopy(best_model)
         self.best_trial = best_trial
         self.logger = logger
 
@@ -72,7 +68,7 @@ class Evaluator:
         transfer_object = TransferObject(
             best_model=self.best_model,
             best_trial=self.best_trial,
-            y_pred=self.best_model.predict(data.data.to_numpy()),
+            y_pred=self.best_model.steps[-1][-1].predict(data.data),
             y_true=data.target.value.to_numpy(),
             label=label,
             encoding=encoding,
@@ -87,18 +83,18 @@ class Evaluator:
 
 class LoggerMixin:
     def save_explanations(self, tobj: TransferObject, explainer_path: Path):
-        if len(tobj.best_model.steps) > 1:
-            # ? probably not needed anymore
-            model_temp = deepcopy(tobj.best_model)
-            model_temp.steps.pop(-1)
-            data_transformed = model_temp.transform(tobj.data.to_numpy())
-            column_map = {f"x{idx:03d}": col for idx, col in enumerate(tobj.data.columns)}
-            data_transformed.columns = [
-                replace_substring(column_map, col) for col in data_transformed.columns
-            ]
+        # if len(tobj.best_model.steps) > 1:
+        #     # ? probably not needed anymore
+        #     model_temp = deepcopy(tobj.best_model)
+        #     model_temp.steps.pop(-1)
+        #     data_transformed = model_temp.transform(tobj.data.to_numpy())
+        #     column_map = {f"x{idx:03d}": col for idx, col in enumerate(tobj.data.columns)}
+        #     data_transformed.columns = [
+        #         replace_substring(column_map, col) for col in data_transformed.columns
+        #     ]
 
-        else:
-            data_transformed = tobj.data.copy()
+        # else:
+        data_transformed = tobj.data.copy()
 
         try:
             reg = tobj.best_model.steps[-1][-1]  # decision function (regressor)
@@ -116,6 +112,8 @@ class LoggerMixin:
             self._save_shap_figure(shap_values, data_transformed, explainer_path, "violin", class_names)
         except Exception as e:
             logging.warning(f"Could not save save shap artifacts: {e}")
+
+        finally:
             plt.close("all")
 
     def _save_shap_figure(self, shap_values, data, explainer_path, plot_type, class_names=None):
@@ -136,20 +134,12 @@ class ArtifactLoggerClassification(LoggerMixin):
         logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
 
     def log_metrics(self, tobj: TransferObject):
-        precision, recall, f1, _ = precision_recall_fscore_support(
-            tobj.y_true, tobj.y_pred, average="weighted", zero_division=0
-        )
+        metrics = calculate_classification_metrics(tobj.y_true, tobj.y_pred)
         mlflow.log_metrics(
-            {
-                f"{tobj.suffix}_precision": precision,
-                f"{tobj.suffix}_recall": recall,
-                f"{tobj.suffix}_f1": f1,
-            }
+            {"".join([tobj.suffix, "_", key]): val for key, val in metrics.to_dict().items()}
         )
-        logging.info(
-            f"Classification report on {tobj.suffix} data:\n"
-            f"{classification_report(tobj.y_true, tobj.y_pred)}"
-        )
+        logging.info(f"--> Metrics on {tobj.suffix} data:\n{str(metrics)}")
+        logging.info(f"Classification report:\n" f"{classification_report(tobj.y_true, tobj.y_pred)}")
 
     def log_artifacts(self, tobj: TransferObject):
         with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:
@@ -185,9 +175,11 @@ class ArtifactLoggerRegression(LoggerMixin):
         logging.info(f"Hyperparameters used: {tobj.best_trial.params}")
 
     def log_metrics(self, tobj: TransferObject):
-        mse = np.mean((tobj.y_true - tobj.y_pred) ** 2)
-        mlflow.log_metrics({f"{tobj.suffix}_mse": mse})
-        logging.info(f"MSE on {tobj.suffix} data: {mse}")
+        metrics = calculate_regression_metrics(tobj.y_true, tobj.y_pred)
+        mlflow.log_metrics(
+            {"".join([tobj.suffix, "_", key]): val for key, val in metrics.to_dict().items()}
+        )
+        logging.info(f"--> Metrics on {tobj.suffix} data:\n{str(metrics)}")
 
     def log_artifacts(self, tobj: TransferObject):
         with tempfile.TemporaryDirectory(dir=configs.BASE_DIR) as dp:

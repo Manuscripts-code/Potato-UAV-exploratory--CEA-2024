@@ -58,11 +58,12 @@ XGBClassifier__max_depth = [3, 6]
 [optimizer.tuned_parameters.optimize_float]
 XGBClassifier__learning_rate = [0.01, 0.2]
 XGBClassifier__min_child_weight = [1.0, 10.0]
-# XGBClassifier__gamma = [0.001, 1.0]
 XGBClassifier__subsample = [0.5, 0.8]
 XGBClassifier__colsample_bytree = [0.5, 0.8]
-# XGBClassifier__reg_alpha = [0.1, 1.0]
 XGBClassifier__reg_lambda = [1.0, 10.0]
+
+[optimizer.tuned_parameters.optimize_category]
+XGBClassifier__random_state = [1]
 
 [optimizer.validator]
 validator = "RepeatedStratifiedKFold"
@@ -72,7 +73,7 @@ random_state = 1
 
 [registry]
 model_name = "TestModelClf"
-description = ""
+description = "Classification"
 metadata = ["test_size=0.25", "n_splits=5", "n_repeats=3", "random_state=1"]
 
 [evaluator]

@@ -15,8 +15,11 @@ from utils.utils import init_object
 
 @step(enable_cache=False, experiment_tracker=Client().active_stack.experiment_tracker.name)
 def model_optimizer(
-    model: Pipeline, data_train: StructuredData, data_val: StructuredData, optimizer_cfg: OptimizerConfig
-) -> tuple[Annotated[Pipeline, "best_model"], Annotated[FrozenTrial, "best_trial"]]:
+    model: Pipeline,
+    data_train: StructuredData,
+    data_val: StructuredData,
+    optimizer_cfg: OptimizerConfig,
+) -> Annotated[FrozenTrial, "best_trial"]:
     logging.info("Optimizing model...")
 
     validator = init_object(
@@ -32,4 +35,4 @@ def model_optimizer(
         optimizer_cfg=optimizer_cfg,
     )
     optimizer.run()
-    return optimizer.best_model, optimizer.best_trial
+    return optimizer.best_trial
