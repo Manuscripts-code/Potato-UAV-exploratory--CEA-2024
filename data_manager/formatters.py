@@ -63,7 +63,7 @@ class Formatter(ABC):
             # Calculate the size of each group and sample the same number of values from each group
             group_sizes = encoded.groupby(encoded).size()
             stratified = encoded.groupby(encoded).apply(
-                lambda x: x.sample(n=group_sizes.min()), random_state=configs.RANDOM_SEED
+                lambda x: x.sample(n=group_sizes.min(), random_state=configs.RANDOM_SEED)
             )
             data = data[stratified.reset_index()["level_1"]].reset_index()
 
