@@ -69,13 +69,30 @@ class Formatter(ABC):
 
         return data
 
-    def _sanity_check(self, df1: pd.DataFrame, df2: pd.DataFrame, df1_name: str, df2_name: str):
+    def _sanity_check(
+        self,
+        df1: pd.DataFrame,
+        df2: pd.DataFrame,
+        df1_name: str,
+        df2_name: str,
+        check_df_values: bool = False,
+    ):
+        # log which rows are missing from df2
+        if check_df_values and len(df1) != len(df2):
+            merged = df1.reset_index().merge(df2, how="left", on=self.columns_eng, indicator=True)
+            missing_indices = merged.index[merged["_merge"] == "left_only"]
+            missing_rows = df1.iloc[missing_indices]
+            raise ValueError(f"Missing rows from {df1_name}:\n{missing_rows}")
+
+        # check if all rows from df1 are in df2, considering only columns_eng
+        if check_df_values and not any(df1[self.columns_eng] == df2[self.columns_eng]):
+            raise ValueError(f"Not all rows from {df1_name} are in {df2_name}.")
+
         if len(df1) != len(df2):
-            logging.error(
+            raise ValueError(
                 f"Number of rows in {df1_name} and {df2_name} do not match.\n"
                 f"{df1_name}: {len(df1)}, {df2_name}: {len(df2)}."
             )
-            raise ValueError(f"Number of rows in {df1_name} and {df2_name} do not match.")
 
     def _merge_measurements_with_meta(
         self, meta: pd.DataFrame, measurements: pd.DataFrame, target_column_label: str
@@ -125,7 +142,7 @@ class RegressionFromExcelFormatter(Formatter):
         data = self._modify_data(data)
         # match rows from measurements with rows from metadata
         merged_df = self._merge_measurements_with_meta(data.meta, measurements, target_column_label)
-        self._sanity_check(data.meta, merged_df, "Metadata", "Measurements")
+        self._sanity_check(data.meta, merged_df, "Metadata", "Measurements", True)
         data.target = RegressionTarget(name=target_column_label, value=merged_df[target_column_label])
         return data
 
@@ -148,7 +165,7 @@ class ClassificationFromExcelFormatter(Formatter):
         data = self._modify_data(data)
         # match rows from measurements with rows from metadata
         merged_df = self._merge_measurements_with_meta(data.meta, measurements, target_column_label)
-        self._sanity_check(data.meta, merged_df, "Metadata", "Measurements")
+        self._sanity_check(data.meta, merged_df, "Metadata", "Measurements", True)
         label = merged_df[target_column_label]
         # encode to numbers
         encoded, encoding = pd.factorize(label)
