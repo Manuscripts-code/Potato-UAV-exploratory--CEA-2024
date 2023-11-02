@@ -17,7 +17,7 @@ varieties = [
 
 [multispectral]
 channels = ["blue", "green", "red", "red_edge", "nir"]
-location_type = "measured"
+location_type = "all"
 
 [sampler]
 splitter = "StratifyAllSplitter"

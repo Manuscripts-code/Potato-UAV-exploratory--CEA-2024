@@ -19,6 +19,7 @@ from sklearn.pipeline import Pipeline
 from configs import configs
 from data_structures.schemas import ClassificationTarget, StructuredData
 from utils.metrics import calculate_classification_metrics, calculate_regression_metrics
+from utils.plot_utils import save_plot_figure
 from utils.utils import ensure_dir, replace_substring, write_json, write_txt
 
 
@@ -117,15 +118,9 @@ class LoggerMixin:
             plt.close("all")
 
     def _save_shap_figure(self, shap_values, data, explainer_path, plot_type, class_names=None):
-        plt.figure()
-        # TODO: add class names
-        shap.summary_plot(shap_values, data, plot_type=plot_type, class_names=class_names)
-        plt.savefig(
-            explainer_path / f"shap_summary_plot_{plot_type}.pdf",
-            format="pdf",
-            bbox_inches="tight",
-        )
-        plt.close("all")
+        save_path = explainer_path / f"shap_summary_plot_{plot_type}.pdf"
+        with save_plot_figure(save_path):
+            shap.summary_plot(shap_values, data, plot_type=plot_type, class_names=class_names)
 
 
 class ArtifactLoggerClassification(LoggerMixin):

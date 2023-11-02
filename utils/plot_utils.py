@@ -16,7 +16,7 @@ from configs import configs
 
 
 @contextmanager
-def _save_plot_figure(
+def save_plot_figure(
     save_path: str | Path = "plot.pdf",
     use_science_style: bool = False,
     figsize: tuple[int, int] = (8, 7),
@@ -94,7 +94,7 @@ def save_confusion_matrix_display(
     target_names: list[str],
     save_path: str | Path = "confusion_matrix.pdf",
 ):
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         cm_display = ConfusionMatrixDisplay.from_predictions(
             y_true, y_pred, display_labels=target_names, normalize="true"
         )
@@ -107,7 +107,7 @@ def save_prediction_errors_display(
     save_path: str | Path = "prediction_errors.pdf",
     kind: str = "residual_vs_predicted",
 ):
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         pe_display = PredictionErrorDisplay.from_predictions(y_true, y_pred, kind=kind)
         pe_display.plot(kind=kind)
 
@@ -119,7 +119,7 @@ def show_parallel_coordinates(
     save_path: str | Path = "visualization_parallel_coordinates.pdf",
     colormap: str = "viridis",
 ):
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         visualizer = yb.ParallelCoordinates(
             classes=classes, features=data.columns.tolist(), shuffle=True, alpha=0.7, colormap=colormap
         )
@@ -134,7 +134,7 @@ def show_radial_visualization(
     save_path: str | Path = "visualization_radial.pdf",
     colormap: str = "viridis",
 ):
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         visualizer = yb.RadViz(
             classes=classes, features=data.columns.tolist(), alpha=0.7, colormap=colormap
         )
@@ -149,7 +149,7 @@ def show_2d_pca(
     save_path: str | Path = "visualization_2d_pca.pdf",
     colormap: str = "viridis",
 ):
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         visualizer = yb.PCA(scale=True, classes=classes, alpha=0.7, colormap=colormap)
         visualizer.fit_transform(data, y_data_encoded)
         visualizer.show()
@@ -164,7 +164,7 @@ def show_manifold(
     method: str = "isomap",
 ):
     # method used can be "tsne", "lle", "isomap", "mds" etc.
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         visualizer = yb.Manifold(
             manifold=method, classes=classes, alpha=0.7, colormap=colormap, n_neighbors=3
         )
@@ -183,7 +183,7 @@ def show_umap(
     random_state: int = configs.RANDOM_SEED,
     **umap_kwargs,
 ):
-    with _save_plot_figure(save_path=save_path, figsize=figsize) as (fig, ax):
+    with save_plot_figure(save_path=save_path, figsize=figsize) as (fig, ax):
         reducer = umap.UMAP(random_state=random_state, **umap_kwargs)
         if supervised:
             embedding = reducer.fit_transform(data, y_data_encoded)
@@ -235,7 +235,7 @@ def save_meta_visualization(
 ):
     for treatment in pd.unique(meta[configs.TREATMENT_ENG]):
         save_path = save_dir / f"visualization_meta_{treatment}.pdf"
-        with _save_plot_figure(save_path):
+        with save_plot_figure(save_path):
             ax = sns.countplot(
                 data=meta,
                 x=configs.DATE_ENG,
@@ -266,7 +266,7 @@ def save_target_visualization(
     _TARGET_LAB = "Target"
     data = pd.DataFrame.from_dict({_TARGET_VAL: target_values, _TARGET_LAB: target_labels})
 
-    with _save_plot_figure(save_path):
+    with save_plot_figure(save_path):
         if target_type == "classification":
             ax = sns.countplot(
                 data=data,

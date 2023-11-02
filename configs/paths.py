@@ -179,5 +179,10 @@ PATHS_MEASUREMENTS = {
         (
             "leaf",
             str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
-        )
+        ),
+    "LICOR_gsw":
+        (
+            "gsw",
+            str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
+        ),
 }
