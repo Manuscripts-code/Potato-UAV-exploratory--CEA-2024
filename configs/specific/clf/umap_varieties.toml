@@ -1,2 +1,5 @@
 [features_generator]
 features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
+
+[multispectral]
+location_type = "measured"
