@@ -119,7 +119,7 @@ class LoggerMixin:
 
     def _save_shap_figure(self, shap_values, data, explainer_path, plot_type, class_names=None):
         save_path = explainer_path / f"shap_summary_plot_{plot_type}.pdf"
-        with save_plot_figure(save_path):
+        with save_plot_figure(save_path=save_path, use_science_style=True):
             shap.summary_plot(shap_values, data, plot_type=plot_type, class_names=class_names)
 
 
