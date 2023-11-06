@@ -3,3 +3,7 @@ features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
 
 [multispectral]
 location_type = "measured"
+
+[formatter]
+formatter = "ClassificationFormatter"
+classification_labels = ["varieties", "treatments"]

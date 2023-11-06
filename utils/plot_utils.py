@@ -177,9 +177,10 @@ def show_umap(
     y_data_encoded: np.ndarray,
     classes: list = None,
     save_path: str | Path = "visualization_umap.pdf",
-    colormap: str = "viridis",
+    colormap: str = "Spectral",
     figsize: tuple[int, int] = (8, 7),
     supervised: bool = False,
+    use_internal_legend: bool = False,
     random_state: int = configs.RANDOM_SEED,
     **umap_kwargs,
 ):
@@ -190,11 +191,15 @@ def show_umap(
         else:
             embedding = reducer.fit_transform(data)
 
-        plt.scatter(*embedding.T, s=25, c=y_data_encoded, cmap=colormap, alpha=0.7)
+        scatter = plt.scatter(*embedding.T, s=40, c=y_data_encoded, cmap=colormap, alpha=0.7)
         plt.setp(ax, xticks=[], yticks=[])
-        cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
-        cbar.set_ticks(np.arange(len(classes)))
-        cbar.set_ticklabels(classes)
+
+        if use_internal_legend:
+            plt.legend(handles=scatter.legend_elements()[0], labels=classes)
+        else:
+            cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
+            cbar.set_ticks(np.arange(len(classes)))
+            cbar.set_ticklabels(classes)
 
 
 def save_data_visualization(
