@@ -175,7 +175,8 @@ def show_manifold(
 def show_umap(
     data: pd.DataFrame,
     y_data_encoded: np.ndarray,
-    classes: list = None,
+    classes: list[str] = None,
+    groups: list[int] = None,
     save_path: str | Path = "visualization_umap.pdf",
     colormap: str = "Spectral",
     figsize: tuple[int, int] = (8, 7),
@@ -184,22 +185,51 @@ def show_umap(
     random_state: int = configs.RANDOM_SEED,
     **umap_kwargs,
 ):
+    reducer = umap.UMAP(random_state=random_state, **umap_kwargs)
+    if supervised:
+        embeddings = reducer.fit_transform(data, y_data_encoded)
+    else:
+        embeddings = reducer.fit_transform(data)
+
+    if groups is None:
+        groups = np.zeros_like(y_data_encoded)
+
+    cmap = plt.get_cmap(colormap)
+    _colors = cmap(np.linspace(0, 1, int(len(classes) / len(np.unique(groups)))))
+    _markers = ["o", "v", "^", "<", ">", "s", "p", "*", "h", "H", "+", "x", "D", "d", "|", "_"]
+
     with save_plot_figure(save_path=save_path, figsize=figsize) as (fig, ax):
-        reducer = umap.UMAP(random_state=random_state, **umap_kwargs)
-        if supervised:
-            embedding = reducer.fit_transform(data, y_data_encoded)
-        else:
-            embedding = reducer.fit_transform(data)
+        for group_idx in np.unique(groups):
+            embedding_masked = embeddings[groups == group_idx]
+            y_data_encoded_masked = y_data_encoded[groups == group_idx]
 
-        scatter = plt.scatter(*embedding.T, s=40, c=y_data_encoded, cmap=colormap, alpha=0.7)
-        plt.setp(ax, xticks=[], yticks=[])
+            for class_idx in np.unique(y_data_encoded_masked):
+                embedding_2masked = embedding_masked[y_data_encoded_masked == class_idx]
 
+                classes_selected = np.array(classes)[np.unique(y_data_encoded_masked)]
+                classes_selected_sorted = np.sort(classes_selected)
+                classes_idx_map = {
+                    idx: np.where(classes_selected_sorted == item)[0][0]
+                    for idx, item in enumerate(classes_selected)
+                }
+
+                ax.scatter(
+                    *embedding_2masked.T,
+                    s=40,
+                    color=_colors[classes_idx_map[class_idx % len(np.unique(y_data_encoded_masked))]],
+                    alpha=0.7,
+                    marker=_markers[group_idx],
+                    label=classes[class_idx],
+                )
+
+        handles, labels = ax.get_legend_handles_labels()
+        sorted_handles_labels = sorted(zip(labels, handles), key=lambda t: t[0])  # Sort by labels
+        labels, handles = zip(*sorted_handles_labels)
         if use_internal_legend:
-            plt.legend(handles=scatter.legend_elements()[0], labels=classes)
+            ax.legend(handles, labels)
         else:
-            cbar = plt.colorbar(boundaries=np.arange(len(classes) + 1) - 0.5)
-            cbar.set_ticks(np.arange(len(classes)))
-            cbar.set_ticklabels(classes)
+            ax.legend(handles, labels, loc="center left", bbox_to_anchor=(1, 0.5))
+        plt.setp(ax, xticks=[], yticks=[])
 
 
 def save_data_visualization(
@@ -225,11 +255,11 @@ def save_data_visualization(
     show_manifold(data, y_data_encoded, classes, _save_path, colormap)
     _save_path = save_dir / "visualization_umap.pdf"
     show_umap(
-        data,
-        y_data_encoded,
-        classes,
-        _save_path,
-        colormap,
+        data=data,
+        y_data_encoded=y_data_encoded,
+        classes=classes,
+        save_path=_save_path,
+        colormap=colormap,
         **dict(n_neighbors=15, min_dist=1),
     )
 
