@@ -175,14 +175,24 @@ PATHS_MEASUREMENTS = {
         "Razred",
         str(configs.MEASUREMENTS_DIR / "Varieties_grouped_Ecobreed_krompir_2022.xlsx"),
     ),
-    "LICOR_leaf":
-        (
-            "leaf",
-            str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
-        ),
-    "LICOR_gsw":
-        (
-            "gsw",
-            str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
-        ),
+    "LICOR_leaf": (
+        "leaf",
+        str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
+    ),
+    "LICOR_gsw": (
+        "gsw",
+        str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
+    ),
+    "LICOR_E": (
+        "E_apparent",
+        str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
+    ),
+    "LICOR_PhiPS2": (
+        "PhiPS2",
+        str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
+    ),
+    "LICOR_ETR": (
+        "ETR",
+        str(configs.MEASUREMENTS_DIR / "LICOR_Ecobreed_krompir_2022.xlsx"),
+    ),
 }
