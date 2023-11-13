@@ -215,7 +215,7 @@ def show_umap(
 
                 ax.scatter(
                     *embedding_2masked.T,
-                    s=40,
+                    s=50,
                     color=_colors[classes_idx_map[class_idx % len(np.unique(y_data_encoded_masked))]],
                     alpha=0.7,
                     marker=_markers[group_idx],
@@ -226,9 +226,11 @@ def show_umap(
         sorted_handles_labels = sorted(zip(labels, handles), key=lambda t: t[0])  # Sort by labels
         labels, handles = zip(*sorted_handles_labels)
         if use_internal_legend:
-            ax.legend(handles, labels)
+            ax.legend(handles, labels, fontsize=18, framealpha=1)
         else:
-            ax.legend(handles, labels, loc="center left", bbox_to_anchor=(1, 0.5))
+            ax.legend(
+                handles, labels, loc="center left", bbox_to_anchor=(1, 0.5), fontsize=18, framealpha=1
+            )
         plt.setp(ax, xticks=[], yticks=[])
 
 
