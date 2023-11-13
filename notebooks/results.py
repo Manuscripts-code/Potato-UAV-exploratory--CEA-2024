@@ -7,6 +7,7 @@ from typing import NamedTuple
 import pandas as pd
 from rich import print
 from sklearn.metrics import classification_report
+from ydata_profiling import ProfileReport
 
 sys.path.insert(0, "..")
 
@@ -134,6 +135,9 @@ class Report:
 
         save_dir = ensure_dir(Path(configs.SAVE_RESULTS_DIR, model_name, model_version, data_name))
 
+        profile = ProfileReport(pd.concat([data.reset_index(drop=True), meta.reset_index(drop=True), target.value.to_frame().reset_index(drop=True)], axis=1), title="Report")  # type: ignore # noqa
+        profile.to_file(save_dir / "profiling_report.html")
+
         write_txt(data.describe().to_string(), save_dir / "describe_data.txt")
         write_txt(meta.groupby([configs.TREATMENT_ENG, configs.DATE_ENG, configs.BLOCK_ENG, configs.VARIETY_ENG]).size().to_string(), save_dir / "describe_meta.txt")  # type: ignore # noqa
         write_txt(data.to_string(), save_dir / "data_data.txt")
@@ -252,11 +256,15 @@ class Report:
         return self._df_reg
 
 
-def produce_results():
+def produce_results(number_of_recents: int | None = None):
     db = SQLiteDatabase()
 
     records = db.get_records()
     records_latest = db.get_records(is_latest=True)
+
+    if number_of_recents is not None:
+        records = records[-number_of_recents:]
+        records_latest = records_latest[-number_of_recents:]
 
     # report = Report()
     # report.add_records(records)
@@ -270,4 +278,6 @@ def produce_results():
 
 
 if __name__ == "__main__":
-    produce_results()
+    number_of_recents = 1
+    # number_of_recents = None
+    produce_results(number_of_recents)
