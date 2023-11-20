@@ -3,6 +3,10 @@ import numpy as np
 
 from configs import configs
 
+"""
+This script is used to plot accuracy plot.
+"""
+
 np.random.seed(7)
 
 f1_eko = np.array([0.945312, 0.807292, 0.721774, 0.674194, 0.643369, 0.556836, 0.516129])

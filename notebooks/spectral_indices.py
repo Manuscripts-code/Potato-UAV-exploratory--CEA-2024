@@ -1,5 +1,9 @@
 import pandas as pd
 
+"""
+This script is used to search for indices that are appropriate for our multispectral sensor.
+"""
+
 if __name__ == "__main__":
     # Github: https://github.com/awesome-spectral-indices/awesome-spectral-indices
     # read json from github link

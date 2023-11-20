@@ -1,0 +1,17 @@
+[general]
+treatments = ["eko", "konv"]
+dates = ["2022_07_20"]
+
+[multispectral]
+location_type = "measured"
+
+[features_generator]
+features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
+feateng_steps = 2
+
+[formatter]
+formatter = "ClassificationFromExcelFormatter"
+classification_label = "Alternaria_class"
+
+[registry]
+model_name = "alternaria_clf"
