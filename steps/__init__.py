@@ -11,6 +11,7 @@ from .model_creator import model_creator
 from .model_evaluator import model_evaluator
 from .model_optimizer import model_optimizer
 from .model_register import model_register
+from .produce_results import produce_results
 from .service_deployer import service_deployer
 from .service_predictor import service_predictor
 
@@ -30,4 +31,5 @@ __all__ = [
     "db_saver_register",
     "features_engineer_creator",
     "features_generator",
+    "produce_results",
 ]

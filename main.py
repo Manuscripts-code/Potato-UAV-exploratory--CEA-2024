@@ -5,9 +5,9 @@ from rich import print
 from zenml.integrations.mlflow.mlflow_utils import get_tracking_uri
 
 from configs import configs
-from notebooks.results import produce_results
 from pipelines.test import deployment_inference_pipeline
 from pipelines.train import train_and_register_model_pipeline
+from steps import produce_results
 from utils.utils import set_random_seed
 
 
