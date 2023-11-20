@@ -1,0 +1,13 @@
+[general]
+treatments = ["eko", "konv"]
+varieties = ["KIS_Tamar", "KIS_Blegos"]
+
+[features_generator]
+features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
+feateng_steps = 2
+
+[formatter]
+stratify_by_meta = true
+
+[registry]
+model_name = "01ek_clf"

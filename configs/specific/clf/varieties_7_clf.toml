@@ -1,0 +1,21 @@
+[general]
+treatments = ["eko", "konv"]
+varieties = [
+	"Carolus",
+	"Alouette",
+	"Otolia",
+	"KIS_Tamar",
+	"KIS_Blegos",
+	"KIS_Kokra",
+	"Levante",
+]
+
+[features_generator]
+features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
+feateng_steps = 2
+
+[formatter]
+stratify_by_meta = true
+
+[registry]
+model_name = "06ek_clf"
