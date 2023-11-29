@@ -159,10 +159,6 @@ PATHS_MEASUREMENTS = {
         "SPAD_mean",
         str(configs.MEASUREMENTS_DIR / "SPAD_Ecobreed_krompir_2022.xlsx"),
     ),
-    "LAI": (
-        "LAI",
-        str(configs.MEASUREMENTS_DIR / "LAI_Ecobreed_krompir_2022.xlsx"),
-    ),
     "Alternaria": (
         "Procent",
         str(configs.MEASUREMENTS_DIR / "Alternaria_ocenjevanje1_Ecobreed_krompir_2022.xlsx"),

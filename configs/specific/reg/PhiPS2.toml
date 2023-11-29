@@ -1,0 +1,13 @@
+[general]
+treatments = ["eko", "konv"]
+
+[features_generator]
+features_engineer = "AutoSpectralIndicesPlusGeneratedRegression"
+feateng_steps = 2
+
+[formatter]
+regression_label = "LICOR_PhiPS2"
+average_duplicates = true
+
+[registry]
+model_name = "PhiPS2_reg"
