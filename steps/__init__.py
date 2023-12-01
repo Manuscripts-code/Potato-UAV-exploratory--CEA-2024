@@ -4,6 +4,7 @@ from .data_loader import data_loader
 from .data_sampler import data_sampler
 from .db_saver_deployer import db_saver_deployer
 from .db_saver_register import db_saver_register
+from .features_balancer import features_balancer
 from .features_engineer_creator import features_engineer_creator
 from .features_generator import features_generator
 from .model_combiner import model_combiner
@@ -31,5 +32,6 @@ __all__ = [
     "db_saver_register",
     "features_engineer_creator",
     "features_generator",
+    "features_balancer",
     "produce_results",
 ]

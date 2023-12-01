@@ -24,11 +24,12 @@ optuna==3.2.0
 optuna-dashboard==0.12.0
 scikit_learn==1.2.2
 zenml==0.44.1
-zenml[server]
+zenml[server]==0.44.1
 xgboost==2.0.0
 autofeat==2.1.2
 shap==0.42.1
 mlxtend==0.23.0
+imbalanced-learn==0.11.0
 
 # MLflow integration (same as running: 'zenml integration install mlflow')
 mlflow==2.5.0

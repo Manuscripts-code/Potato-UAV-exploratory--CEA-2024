@@ -33,6 +33,9 @@ feateng_steps = 3
 verbose = 2
 n_jobs = 10
 
+[balancer]
+use = false
+
 [formatter]
 formatter = "ClassificationFormatter"
 classification_labels = ["varieties"]

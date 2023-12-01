@@ -60,6 +60,10 @@ class FeaturesConfig(BaseModel):
         return dict_
 
 
+class BalancerConfig(BaseModel):
+    use: bool = False
+
+
 class FormatterConfig(BaseModel):
     formatter: str
     measurements_paths: TYPE_DICT_TUPL
@@ -145,6 +149,9 @@ class ConfigParser:
 
     def features(self) -> FeaturesConfig:
         return self._parse_config(configs.FEATURES_CFG_NAME, FeaturesConfig)
+
+    def balancer(self) -> BalancerConfig:
+        return self._parse_config(configs.BALANCER_CFG_NAME, BalancerConfig)
 
     def formatter(self) -> FormatterConfig:
         config = partial(

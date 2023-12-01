@@ -9,6 +9,7 @@ from steps import (
     data_loader,
     data_sampler,
     db_saver_register,
+    features_balancer,
     features_engineer_creator,
     features_generator,
     model_combiner,
@@ -35,6 +36,7 @@ def train_and_register_model_pipeline() -> None:
     data_train_feat, data_val_feat, data_test_feat = features_generator(
         features_engineer, data_train, data_val, data_test
     )
+    data_train_feat = features_balancer(data_train_feat, cfg_parser.balancer())
 
     model = model_creator(cfg_parser.model())
     best_trial = model_optimizer(model, data_train_feat, data_val_feat, cfg_parser.optimizer())
