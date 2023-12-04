@@ -38,7 +38,7 @@ def features_balancer(
 
         classes, counts = np.unique(data_part.target.value, return_counts=True)
         # Oversample both classes to the sum of counts
-        balancer = over_sampling.SVMSMOTE(
+        balancer = over_sampling.SMOTE(
             sampling_strategy={class_: int(np.sum(counts)) for class_ in classes},
             random_state=configs.RANDOM_SEED,
         )

@@ -24,7 +24,7 @@ formatter = "ClassificationFromExcelFormatter"
 classification_label = "Alternaria_class"
 
 [registry]
-model_name = "alternaria_clf"
+model_name = "alternaria_b_clf"
 
 [balancer]
-use = false
+use = true
