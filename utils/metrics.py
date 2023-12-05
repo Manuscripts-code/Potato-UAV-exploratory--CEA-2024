@@ -1,5 +1,6 @@
 from typing import NamedTuple
 
+import numpy as np
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -11,6 +12,17 @@ from sklearn.metrics import (
     r2_score,
     recall_score,
 )
+
+
+def normalized_RMSE(y_true: np.ndarray, y_pred: np.ndarray, normalize_by: str = "range"):
+    rmse = mean_squared_error(y_true, y_pred, squared=False)
+    if normalize_by == "range":
+        normalizer = np.max(y_true) - np.min(y_true)
+    elif normalize_by == "mean":
+        normalizer = np.mean(y_true)
+    else:
+        raise ValueError(f"Unknown normalizer {normalize_by}")
+    return rmse / normalizer
 
 
 class ClassificationMetrics(NamedTuple):
@@ -38,6 +50,8 @@ class RegressionMetrics(NamedTuple):
     r2: float
     mape: float
     maxe: float
+    nrmse_mean: float
+    nrmse_range: float
 
     def __str__(self) -> str:
         return (
@@ -46,7 +60,9 @@ class RegressionMetrics(NamedTuple):
             f"Root mean squared error: {self.rmse:.2f}\n"
             f"R2 score: {self.r2:.2f}\n"
             f"Mean absolute percentage error: {self.mape:.2f}\n"
-            f"Max error: {self.maxe:.2f}"
+            f"Max error: {self.maxe:.2f}\n"
+            f"Normalized root mean squared error (by mean): {self.nrmse_mean:.2f}\n"
+            f"Normalized root mean squared error (by range): {self.nrmse_range:.2f}\n"
         )
 
     def to_dict(self) -> dict:
@@ -73,6 +89,8 @@ def calculate_regression_metrics(y_true, y_pred):
     r2 = r2_score(y_true, y_pred)
     mape = mean_absolute_percentage_error(y_true, y_pred)
     maxe = max_error(y_true, y_pred)
+    nrmse_mean = normalized_RMSE(y_true, y_pred, normalize_by="mean")
+    nrmse_range = normalized_RMSE(y_true, y_pred, normalize_by="range")
     return RegressionMetrics(
         mae=mae,
         mse=mse,
@@ -80,4 +98,6 @@ def calculate_regression_metrics(y_true, y_pred):
         r2=r2,
         mape=mape,
         maxe=maxe,
+        nrmse_mean=nrmse_mean,
+        nrmse_range=nrmse_range,
     )
