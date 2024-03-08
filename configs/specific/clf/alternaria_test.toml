@@ -1,0 +1,35 @@
+[general]
+treatments = ["eko", "konv"]
+dates = ["2022_07_20"]
+varieties = [
+	# "Carolus",
+	# "Alouette",
+	"Twister",
+	"Otolia",
+	# "KIS_Tamar",
+	"KIS_Blegos",
+	# "KIS_Kokra",
+	# "Levante",
+]
+
+[multispectral]
+location_type = "measured"
+
+[sampler]
+splitter = "SimpleSplitter"
+split_size_val = 0.0
+split_size_test = 0.95
+
+[features_generator]
+features_engineer = "AutoSpectralIndicesPlusGeneratedClassification"
+feateng_steps = 2
+
+[formatter]
+formatter = "ClassificationFromExcelFormatter"
+classification_label = "Alternaria_class"
+
+[registry]
+model_name = "alternaria_b_clf"
+
+[balancer]
+use = true

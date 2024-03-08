@@ -37,14 +37,11 @@ class TransferObject:
 
 
 class ArtifactLogger(Protocol):
-    def log_params(self, tobj: TransferObject):
-        ...
+    def log_params(self, tobj: TransferObject): ...
 
-    def log_metrics(self, tobj: TransferObject):
-        ...
+    def log_metrics(self, tobj: TransferObject): ...
 
-    def log_artifacts(self, tobj: TransferObject):
-        ...
+    def log_artifacts(self, tobj: TransferObject): ...
 
 
 class Evaluator:
@@ -120,7 +117,15 @@ class LoggerMixin:
     def _save_shap_figure(self, shap_values, data, explainer_path, plot_type, class_names=None):
         save_path = explainer_path / f"shap_summary_plot_{plot_type}.pdf"
         with save_plot_figure(save_path=save_path, use_science_style=True):
-            shap.summary_plot(shap_values, data, plot_type=plot_type, class_names=class_names)
+            shap.summary_plot(
+                shap_values,
+                data,
+                plot_type=plot_type,
+                class_names=class_names,
+                max_display=10,
+                # alpha=0.3,
+                # color_bar=False,
+            )
 
 
 class ArtifactLoggerClassification(LoggerMixin):

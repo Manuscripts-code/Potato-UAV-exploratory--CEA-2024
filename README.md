@@ -8,6 +8,8 @@ How to install:
 - source .venv/bin/activate
 - pip3 install -r requirements.txt
 
+echo "PYTHONPATH=$(pwd)" > .env
+
 ZenML:
 
 # Disconnect first if you closed PC
