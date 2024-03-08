@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 import numpy as np
 from sklearn.metrics import (
@@ -69,11 +69,15 @@ class RegressionMetrics(NamedTuple):
         return self._asdict()
 
 
-def calculate_classification_metrics(y_true, y_pred):
+def calculate_classification_metrics(
+    y_true,
+    y_pred,
+    average: Literal["micro", "macro", "samples", "weighted", "binary"] | None = "weighted",
+):
     accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, average="weighted")
-    recall = recall_score(y_true, y_pred, average="weighted")
-    f1 = f1_score(y_true, y_pred, average="weighted")
+    precision = precision_score(y_true, y_pred, average=average)
+    recall = recall_score(y_true, y_pred, average=average)
+    f1 = f1_score(y_true, y_pred, average=average)
     return ClassificationMetrics(
         accuracy=accuracy,
         precision=precision,
