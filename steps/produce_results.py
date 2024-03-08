@@ -158,11 +158,16 @@ class Report:
             encoding = target.encoding.apply(row_formatter).to_dict()
             target_names = [encoding[key] for key in sorted(encoding.keys())]
 
-            save_confusion_matrix_display(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
-            write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
-            write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
-            save_data_visualization(data, y_data_encoded=y_true, classes=target_names, save_dir=save_dir)  # type: ignore # noqa
-            save_target_visualization(target_values=y_true, target_labels=target_label.to_numpy(), save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
+            try:
+                save_confusion_matrix_display(y_true, y_pred, target_names, save_path=save_dir / "confusion_matrix.pdf")  # type: ignore # noqa
+                write_txt(classification_report(y_true, y_pred, target_names=target_names), save_dir / "classification_report.txt")  # type: ignore # noqa
+                write_txt(pd.concat([target_label, target.value], axis=1).to_string(), save_dir / "data_target.txt")  # type: ignore # noqa
+                save_data_visualization(data, y_data_encoded=y_true, classes=target_names, save_dir=save_dir)  # type: ignore # noqa
+                save_target_visualization(target_values=y_true, target_labels=target_label.to_numpy(), save_path=save_dir / "visualization_target.pdf")  # type: ignore # noqa
+            except Exception:
+                print(
+                    f"Failed to save classification artifacts for: {model_name} {model_version} {data_name}"
+                )
 
         elif isinstance(target, RegressionTarget):
             target_label = meta[configs.VARIETY_ENG]
@@ -283,5 +288,5 @@ def produce_results(number_of_recents: int | None = None):
 
 if __name__ == "__main__":
     number_of_recents = 1
-    number_of_recents = None
+    # number_of_recents = None
     produce_results(number_of_recents)
