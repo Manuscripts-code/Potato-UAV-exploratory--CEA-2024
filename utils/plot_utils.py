@@ -9,8 +9,10 @@ import scienceplots  # noqa
 import seaborn as sns
 import umap
 import yellowbrick.features as yb
+from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
-from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay
+from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay, accuracy_score
+from sklearn.neighbors import KNeighborsClassifier
 
 from configs import configs
 
@@ -195,10 +197,14 @@ def show_umap(
         groups = np.zeros_like(y_data_encoded)
 
     cmap = plt.get_cmap(colormap)
-    _colors = cmap(np.linspace(0, 1, int(len(classes) / len(np.unique(groups)))))
+    if int(len(classes) / len(np.unique(groups))) > 2:
+        _colors = cmap(np.linspace(0, 1, int(len(classes) / len(np.unique(groups)))))
+    else:
+        _colors = ["red", "blue"]
     _markers = ["o", "v", "^", "<", ">", "s", "p", "*", "h", "H", "+", "x", "D", "d", "|", "_"]
 
     with save_plot_figure(save_path=save_path, figsize=figsize) as (fig, ax):
+        # display the UMAP embedding
         for group_idx in np.unique(groups):
             embedding_masked = embeddings[groups == group_idx]
             y_data_encoded_masked = y_data_encoded[groups == group_idx]
@@ -221,10 +227,40 @@ def show_umap(
                     marker=_markers[group_idx],
                     label=classes[class_idx],
                 )
+        # display classification boundaries
+        y_data_encoded_ = [
+            classes_idx_map[class_idx % len(np.unique(y_data_encoded_masked))]
+            for class_idx in y_data_encoded
+        ]
+        clf = KNeighborsClassifier(n_neighbors=10, n_jobs=-1)
+        clf.fit(embeddings, y_data_encoded_)
+        y_pred = clf.predict(embeddings)
+        accuracy = accuracy_score(y_data_encoded_, y_pred)
+
+        h = 0.02
+        x_min, x_max = embeddings[:, 0].min() - 1, embeddings[:, 0].max() + 1
+        y_min, y_max = embeddings[:, 1].min() - 1, embeddings[:, 1].max() + 1
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+        Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+        ax.contourf(
+            xx,
+            yy,
+            Z,
+            cmap=ListedColormap([_colors[g] for g in np.unique(y_data_encoded_)]),
+            alpha=0.3,
+        )
 
         handles, labels = ax.get_legend_handles_labels()
         sorted_handles_labels = sorted(zip(labels, handles), key=lambda t: t[0])  # Sort by labels
         labels, handles = zip(*sorted_handles_labels)
+
+        accuracy_handle = Line2D(
+            [0], [0], marker="o", color="w", label=f"Score:  {accuracy:.2f}", markersize=15
+        )
+        handles = [accuracy_handle] + list(handles)
+        labels = [accuracy_handle.get_label()] + list(labels)
+
         if use_internal_legend:
             ax.legend(handles, labels, fontsize=18, framealpha=1)
         else:
