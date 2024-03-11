@@ -13,6 +13,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.lines import Line2D
 from sklearn.metrics import ConfusionMatrixDisplay, PredictionErrorDisplay, accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 
 from configs import configs
 
@@ -205,6 +206,9 @@ def show_umap(
 
     with save_plot_figure(save_path=save_path, figsize=figsize) as (fig, ax):
         # display the UMAP embedding
+        y_data_encoded_ = []
+        embeddings_ = []
+
         for group_idx in np.unique(groups):
             embedding_masked = embeddings[groups == group_idx]
             y_data_encoded_masked = y_data_encoded[groups == group_idx]
@@ -223,16 +227,22 @@ def show_umap(
                     *embedding_2masked.T,
                     s=50,
                     color=_colors[classes_idx_map[class_idx % len(np.unique(y_data_encoded_masked))]],
-                    alpha=0.7,
+                    alpha=0.6,
                     marker=_markers[group_idx],
                     label=classes[class_idx],
                 )
-        # display classification boundaries
-        y_data_encoded_ = [
-            classes_idx_map[class_idx % len(np.unique(y_data_encoded_masked))]
-            for class_idx in y_data_encoded
-        ]
-        clf = KNeighborsClassifier(n_neighbors=10, n_jobs=-1)
+
+                y_data_encoded_.append(
+                    [classes_idx_map[class_idx % len(np.unique(y_data_encoded_masked))]]
+                    * len(y_data_encoded_masked[y_data_encoded_masked == class_idx])
+                )
+                embeddings_.append(embedding_2masked)
+
+        y_data_encoded_ = np.concatenate(y_data_encoded_)
+        embeddings = np.concatenate(embeddings_)
+
+        # clf = KNeighborsClassifier(n_neighbors=3, n_jobs=-1)
+        clf = SVC()
         clf.fit(embeddings, y_data_encoded_)
         y_pred = clf.predict(embeddings)
         accuracy = accuracy_score(y_data_encoded_, y_pred)
@@ -247,8 +257,8 @@ def show_umap(
             xx,
             yy,
             Z,
-            cmap=ListedColormap([_colors[g] for g in np.unique(y_data_encoded_)]),
-            alpha=0.3,
+            cmap=ListedColormap(_colors),
+            alpha=0.2,
         )
 
         handles, labels = ax.get_legend_handles_labels()
