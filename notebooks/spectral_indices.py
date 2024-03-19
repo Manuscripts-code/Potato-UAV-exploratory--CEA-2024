@@ -18,9 +18,12 @@ replacements = {
 def replace_bands(formula: str) -> str:
     """
     Replace the bands in the formula with the bands that are available in our sensor.
+    Also change it to format suitable for formatting in word document.
     """
     for old_band, new_band in replacements.items():
         formula = formula.replace(old_band, new_band)
+        formula = formula.replace(" ", "")
+        formula = formula.replace("**", "^")
     return formula
 
 
