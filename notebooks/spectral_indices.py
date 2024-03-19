@@ -1,5 +1,7 @@
 import pandas as pd
 
+from configs import configs
+
 """
 This script is used to search for indices that are appropriate for our multispectral sensor.
 """
@@ -16,3 +18,9 @@ if __name__ == "__main__":
             print(f"{name}:    {bands}")
             all_available_names.append(name)
     print(f"all_available_names: {all_available_names}")
+
+    # display table of indices for manuscript
+    df_available = df[df["short_name"].isin(all_available_names)].reset_index(drop=True)
+    df_available[["short_name", "long_name", "formula", "reference"]].to_excel(
+        configs.SAVE_RESULTS_DIR / "spectral_indices_table.xlsx", index=False
+    )
