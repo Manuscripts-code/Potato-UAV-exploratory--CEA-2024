@@ -6,6 +6,24 @@ from configs import configs
 This script is used to search for indices that are appropriate for our multispectral sensor.
 """
 
+replacements = {
+    "RE1": "RE",
+    "RE2": "RE",
+    "RE3": "RE",
+    "N2": "N",
+    "G1": "G",
+}
+
+
+def replace_bands(formula: str) -> str:
+    """
+    Replace the bands in the formula with the bands that are available in our sensor.
+    """
+    for old_band, new_band in replacements.items():
+        formula = formula.replace(old_band, new_band)
+    return formula
+
+
 if __name__ == "__main__":
     # Github: https://github.com/awesome-spectral-indices/awesome-spectral-indices
     # read json from github link
@@ -21,6 +39,7 @@ if __name__ == "__main__":
 
     # display table of indices for manuscript
     df_available = df[df["short_name"].isin(all_available_names)].reset_index(drop=True)
+    df_available["formula"] = df_available["formula"].apply(replace_bands)
     df_available[["short_name", "long_name", "formula", "reference"]].to_excel(
         configs.SAVE_RESULTS_DIR / "spectral_indices_table.xlsx", index=False
     )
