@@ -58,7 +58,7 @@ def save_features_plot(
         if no_colors > 2:
             colors = cmap(np.linspace(0, 1, no_colors))
         else:
-            colors = ["red", "green"]
+            colors = ["darkgoldenrod", "forestgreen"]
 
         x_values = list(range(len(data.columns)))
 
@@ -93,7 +93,7 @@ def save_features_plot(
         # ax.spines["top"].set_linewidth(0)
         ax.set_xticks(x_values)
         ax.set_xticklabels(data.columns, rotation=0)
-        ax.legend(loc="upper left", fontsize=12, framealpha=1)
+        ax.legend(loc="upper left", fontsize=12, framealpha=1, frameon=False)
 
 
 def save_confusion_matrix_display(
