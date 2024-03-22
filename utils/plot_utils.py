@@ -42,53 +42,58 @@ def save_plot_figure(
 
 
 def save_features_plot(
-    features: pd.DataFrame,
-    features_names: list[str],
-    labels: np.ndarray,
-    *,
+    data: pd.DataFrame,
+    y_data_encoded: pd.DataFrame,
+    classes: list[str],
     save_path: str | Path = "features_plot.pdf",
+    colormap: str = "viridis",
     x_label: str = "Spectral bands",
     y_label: str = "",
 ):
-    assert len(features) == len(labels), "Features and labels must have the same length!"
-    """
-    Currently not used, but can be used to plot the features of the data.
-    For this reason plotting from other libraries is used.
-    """
+    with save_plot_figure(save_path) as (fig, ax):
+        cmap = plt.get_cmap(colormap)
+        unique_labels = np.unique(y_data_encoded)
+        no_colors = len(unique_labels)
 
-    mpl.rcParams.update(mpl.rcParamsDefault)
-    fig, ax = plt.subplots(figsize=(8, 7), dpi=300)
-    ax.set_ylabel(y_label, fontsize=24)
-    ax.set_xlabel(x_label, fontsize=24)
-    ax.tick_params(axis="both", which="major", labelsize=22)
-    ax.tick_params(axis="both", which="minor", labelsize=22)
-    # ax.set_ylim([0, 1])
-    ax.spines["bottom"].set_linewidth(2)
-    ax.spines["left"].set_linewidth(2)
-    ax.spines["right"].set_linewidth(0)
-    ax.spines["top"].set_linewidth(0)
+        if no_colors > 2:
+            colors = cmap(np.linspace(0, 1, no_colors))
+        else:
+            colors = ["red", "green"]
 
-    cmap = plt.get_cmap("viridis")
-    unique_labels = np.unique(labels)
-    no_colors = len(unique_labels)
-    colors = cmap(np.linspace(0, 1, no_colors))
-    labels_color_map = {label: idx for idx, label in enumerate(np.unique(labels))}
+        x_values = list(range(len(data.columns)))
 
-    x_values = list(range(len(features_names)))
+        grouped_data = data.groupby(y_data_encoded.to_numpy())
+        mean_values = grouped_data.mean()
+        std_values = grouped_data.std()
 
-    for label, features_row in zip(labels, features.iterrows()):
-        ax.plot(x_values, features_row[1].tolist(), color=colors[labels_color_map[label]], alpha=0.6)
+        for idx in unique_labels:
+            mean = mean_values.loc[idx].tolist()
+            std = std_values.loc[idx].tolist()
+            ax.plot(x_values, mean, color=colors[idx], label=classes[idx], alpha=0.6)
+            ax.fill_between(
+                x_values,
+                [m - s for m, s in zip(mean, std)],
+                [m + s for m, s in zip(mean, std)],
+                color=colors[idx],
+                alpha=0.2,
+            )
 
-    ax.set_xticks(x_values)
-    ax.set_xticklabels(features_names, rotation=0)
+        custom_lines = []
+        for idx in unique_labels:
+            custom_lines.append(Line2D([0], [0], color=colors[idx], lw=2))
 
-    custom_lines = []
-    for idx in range(no_colors):
-        custom_lines.append(Line2D([0], [0], color=colors[idx], lw=2))
-
-    ax.legend(custom_lines, [str(num) for num in unique_labels], fontsize=22)
-    plt.savefig(save_path, format="pdf", bbox_inches="tight")
-    plt.close("all")
+        ax.set_ylabel(y_label, fontsize=14)
+        ax.set_xlabel(x_label, fontsize=14)
+        ax.tick_params(axis="both", which="major", labelsize=12)
+        ax.tick_params(axis="both", which="minor", labelsize=12)
+        # ax.set_ylim([0, 1])
+        # ax.spines["bottom"].set_linewidth(2)
+        # ax.spines["left"].set_linewidth(2)
+        # ax.spines["right"].set_linewidth(0)
+        # ax.spines["top"].set_linewidth(0)
+        ax.set_xticks(x_values)
+        ax.set_xticklabels(data.columns, rotation=0)
+        ax.legend(loc="upper left", fontsize=12, framealpha=1)
 
 
 def save_confusion_matrix_display(
