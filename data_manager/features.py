@@ -152,6 +152,8 @@ class AutoSpectralIndicesPlusGenerated(BaseEstimator, TransformerMixin):
         self.selector_spectral_indices = selector_spectral_indices
         self.selector_generated = selector_generated
 
+        self.columns_to_drop: list[str] = []
+
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}(\n"
@@ -160,20 +162,38 @@ class AutoSpectralIndicesPlusGenerated(BaseEstimator, TransformerMixin):
             f")"
         )
 
+    def _correlation_analysis(self, data: pd.DataFrame):
+        # Remove highly correlated features
+        # Transform data
+        df_generated = self.selector_generated.transform(data)
+        df_spectral_indices = self.selector_spectral_indices.transform(data)
+        df_merged = pd.concat([df_generated, df_spectral_indices], axis=1)
+        # Calculate correlation between features
+        correlation_matrix = df_merged.corr().abs()
+        upper_triangle = correlation_matrix.where(
+            np.triu(np.ones(correlation_matrix.shape), k=1).astype(np.bool_)
+        )
+        # Select columns with correlation greater than 0.99
+        self.columns_to_drop = [
+            column for column in upper_triangle.columns if any(upper_triangle[column] > 0.99)
+        ]
+
     def fit(self, data: pd.DataFrame, target: pd.Series) -> BaseEstimator:
         self.selector_generated.fit(data, target)
         self.selector_spectral_indices.fit(data, target)
+        self._correlation_analysis(data)
         return self
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         df_generated = self.selector_generated.transform(data)
         df_spectral_indices = self.selector_spectral_indices.transform(data)
-        return pd.concat([df_generated, df_spectral_indices], axis=1)
+        df_merged = pd.concat([df_generated, df_spectral_indices], axis=1)
+        df_merged = df_merged.drop(columns=self.columns_to_drop)
+        return df_merged
 
     def fit_transform(self, data: pd.DataFrame, target: pd.Series) -> pd.DataFrame:
-        df_generated = self.selector_generated.fit_transform(data, target)
-        df_spectral_indices = self.selector_spectral_indices.fit_transform(data, target)
-        return pd.concat([df_generated, df_spectral_indices], axis=1)
+        self.fit(data, target)
+        return self.transform(data)
 
 
 class AutoSpectralIndicesPlusGeneratedClassification(AutoSpectralIndicesPlusGenerated):
