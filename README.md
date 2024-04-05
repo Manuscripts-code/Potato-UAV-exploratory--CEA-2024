@@ -121,15 +121,19 @@ The options could be combined as needed. For example, to run the train pipeline 
 python3 main.py --config train --toml-config-file reg/E.toml --results
 ```
 
+### 🌟 Troubleshooting:
 
 
+- **Error** findfont: Generic family 'sans-serif' not found because none of the following families were found: Arial, Liberation Sans, Bitstream Vera Sans, sans-serif
 
-## Bugs:
-(findfont: Generic family 'sans-serif' not found because none of the following families were found: Arial, Liberation Sans, Bitstream Vera Sans, sans-serif)
+This can be resolved by installing the `msttcorefonts` package and clearing the Matplotlib cache. The following should resolve the issue:
 
-$ sudo apt install msttcorefonts -qq
-$ rm ~/.cache/matplotlib -rf
+```bash
+sudo apt install msttcorefonts -qq
+rm -rf ~/.cache/matplotlib
+```
 
-## Issues
 
-This project was initially developed by Janez Lapajne. If you have any questions or encounter any issues, post an issue on Github.
+### 📬 Contact
+
+This project was initially developed by Janez Lapajne. If you have any questions or encounter any other problem, feel free to post an issue on Github.
