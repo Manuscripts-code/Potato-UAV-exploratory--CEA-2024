@@ -62,6 +62,36 @@ zenml up
 
 ### Dataset
 
+Download the data from [Zenodo](add-link) and place to `data` directory.
+The folder structure should look like:
+
+```
+📁 data
+├── 📜.gitkeep
+├── 📁 multispectral_images
+│   ├── 📁 2022_07_20__konv_ecobreed
+│   │   ├── 🖼️ Ecobreed_krompir_konv_20_07_2022_transparent_reflectance_nir_modified.tif
+│   │   ├── 🖼️ Ecobreed_krompir_konv_20_07_2022_transparent_reflectance_red_modified.tif
+|   |   └── 🖼️ ...
+│   ├── 📁 2022_07_20__eko_ecobreed
+│   │   ├── 🖼️ Ecobreed_krompir_eko_20_07_2022_transparent_reflectance_nir_modified.tif
+│   │   ├── 🖼️ Ecobreed_krompir_eko_20_07_2022_transparent_reflectance_red_modified.tif
+|   |   └── 🖼️ ...
+│   └── 📁 ...
+├── 📁 shapefiles
+│   ├── 📄 potato_locations_eko.shp
+│   ├── 📄 potato_locations_konv.shp
+│   ├── 📄 potato_measured_locations_eko.shp
+│   ├── 📄 potato_measured_locations_konv.shp
+│   └── 📄 ...
+└── 📁 measurements
+    ├── 📊 Alternaria_ocenjevanje1_Ecobreed_krompir_2022.xlsx
+    ├── 📊 LICOR_Ecobreed_krompir_2022.xlsx
+    ├── 📊 SPAD_Ecobreed_krompir_2022.xlsx
+    └── 📊 Varieties_grouped_Ecobreed_krompir_2022.xlsx
+```
+
+
 # Run the script
 python3 main.py
 
