@@ -1,10 +1,9 @@
 # Ecobreed-potato
 
-## 🔍 Introduction
+### 🔍 Introduction
 
 place abstract here
 
-## 📚 Getting started
 
 
 ### ⚙️ Environment setup
@@ -28,7 +27,7 @@ pip3 install -r requirements.txt
 echo "PYTHONPATH=$(pwd)" > .env
 ```
 
-4) Initialize zenML tool, by running the following:
+4) Initialize ZenML tool, by running the following:
 
 ```bash
 # Initialize ZenML
@@ -99,10 +98,28 @@ The `data` directory contains three types of data: multispectral images, shapefi
 
 - **measurements**: This directory contains Excel (.xlsx) files with various ground measurements taken from the potato plants. Each file represents a different type of measurement, such as `Alternaria_ocenjevanje1_Ecobreed_krompir_2022.xlsx` for Alternaria scoring, `LICOR_Ecobreed_krompir_2022.xlsx` for LICOR measurements, `SPAD_Ecobreed_krompir_2022.xlsx` for SPAD measurements, and `Varieties_grouped_Ecobreed_krompir_2022.xlsx` for grouped variety data.
 
-# Run the script
-python3 main.py
 
+### 📚 How to use
 
+For optimal control and customization, it is recommended to execute the experiments via the `main.py` python script, which offers several command-line options:
+
+- `--config` or `-c`: This option allows to specify which pipeline to run. The available choices are `train`, `test`, and `all`. If not specified, the script will execute `all` pipelines by default.
+
+  Example usage: `python3 main.py --config train`
+
+- `--toml-config-file` or `-t`: This option allows to specify a TOML configuration file located in the 'configs/specific/**/*.toml' directory. If not specified, the script will use the default TOML configuration file.
+
+  Example usage: `python3 main.py --toml-config-file clf/alternaria_b.toml`
+
+- `--results` or `-r`: This is a flag option. If set, the script will produce results, i.e., calculate metrics and save artifacts.
+
+  Example usage: `python3 main.py --results`
+
+The options could be combined as needed. For example, to run the train pipeline with a specific TOML configuration file and produce results, the following could be used:
+
+```bash
+python3 main.py --config train --toml-config-file reg/E.toml --results
+```
 
 
 
