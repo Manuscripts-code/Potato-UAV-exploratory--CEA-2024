@@ -121,6 +121,11 @@ The options could be combined as needed. For example, to run the train pipeline 
 python3 main.py --config train --toml-config-file reg/E.toml --results
 ```
 
+Alternatively, specific lines could be uncommented in the `run.sh` script and the script then executed to perform batch tasks processing sequentially.
+
+By including the `--results` flag, some results will be automatically generated. For additional results, plots, and classification metrics, utilization of scripts and notebooks found in the `notebooks` directory is required.
+
+
 ### 🌟 Troubleshooting:
 
 
