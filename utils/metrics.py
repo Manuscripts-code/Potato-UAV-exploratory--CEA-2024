@@ -3,6 +3,7 @@ from typing import Literal, NamedTuple
 import numpy as np
 from sklearn.metrics import (
     accuracy_score,
+    balanced_accuracy_score,
     f1_score,
     max_error,
     mean_absolute_error,
@@ -14,7 +15,9 @@ from sklearn.metrics import (
 )
 
 
-def normalized_RMSE(y_true: np.ndarray, y_pred: np.ndarray, normalize_by: str = "range"):
+def normalized_RMSE(
+    y_true: np.ndarray, y_pred: np.ndarray, normalize_by: str = "range"
+):
     rmse = mean_squared_error(y_true, y_pred, squared=False)
     if normalize_by == "range":
         normalizer = np.max(y_true) - np.min(y_true)
@@ -27,6 +30,7 @@ def normalized_RMSE(y_true: np.ndarray, y_pred: np.ndarray, normalize_by: str = 
 
 class ClassificationMetrics(NamedTuple):
     accuracy: float
+    accuracy_balanced: float
     precision: float
     recall: float
     f1: float
@@ -34,6 +38,7 @@ class ClassificationMetrics(NamedTuple):
     def __str__(self) -> str:
         return (
             f"Accuracy: {self.accuracy:.2f}\n"
+            f"Balanced accuracy: {self.accuracy_balanced:.2f}\n"
             f"Precision: {self.precision:.2f}\n"
             f"Recall: {self.recall:.2f}\n"
             f"F1: {self.f1:.2f}\n"
@@ -72,14 +77,17 @@ class RegressionMetrics(NamedTuple):
 def calculate_classification_metrics(
     y_true,
     y_pred,
-    average: Literal["micro", "macro", "samples", "weighted", "binary"] | None = "weighted",
+    average: Literal["micro", "macro", "samples", "weighted", "binary"]
+    | None = "weighted",
 ):
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred, average=average)
     recall = recall_score(y_true, y_pred, average=average)
     f1 = f1_score(y_true, y_pred, average=average)
+    accuracy_balanced = balanced_accuracy_score(y_true, y_pred)
     return ClassificationMetrics(
         accuracy=accuracy,
+        accuracy_balanced=accuracy_balanced,
         precision=precision,
         recall=recall,
         f1=f1,
