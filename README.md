@@ -1,10 +1,15 @@
-# Ecobreed-potato
+# Field-Scale UAV-Based Multispectral Phenomics: Leveraging Machine Learning, Explainable AI, and Hybrid Feature Engineering for Enhancements in potato phenotyping
+
+See related [Publications](https://github.com/janezlapajne/manuscripts)
 
 ### 🔍 Introduction
 
-place abstract here
+Fast and accurate identification of potato plant traits is essential for formulating effective culti-vation strategies. The integration of spectral cameras on Unmanned Aerial Vehicles (UAVs) has demonstrated appealing potential, facilitating non-invasive investigations on a large scale by providing valuable features for construction of machine learning models. Nevertheless, interpreting these features, and those derived from them, remains a challenge, limiting confi-dent utilization in real-world applications. In this study, the interpretability of machine learning models is addressed by employing SHAP (SHapley Additive exPlanations) and UMAP (Uni-form Manifold Approximation and Projection) to better understand the modeling process. The XGBoost model was trained on a multispectral dataset of potato plants and evaluated on vari-ous tasks, i.e. variety classification, physiological measures estimation, and detection of early blight disease. To optimize its performance, nearly 100 vegetation indices and over 500 auto-generated features were utilized for training. The results indicate successful separation of plant varieties with up to 97.10% accuracy, estimation of physiological values with a maxi-mum R2 and rNRMSE of 0.57 and 0.129, respectively, and detection of early blight with an F1 score of 0.826. Furthermore, both UMAP and SHAP proved beneficial for comprehensive analysis. UMAP visual observations closely corresponded to computed metrics, enhancing confidence for variety differentiation. Concurrently, SHAP identified the most informative features – green, red edge, and NIR channels – for most tasks, aligning tightly with existing literature. This study highlights potential improvements in farming efficiency, crop yield, and sustainability, and promotes the development of interpretable machine learning models for remote sensing applications.
 
-
+**Authors:** Janez Lapajne*, Andrej Vončina, Ana Vojnović, Daša Donša, Peter Dolničar and Uroš Žibrat \
+**Keywords:** Multispectral imaging; potato research; machine learning; interpretability techniques. \
+**Published In:** [CEA]() \
+**Publication Date:** Dec, 2024
 
 ### ⚙️ Environment setup
 
@@ -141,4 +146,4 @@ rm -rf ~/.cache/matplotlib
 
 ### 📬 Contact
 
-This project was initially developed by Janez Lapajne. If you have any questions or encounter any other problem, feel free to post an issue on Github.
+This project was initially developed by [Janez Lapajne](https://github.com/janezlapajne). If you have any questions or encounter any other problem, feel free to post an issue on Github.
