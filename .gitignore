@@ -4,6 +4,7 @@ __pycache__/
 # editors
 .vscode
 .ipynb_checkpoints
+.history
 
 # env
 .env

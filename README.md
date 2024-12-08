@@ -1,4 +1,4 @@
-# Field-Scale UAV-Based Multispectral Phenomics: Leveraging Machine Learning, Explainable AI, and Hybrid Feature Engineering for Enhancements in potato phenotyping
+## Field-Scale UAV-Based Multispectral Phenomics: Leveraging Machine Learning, Explainable AI, and Hybrid Feature Engineering for Enhancements in potato phenotyping
 
 See related [Publications](https://github.com/janezlapajne/manuscripts)
 
@@ -8,8 +8,27 @@ Fast and accurate identification of potato plant traits is essential for formula
 
 **Authors:** Janez Lapajne*, Andrej Vončina, Ana Vojnović, Daša Donša, Peter Dolničar and Uroš Žibrat \
 **Keywords:** Multispectral imaging; potato research; machine learning; interpretability techniques. \
-**Published In:** [CEA]() \
+**Published In:** [CEA](https://www.sciencedirect.com/science/article/pii/S0168169924011372) \
 **Publication Date:** Dec, 2024
+
+<br>
+
+![field](./docs/field.png)
+*Figure 1: Potato field with GCPs, blocks and microplots labeled.*
+
+<br>
+<br>
+
+![pipeline](./docs/pipeline.png)
+*Figure 2:  Processing pipeline. Red rectangles signify the five stages, delineating steps based on their functionality. Yellow bubbles, sequentially numbered, represent individual steps. Brief input and output descriptions accompany each stage on the right. Blue, curved feedback arrows indicate optional backtracking through saved logs and artifacts.*
+
+<br>
+<br>
+
+![results](./docs/results.png)
+*Figure 3: Detection of early blight: a) Mean reflectance of either infestation condition; b) SHAP bar plot. Classification of varieties: c) Mean reflectance per variety; d) SHAP bar plot, where each bar’s color corresponds to the contribution of the respective variety. In both cases, the reflectance’s mean value and standard deviation are represented with solid line and ribbon, respectively. Larger values in SHAP bar plots indicate features that contribute more information. Different features are colorcoded for easy identification: non-modified reflectance values (black), automatically generated features (green), and calculated spectral indices (red).*
+
+<br>
 
 ### ⚙️ Environment setup
 
@@ -23,11 +42,13 @@ source .venv/bin/activate
 ```
 
 2) Install packages into virtual environment:
+
 ```bash
 pip3 install -r requirements.txt
 ```
 
 3) Go to root of the repository and run the following to create .env file:
+
 ```bash
 echo "PYTHONPATH=$(pwd)" > .env
 ```
@@ -56,6 +77,7 @@ zenml stack register ecobreed -a default\
 ```
 
 5) (Required only after system restart) Run to re-initialize:
+
 ```bash
 # Disconnect first if you closed PC
 zenml disconnect
@@ -66,7 +88,7 @@ zenml up
 
 ### 📅 Dataset
 
-Download data from [Zenodo](add-link) and decompress (unzip) to `data` directory.
+Download data from [Zenodo](https://zenodo.org/records/10934163) and decompress (unzip) to `data` directory.
 After successful extraction, the directory structure should resemble the following:
 
 ```
@@ -103,7 +125,6 @@ The `data` directory contains three types of data: multispectral images, shapefi
 
 - **measurements**: This directory contains Excel (.xlsx) files with various ground measurements taken from the potato plants. Each file represents a different type of measurement, such as `Alternaria_ocenjevanje1_Ecobreed_krompir_2022.xlsx` for Alternaria scoring, `LICOR_Ecobreed_krompir_2022.xlsx` for LICOR measurements, `SPAD_Ecobreed_krompir_2022.xlsx` for SPAD measurements, and `Varieties_grouped_Ecobreed_krompir_2022.xlsx` for grouped variety data.
 
-
 ### 📚 How to use
 
 For optimal control and customization, it is recommended to execute the experiments via the `main.py` python script, which offers several command-line options:
@@ -130,9 +151,7 @@ Alternatively, specific lines could be uncommented in the `run.sh` script and th
 
 By including the `--results` flag, some results will be automatically generated. For additional results, plots, and classification metrics, utilization of scripts and notebooks found in the `notebooks` directory is required.
 
-
-### 🌟 Troubleshooting:
-
+### 🌟 Troubleshooting
 
 - **Error** findfont: Generic family 'sans-serif' not found because none of the following families were found: Arial, Liberation Sans, Bitstream Vera Sans, sans-serif
 
@@ -142,7 +161,6 @@ This can be resolved by installing the `msttcorefonts` package and clearing the 
 sudo apt install msttcorefonts -qq
 rm -rf ~/.cache/matplotlib
 ```
-
 
 ### 📬 Contact
 
